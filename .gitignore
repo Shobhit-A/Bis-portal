@@ -1,0 +1,23 @@
+node_modules/
+dist/
+build/
+
+# Environment files with real secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# User-uploaded documents
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/

@@ -1,0 +1,131 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/AuthContext';
+import api from '../lib/axios';
+import toast from 'react-hot-toast';
+import { RefreshCw } from 'lucide-react';
+
+export default function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ username: '', password: '' });
+  const [captcha, setCaptcha] = useState(null);
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const loadCaptcha = useCallback(() => {
+    setCaptchaAnswer('');
+    api.get('/auth/captcha').then(res => setCaptcha(res.data)).catch(() => setCaptcha(null));
+  }, []);
+
+  useEffect(() => { loadCaptcha(); }, [loadCaptcha]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const user = await login(form.username.trim(), form.password, captcha?.token, captchaAnswer);
+      toast.success(`Welcome back, ${user.username}`);
+      navigate(user.role === 'ADMIN' ? '/admin' : '/portal');
+    } catch (err) {
+      setError(err.response?.data?.error || err.response?.data?.errors?.[0]?.msg || 'Login failed. Please try again.');
+      loadCaptcha();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-surface flex flex-col">
+      {/* Header */}
+      <div className="bg-primary px-6 py-4 flex items-center gap-3">
+        <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+          <span className="text-white font-bold text-sm">AV</span>
+        </div>
+        <span className="text-white font-semibold text-sm tracking-wide">ABSOLUTE VERITAS</span>
+      </div>
+
+      {/* Main */}
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-sm">
+          <div className="card p-8">
+            <div className="mb-6">
+              <h1 className="text-xl font-semibold text-gray-900">Sign in to your account</h1>
+              <p className="text-sm text-gray-500 mt-1">BIS Certification Client Portal</p>
+            </div>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">{error}</div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="label">Username <span className="required">*</span></label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Enter your username"
+                  value={form.username}
+                  onChange={e => setForm(p => ({ ...p, username: e.target.value }))}
+                  autoComplete="username"
+                  autoFocus
+                  required
+                />
+              </div>
+              <div>
+                <label className="label">Password <span className="required">*</span></label>
+                <input
+                  type="password"
+                  className="input"
+                  placeholder="Enter your password"
+                  value={form.password}
+                  onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                  autoComplete="current-password"
+                  required
+                />
+              </div>
+              <div>
+                <label className="label">Security Check <span className="required">*</span></label>
+                <div className="flex gap-2 items-stretch">
+                  <div className="input flex-1 bg-gray-50 font-mono text-center select-none">
+                    {captcha ? `${captcha.question} = ?` : '...'}
+                  </div>
+                  <button type="button" onClick={loadCaptcha} title="Get a new question"
+                    className="px-3 border border-border rounded text-gray-400 hover:text-primary hover:border-primary transition-colors">
+                    <RefreshCw size={15} />
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="input mt-2"
+                  placeholder="Enter the answer"
+                  value={captchaAnswer}
+                  onChange={e => setCaptchaAnswer(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
+                {loading ? 'Signing in...' : 'Sign In'}
+              </button>
+            </form>
+          </div>
+
+          <p className="text-center text-xs text-gray-400 mt-6">
+            Having trouble? Contact{' '}
+            <a href="mailto:cs@absoluteveritas.com" className="text-primary hover:underline">
+              cs@absoluteveritas.com
+            </a>
+          </p>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="py-4 text-center text-xs text-gray-400 border-t border-border">
+        © {new Date().getFullYear()} Absolute Veritas · BIS Certification Consultancy · New Delhi, India
+      </div>
+    </div>
+  );
+}

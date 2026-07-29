@@ -1,0 +1,30 @@
+{
+  "name": "bis-portal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.5.4",
+    "nodemon": "^3.1.14",
+    "postcss": "^8.5.24",
+    "tailwindcss": "^4.3.3"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.5.7",
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@radix-ui/react-select": "^2.3.7",
+    "axios": "^1.18.1",
+    "lucide-react": "^1.27.0",
+    "react-dropzone": "^19.1.1",
+    "react-hook-form": "^7.83.0",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.18.1",
+    "zod": "^4.4.3"
+  }
+}
