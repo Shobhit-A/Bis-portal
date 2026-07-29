@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import api from '../lib/axios';
 import toast from 'react-hot-toast';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const loadCaptcha = useCallback(() => {
     setCaptchaAnswer('');
@@ -76,15 +77,22 @@ export default function LoginPage() {
               </div>
               <div>
                 <label className="label">Password <span className="required">*</span></label>
-                <input
-                  type="password"
-                  className="input"
-                  placeholder="Enter your password"
-                  value={form.password}
-                  onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                  autoComplete="current-password"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="input pr-10"
+                    placeholder="Enter your password"
+                    value={form.password}
+                    onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button type="button" onClick={() => setShowPassword(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="label">Security Check <span className="required">*</span></label>

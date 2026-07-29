@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Download, FileText, Unlock, File } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Unlock, File, Loader2 } from 'lucide-react';
 
 const SECTIONS = [
   { key: 'registration', label: 'Registration Form' },
@@ -22,6 +22,9 @@ export default function SubmissionView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('registration');
+  const [downloadingExcel, setDownloadingExcel] = useState(false);
+  const [downloadingDocs, setDownloadingDocs] = useState(false);
+  const [downloadingDocId, setDownloadingDocId] = useState(null);
 
   const loadSubmission = () => {
     setLoading(true);
@@ -39,28 +42,38 @@ export default function SubmissionView() {
   useEffect(() => { loadSubmission(); }, [id]);
 
   const handleDownloadExcel = async () => {
-    const res = await api.get(`/admin/submissions/${id}/excel`, { responseType: 'blob' });
-    const url = URL.createObjectURL(res.data);
-    const a = document.createElement('a'); a.href = url;
-    a.download = `${submission.user.username}_BIS_Form.xlsx`; a.click();
-    URL.revokeObjectURL(url);
+    setDownloadingExcel(true);
+    try {
+      const res = await api.get(`/admin/submissions/${id}/excel`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a'); a.href = url;
+      a.download = `${submission.user.username}_BIS_Form.xlsx`; a.click();
+      URL.revokeObjectURL(url);
+    } catch { toast.error('Failed to download Excel'); }
+    finally { setDownloadingExcel(false); }
   };
 
   const handleDownloadDocs = async () => {
-    const res = await api.get(`/admin/submissions/${id}/docs`, { responseType: 'blob' });
-    const url = URL.createObjectURL(res.data);
-    const a = document.createElement('a'); a.href = url;
-    a.download = `${submission.user.username}_documents.zip`; a.click();
-    URL.revokeObjectURL(url);
+    setDownloadingDocs(true);
+    try {
+      const res = await api.get(`/admin/submissions/${id}/docs`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a'); a.href = url;
+      a.download = `${submission.user.username}_documents.zip`; a.click();
+      URL.revokeObjectURL(url);
+    } catch { toast.error('Failed to download documents'); }
+    finally { setDownloadingDocs(false); }
   };
 
   const handleDownloadDoc = async (doc) => {
+    setDownloadingDocId(doc.id);
     try {
       const res = await api.get(`/admin/submissions/${id}/documents/${doc.id}`, { responseType: 'blob' });
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a'); a.href = url; a.download = doc.fileName; a.click();
       URL.revokeObjectURL(url);
     } catch { toast.error('Failed to download document'); }
+    finally { setDownloadingDocId(null); }
   };
 
   const handleUnlock = async () => {
@@ -104,11 +117,13 @@ export default function SubmissionView() {
               <Unlock size={13} /> Unlock
             </button>
           )}
-          <button onClick={handleDownloadExcel} className="text-white/70 hover:text-white text-xs flex items-center gap-1.5 px-3 py-1.5 rounded border border-white/30 hover:border-white/60">
-            <FileText size={13} /> Excel
+          <button onClick={handleDownloadExcel} disabled={downloadingExcel}
+            className="text-white/70 hover:text-white text-xs flex items-center gap-1.5 px-3 py-1.5 rounded border border-white/30 hover:border-white/60 disabled:opacity-60">
+            {downloadingExcel ? <Loader2 size={13} className="animate-spin" /> : <FileText size={13} />} Excel
           </button>
-          <button onClick={handleDownloadDocs} className="text-white/70 hover:text-white text-xs flex items-center gap-1.5 px-3 py-1.5 rounded border border-white/30 hover:border-white/60">
-            <Download size={13} /> Docs ZIP
+          <button onClick={handleDownloadDocs} disabled={downloadingDocs}
+            className="text-white/70 hover:text-white text-xs flex items-center gap-1.5 px-3 py-1.5 rounded border border-white/30 hover:border-white/60 disabled:opacity-60">
+            {downloadingDocs ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />} Docs ZIP
           </button>
         </div>
       </nav>
@@ -152,14 +167,17 @@ export default function SubmissionView() {
                     <div className="space-y-2">
                       {activeDocs.map(doc => (
                         <button key={doc.id} onClick={() => handleDownloadDoc(doc)}
-                          className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-blue-50 rounded border border-gray-100 hover:border-primary/30 text-left transition-colors">
+                          disabled={downloadingDocId === doc.id}
+                          className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-blue-50 rounded border border-gray-100 hover:border-primary/30 text-left transition-colors disabled:opacity-60">
                           <File size={15} className="text-primary shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="text-xs font-medium text-gray-700">{doc.fieldLabel}</div>
                             <div className="text-xs text-gray-500 truncate">{doc.fileName}</div>
                           </div>
                           <div className="text-xs text-gray-400">{new Date(doc.uploadedAt).toLocaleDateString('en-IN')}</div>
-                          <Download size={14} className="text-gray-400 shrink-0" />
+                          {downloadingDocId === doc.id
+                            ? <Loader2 size={14} className="text-gray-400 shrink-0 animate-spin" />
+                            : <Download size={14} className="text-gray-400 shrink-0" />}
                         </button>
                       ))}
                     </div>

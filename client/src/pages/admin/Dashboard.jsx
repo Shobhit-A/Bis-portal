@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X } from 'lucide-react';
+import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2 } from 'lucide-react';
 
 function StatusBadge({ status }) {
   if (status === 'SUBMITTED') return <span className="badge-submitted">Submitted</span>;
@@ -128,6 +128,7 @@ export default function AdminDashboard() {
   const [showCreate, setShowCreate] = useState(false);
   const [resetUser, setResetUser] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [downloadingDocsId, setDownloadingDocsId] = useState(null);
 
   useEffect(() => {
     api.get('/admin/users')
@@ -157,12 +158,14 @@ export default function AdminDashboard() {
   };
 
   const handleDownloadDocs = async (submissionId, username) => {
+    setDownloadingDocsId(submissionId);
     try {
       const res = await api.get(`/admin/submissions/${submissionId}/docs`, { responseType: 'blob' });
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a'); a.href = url; a.download = `${username}_documents.zip`; a.click();
       URL.revokeObjectURL(url);
     } catch { toast.error('Download failed'); }
+    finally { setDownloadingDocsId(null); }
   };
 
   const stats = {
@@ -253,12 +256,17 @@ export default function AdminDashboard() {
                           </button>
                           <button onClick={() => handleDownloadExcel(u.submission.id, u.username)}
                             disabled={downloadingId === u.submission.id}
-                            className="p-1.5 text-gray-400 hover:text-green-600 rounded hover:bg-green-50" title="Download Excel">
-                            <FileText size={15} />
+                            className="p-1.5 text-gray-400 hover:text-green-600 rounded hover:bg-green-50 disabled:opacity-60" title="Download Excel">
+                            {downloadingId === u.submission.id
+                              ? <Loader2 size={15} className="animate-spin" />
+                              : <FileText size={15} />}
                           </button>
                           <button onClick={() => handleDownloadDocs(u.submission.id, u.username)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50" title="Download Documents ZIP">
-                            <Download size={15} />
+                            disabled={downloadingDocsId === u.submission.id}
+                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50 disabled:opacity-60" title="Download Documents ZIP">
+                            {downloadingDocsId === u.submission.id
+                              ? <Loader2 size={15} className="animate-spin" />
+                              : <Download size={15} />}
                           </button>
                         </>
                       )}
