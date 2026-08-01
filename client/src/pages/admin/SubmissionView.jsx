@@ -157,7 +157,7 @@ export default function SubmissionView() {
                   {Object.entries(activeData).map(([key, value]) => (
                     <div key={key} className="grid grid-cols-2 gap-4 py-2 border-b border-gray-100 last:border-0">
                       <div className="text-sm font-medium text-gray-600">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
-                      <div className="text-sm text-gray-900">{Array.isArray(value) ? value.join(', ') : String(value || '—')}</div>
+                      <div className="text-sm text-gray-900">{Array.isArray(value) ? value.map(v => typeof v === 'object' ? JSON.stringify(v) : v).join(', ') : String(value || '—')}</div>
                     </div>
                   ))}
                 </div>
