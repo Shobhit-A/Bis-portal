@@ -154,12 +154,40 @@ export default function SubmissionView() {
             ) : (
               <>
                 <div className="space-y-2">
-                  {Object.entries(activeData).map(([key, value]) => (
-                    <div key={key} className="grid grid-cols-2 gap-4 py-2 border-b border-gray-100 last:border-0">
-                      <div className="text-sm font-medium text-gray-600">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
-                      <div className="text-sm text-gray-900">{Array.isArray(value) ? value.map(v => typeof v === 'object' ? JSON.stringify(v) : v).join(', ') : String(value || '—')}</div>
-                    </div>
-                  ))}
+                  {Object.entries(activeData).map(([key, value]) => {
+                    const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    const isObjectArray = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object' && value[0] !== null;
+                    if (isObjectArray) {
+                      const cols = Object.keys(value[0]);
+                      return (
+                        <div key={key} className="py-2 border-b border-gray-100 last:border-0">
+                          <div className="text-sm font-medium text-gray-600 mb-2">{label}</div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs border border-gray-200 rounded">
+                              <thead>
+                                <tr className="bg-gray-50">
+                                  {cols.map(c => <th key={c} className="text-left px-2 py-1.5 font-medium text-gray-500 border-b border-gray-200 whitespace-nowrap">{c.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>)}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {value.map((row, i) => (
+                                  <tr key={i} className={i % 2 ? 'bg-gray-50/50' : ''}>
+                                    {cols.map(c => <td key={c} className="px-2 py-1.5 border-b border-gray-100 text-gray-900">{String(row[c] ?? '') || '—'}</td>)}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div key={key} className="grid grid-cols-2 gap-4 py-2 border-b border-gray-100 last:border-0">
+                        <div className="text-sm font-medium text-gray-600">{label}</div>
+                        <div className="text-sm text-gray-900">{Array.isArray(value) ? value.join(', ') : String(value || '—')}</div>
+                      </div>
+                    );
+                  })}
                 </div>
                 {activeDocs.length > 0 && (
                   <div className="mt-6">
