@@ -20,7 +20,7 @@ router.get('/users', async (req, res) => {
       where: { role: 'CLIENT' },
       select: {
         id: true, username: true, createdAt: true,
-        submission: { select: { id: true, status: true, updatedAt: true } }
+        submissions: { select: { id: true, label: true, status: true, updatedAt: true }, orderBy: { updatedAt: 'desc' } }
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -46,8 +46,6 @@ router.post('/users', [
       data: { username, passwordHash, role: 'CLIENT' },
       select: { id: true, username: true, role: true, createdAt: true }
     });
-    // Auto-create empty submission
-    await prisma.submission.create({ data: { userId: user.id, formData: {} } });
     res.status(201).json(user);
   } catch (err) {
     console.error(err);
