@@ -1,8 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, createContext, useContext } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, X, File, CheckCircle } from 'lucide-react';
 import api from '../lib/axios';
 import toast from 'react-hot-toast';
+
+// Provided by PortalLayout, consumed here so none of the 9 tab components
+// need to thread submissionId through as a prop.
+export const SubmissionIdContext = createContext(null);
 
 export function Field({ label, required, error, children, hint }) {
   return (
@@ -31,6 +35,7 @@ export function Select({ value, onChange, options, placeholder = 'Select...', cl
 }
 
 export function FileUpload({ fieldKey, fieldLabel, existingDoc, onUploaded, onRemoved }) {
+  const submissionId = useContext(SubmissionIdContext);
   const [uploading, setUploading] = useState(false);
   const [doc, setDoc] = useState(existingDoc || null);
 
@@ -43,7 +48,7 @@ export function FileUpload({ fieldKey, fieldLabel, existingDoc, onUploaded, onRe
     formData.append('fieldKey', fieldKey);
     formData.append('fieldLabel', fieldLabel);
     try {
-      const res = await api.post('/submission/documents', formData, {
+      const res = await api.post(`/submissions/${submissionId}/documents`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setDoc(res.data);
@@ -54,12 +59,12 @@ export function FileUpload({ fieldKey, fieldLabel, existingDoc, onUploaded, onRe
     } finally {
       setUploading(false);
     }
-  }, [fieldKey, fieldLabel]);
+  }, [fieldKey, fieldLabel, submissionId]);
 
   const handleRemove = async () => {
     if (!doc) return;
     try {
-      await api.delete(`/submission/documents/${doc.id}`);
+      await api.delete(`/submissions/${submissionId}/documents/${doc.id}`);
       setDoc(null);
       onRemoved?.(doc.id);
       toast.success('Document removed');
