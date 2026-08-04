@@ -168,12 +168,21 @@ export default function AdminDashboard() {
     finally { setDownloadingDocsId(null); }
   };
 
+  const allSubmissions = users.flatMap(u => u.submissions || []);
   const stats = {
     total: users.length,
-    submitted: users.filter(u => u.submission?.status === 'SUBMITTED').length,
-    inProgress: users.filter(u => u.submission?.status === 'IN_PROGRESS').length,
-    notStarted: users.filter(u => !u.submission || u.submission?.status === 'NOT_STARTED').length,
+    submitted: allSubmissions.filter(s => s.status === 'SUBMITTED').length,
+    inProgress: allSubmissions.filter(s => s.status === 'IN_PROGRESS').length,
+    notStarted: allSubmissions.filter(s => s.status === 'NOT_STARTED').length,
   };
+
+  // One row per form; clients with zero forms still get one row so their
+  // account remains visible/manageable (reset password, delete).
+  const rows = users.flatMap(u =>
+    u.submissions && u.submissions.length > 0
+      ? u.submissions.map(s => ({ ...s, userId: u.id, username: u.username, accountCreatedAt: u.createdAt }))
+      : [{ id: null, label: null, status: null, updatedAt: null, userId: u.id, username: u.username, accountCreatedAt: u.createdAt }]
+  );
 
   return (
     <div className="min-h-screen bg-surface">
@@ -236,45 +245,48 @@ export default function AdminDashboard() {
                 <tr><td colSpan={5} className="text-center py-12 text-gray-400 text-sm">Loading...</td></tr>
               ) : users.length === 0 ? (
                 <tr><td colSpan={5} className="text-center py-12 text-gray-400 text-sm">No client accounts yet. Create one to get started.</td></tr>
-              ) : users.map((u, i) => (
-                <tr key={u.id} className={`border-b border-border last:border-0 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                  <td className="px-4 py-3 font-medium text-gray-900">{u.username}</td>
-                  <td className="px-4 py-3"><StatusBadge status={u.submission?.status} /></td>
+              ) : rows.map((row, i) => (
+                <tr key={row.id || `${row.userId}-empty`} className={`border-b border-border last:border-0 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                  <td className="px-4 py-3 font-medium text-gray-900">
+                    {row.username}
+                    {row.label && <span className="text-gray-400 font-normal"> — {row.label}</span>}
+                  </td>
+                  <td className="px-4 py-3"><StatusBadge status={row.status} /></td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
-                    {u.submission?.updatedAt ? new Date(u.submission.updatedAt).toLocaleDateString('en-IN') : '—'}
+                    {row.updatedAt ? new Date(row.updatedAt).toLocaleDateString('en-IN') : '—'}
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
-                    {new Date(u.createdAt).toLocaleDateString('en-IN')}
+                    {new Date(row.accountCreatedAt).toLocaleDateString('en-IN')}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      {u.submission && (
+                      {row.id && (
                         <>
-                          <button onClick={() => navigate(`/admin/submissions/${u.submission.id}`)}
+                          <button onClick={() => navigate(`/admin/submissions/${row.id}`)}
                             className="p-1.5 text-gray-400 hover:text-primary rounded hover:bg-blue-50" title="View form">
                             <Eye size={15} />
                           </button>
-                          <button onClick={() => handleDownloadExcel(u.submission.id, u.username)}
-                            disabled={downloadingId === u.submission.id}
+                          <button onClick={() => handleDownloadExcel(row.id, `${row.username}_${row.label}`)}
+                            disabled={downloadingId === row.id}
                             className="p-1.5 text-gray-400 hover:text-green-600 rounded hover:bg-green-50 disabled:opacity-60" title="Download Excel">
-                            {downloadingId === u.submission.id
+                            {downloadingId === row.id
                               ? <Loader2 size={15} className="animate-spin" />
                               : <FileText size={15} />}
                           </button>
-                          <button onClick={() => handleDownloadDocs(u.submission.id, u.username)}
-                            disabled={downloadingDocsId === u.submission.id}
+                          <button onClick={() => handleDownloadDocs(row.id, `${row.username}_${row.label}`)}
+                            disabled={downloadingDocsId === row.id}
                             className="p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50 disabled:opacity-60" title="Download Documents ZIP">
-                            {downloadingDocsId === u.submission.id
+                            {downloadingDocsId === row.id
                               ? <Loader2 size={15} className="animate-spin" />
                               : <Download size={15} />}
                           </button>
                         </>
                       )}
-                      <button onClick={() => setResetUser(u)}
+                      <button onClick={() => setResetUser({ id: row.userId, username: row.username })}
                         className="p-1.5 text-gray-400 hover:text-yellow-600 rounded hover:bg-yellow-50" title="Reset password">
                         <Key size={15} />
                       </button>
-                      <button onClick={() => handleDelete(u.id, u.username)}
+                      <button onClick={() => handleDelete(row.userId, row.username)}
                         className="p-1.5 text-gray-400 hover:text-red-600 rounded hover:bg-red-50" title="Delete account">
                         <Trash2 size={15} />
                       </button>
@@ -287,7 +299,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {showCreate && <CreateUserModal onClose={() => setShowCreate(false)} onCreated={u => setUsers(prev => [{ ...u, submission: null }, ...prev])} />}
+      {showCreate && <CreateUserModal onClose={() => setShowCreate(false)} onCreated={u => setUsers(prev => [{ ...u, submissions: [] }, ...prev])} />}
       {resetUser && <ResetPasswordModal user={resetUser} onClose={() => setResetUser(null)} />}
     </div>
   );
