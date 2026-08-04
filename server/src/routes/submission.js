@@ -1,28 +1,15 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const { PrismaClient } = require('@prisma/client');
 const { sendAdminAlert } = require('../services/emailService');
+const { uploadObject, deleteObject } = require('../services/storage');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Multer config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../../uploads', req.user.id);
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${unique}-${file.originalname.replace(/\s+/g, '_')}`);
-  }
-});
-
+// Multer config — buffer in memory, then streamed to R2 (no local disk involved)
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: (parseInt(process.env.MAX_FILE_SIZE_MB) || 5) * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
@@ -106,26 +93,27 @@ router.post('/documents', upload.single('file'), async (req, res) => {
       submission = await prisma.submission.create({ data: { userId: req.user.id, formData: {} } });
     }
     if (submission.status === 'SUBMITTED') {
-      fs.unlinkSync(req.file.path);
       return res.status(403).json({ error: 'Form already submitted. Contact admin to unlock.' });
     }
 
     // Remove old doc for same fieldKey if exists
     const existing = await prisma.document.findFirst({ where: { submissionId: submission.id, fieldKey } });
     if (existing) {
-      const oldPath = path.join(__dirname, '../../uploads', existing.filePath);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      await deleteObject(existing.filePath);
       await prisma.document.delete({ where: { id: existing.id } });
     }
 
-    const relPath = path.join(req.user.id, req.file.filename);
+    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const objectKey = `${req.user.id}/${unique}-${req.file.originalname.replace(/\s+/g, '_')}`;
+    await uploadObject(objectKey, req.file.buffer, req.file.mimetype);
+
     const doc = await prisma.document.create({
       data: {
         submissionId: submission.id,
         fieldKey,
         fieldLabel: fieldLabel || fieldKey,
         fileName: req.file.originalname,
-        filePath: relPath,
+        filePath: objectKey,
         mimeType: req.file.mimetype,
         fileSize: req.file.size
       }
@@ -142,8 +130,7 @@ router.delete('/documents/:id', async (req, res) => {
   try {
     const doc = await prisma.document.findUnique({ where: { id: req.params.id }, include: { submission: true } });
     if (!doc || doc.submission.userId !== req.user.id) return res.status(404).json({ error: 'Not found' });
-    const filePath = path.join(__dirname, '../../uploads', doc.filePath);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    await deleteObject(doc.filePath);
     await prisma.document.delete({ where: { id: req.params.id } });
     res.json({ message: 'Document deleted' });
   } catch (err) {

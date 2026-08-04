@@ -1,12 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const archiver = require('archiver');
-const path = require('path');
-const fs = require('fs');
 const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 const { adminMiddleware } = require('../middleware/authMiddleware');
 const { generateExcel } = require('../services/excelExport');
+const { getObjectStream } = require('../services/storage');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -119,12 +118,13 @@ router.get('/submissions/:id/documents/:docId', async (req, res) => {
   try {
     const doc = await prisma.document.findUnique({ where: { id: req.params.docId } });
     if (!doc || doc.submissionId !== req.params.id) return res.status(404).json({ error: 'Document not found' });
-    const filePath = path.join(__dirname, '../../uploads', doc.filePath);
-    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File missing on server' });
-    res.download(filePath, doc.fileName);
+    const stream = await getObjectStream(doc.filePath);
+    res.setHeader('Content-Type', doc.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${doc.fileName}"`);
+    stream.pipe(res);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Download failed' });
+    res.status(404).json({ error: 'File missing on storage' });
   }
 });
 
@@ -159,10 +159,14 @@ router.get('/submissions/:id/docs', async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${submission.user.username}_documents.zip"`);
     const archive = archiver('zip', { zlib: { level: 9 } });
     archive.pipe(res);
-    submission.documents.forEach(doc => {
-      const filePath = path.join(__dirname, '../../uploads', doc.filePath);
-      if (fs.existsSync(filePath)) archive.file(filePath, { name: `${doc.fieldLabel}/${doc.fileName}` });
-    });
+    for (const doc of submission.documents) {
+      try {
+        const stream = await getObjectStream(doc.filePath);
+        archive.append(stream, { name: `${doc.fieldLabel}/${doc.fileName}` });
+      } catch (err) {
+        console.error(`Skipping missing document ${doc.filePath}:`, err.message);
+      }
+    }
     await archive.finalize();
   } catch (err) {
     console.error(err);

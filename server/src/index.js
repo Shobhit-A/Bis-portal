@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth');
@@ -19,8 +18,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
 
-// Static uploads (protected via route, not direct access)
-app.use('/uploads', authMiddleware, express.static(path.join(__dirname, '../uploads')));
+// Documents are stored in Cloudflare R2, served via authenticated API routes
+// (see routes/admin.js and routes/submission.js) — no local static mount needed.
 
 // Routes
 app.use('/api/auth', authRoutes);
