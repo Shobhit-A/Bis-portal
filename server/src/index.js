@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
-const submissionRoutes = require('./routes/submission');
+const submissionsRoutes = require('./routes/submissions');
 const { authMiddleware } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -19,12 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
 
 // Documents are stored in Cloudflare R2, served via authenticated API routes
-// (see routes/admin.js and routes/submission.js) — no local static mount needed.
+// (see routes/admin.js and routes/submissions.js) — no local static mount needed.
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', authMiddleware, adminRoutes);
-app.use('/api/submission', authMiddleware, submissionRoutes);
+app.use('/api/submissions', authMiddleware, submissionsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
