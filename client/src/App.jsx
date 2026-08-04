@@ -6,6 +6,7 @@ import LoginPage from './pages/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import SubmissionView from './pages/admin/SubmissionView';
 import PortalLayout from './pages/portal/PortalLayout';
+import MyForms from './pages/portal/MyForms';
 
 function ProtectedRoute({ children, role }) {
   const { user, loading } = useAuth();
@@ -23,7 +24,8 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/portal'} /> : <LoginPage />} />
       <Route path="/admin" element={<ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/submissions/:id" element={<ProtectedRoute role="ADMIN"><SubmissionView /></ProtectedRoute>} />
-      <Route path="/portal/*" element={<ProtectedRoute role="CLIENT"><PortalLayout /></ProtectedRoute>} />
+      <Route path="/portal" element={<ProtectedRoute role="CLIENT"><MyForms /></ProtectedRoute>} />
+      <Route path="/portal/:submissionId/*" element={<ProtectedRoute role="CLIENT"><PortalLayout /></ProtectedRoute>} />
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
