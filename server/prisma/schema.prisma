@@ -9,14 +9,14 @@ datasource db {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  username     String      @unique
-  email        String?     @unique
+  id           String       @id @default(cuid())
+  username     String       @unique
+  email        String?      @unique
   passwordHash String
-  role         Role        @default(CLIENT)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  submission   Submission?
+  role         Role         @default(CLIENT)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  submissions  Submission[]
 }
 
 enum Role {
@@ -26,7 +26,8 @@ enum Role {
 
 model Submission {
   id        String     @id @default(cuid())
-  userId    String     @unique
+  userId    String
+  label     String     @default("Form 1")
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   status    Status     @default(NOT_STARTED)
   formData  Json       @default("{}")
