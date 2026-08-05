@@ -10,6 +10,12 @@ const { authMiddleware } = require('./middleware/authMiddleware');
 
 const app = express();
 
+// Render (and most PaaS hosts) sit behind a reverse proxy — without this,
+// req.protocol always reads 'http' (breaks the email approve-link URL) and
+// express-rate-limit sees the proxy's IP for every visitor instead of the
+// real client IP (breaks per-visitor rate limiting).
+app.set('trust proxy', 1);
+
 // Rate limiting
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 

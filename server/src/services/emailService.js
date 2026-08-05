@@ -38,7 +38,7 @@ async function sendAdminAlert({ clientUsername, companyName, submittedAt }) {
   }
 }
 
-async function sendRegistrationAlert({ username, email }) {
+async function sendRegistrationAlert({ username, email, approveUrl }) {
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
   sendSmtpEmail.sender = FROM;
   sendSmtpEmail.to = [{ email: process.env.ADMIN_EMAIL }];
@@ -55,8 +55,9 @@ async function sendRegistrationAlert({ username, email }) {
           <tr><td style="padding: 8px 0; color: #666;">Email</td><td style="padding: 8px 0;">${email}</td></tr>
         </table>
         <p style="color: #666; margin-top: 16px;">This account is pending approval before the client can log in.</p>
-        <div style="margin-top: 24px;">
-          <a href="${process.env.CLIENT_URL}/admin" style="background: #1F5C99; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Review in Admin Dashboard →</a>
+        <div style="margin-top: 24px; display: flex; gap: 12px;">
+          <a href="${approveUrl}" style="background: #2e7d32; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">✓ Approve Account</a>
+          <a href="${process.env.CLIENT_URL}/admin" style="background: #1F5C99; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Review in Dashboard →</a>
         </div>
       </div>
       <div style="padding: 16px; background: #e9ecef; text-align: center; font-size: 12px; color: #666;">

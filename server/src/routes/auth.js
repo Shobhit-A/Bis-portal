@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/authMiddleware');
-const { sendRegistrationAlert } = require('../services/emailService');
+const { sendRegistrationAlert, sendActivationEmail } = require('../services/emailService');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -53,12 +53,53 @@ router.post('/register', loginLimiter, [
       select: { id: true, username: true, email: true }
     });
 
-    sendRegistrationAlert({ username: user.username, email: user.email }); // fire-and-forget, don't make the client wait on Brevo
+    const approveToken = jwt.sign({ type: 'approve-user', userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const approveUrl = `${req.protocol}://${req.get('host')}/api/auth/approve/${approveToken}`;
+    sendRegistrationAlert({ username: user.username, email: user.email, approveUrl }); // fire-and-forget, don't make the client wait on Brevo
 
     res.status(201).json({ message: 'Registration submitted. You will be notified by email once your account is approved.' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET /api/auth/approve/:token — one-click admin approval from the registration email
+router.get('/approve/:token', async (req, res) => {
+  const sendPage = (title, message, color) => res.send(`
+    <!DOCTYPE html>
+    <html><head><title>${title}</title><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+    <body style="font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f8f9fa;">
+      <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 400px;">
+        <h2 style="color: ${color}; margin-top: 0;">${title}</h2>
+        <p style="color: #666;">${message}</p>
+        <a href="${process.env.CLIENT_URL}/admin" style="color: #1F5C99;">Go to Admin Dashboard →</a>
+      </div>
+    </body></html>
+  `);
+
+  let payload;
+  try {
+    payload = jwt.verify(req.params.token, process.env.JWT_SECRET);
+  } catch {
+    return sendPage('Link Expired', 'This approval link has expired or is invalid. Please approve this account from the admin dashboard instead.', '#c62828');
+  }
+  if (payload.type !== 'approve-user') {
+    return sendPage('Invalid Link', 'This link is not a valid approval link.', '#c62828');
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) return sendPage('Account Not Found', 'This account no longer exists.', '#c62828');
+    if (user.approved) return sendPage('Already Approved', `${user.username} was already approved.`, '#2e7d32');
+
+    const updated = await prisma.user.update({ where: { id: user.id }, data: { approved: true } });
+    if (updated.email) sendActivationEmail({ username: updated.username, email: updated.email });
+
+    sendPage('Account Approved ✓', `${updated.username} can now log in to the portal.`, '#2e7d32');
+  } catch (err) {
+    console.error(err);
+    sendPage('Error', 'Something went wrong approving this account. Please try from the admin dashboard.', '#c62828');
   }
 });
 
