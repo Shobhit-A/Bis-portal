@@ -109,7 +109,7 @@ router.post('/:id/submit', async (req, res) => {
       include: { user: true }
     });
 
-    await sendAdminAlert({ clientUsername: updated.user.username, submittedAt: updated.updatedAt });
+    sendAdminAlert({ clientUsername: updated.user.username, submittedAt: updated.updatedAt }); // fire-and-forget, don't make the client wait on Brevo
 
     res.json({ message: 'Form submitted successfully', submission: updated });
   } catch (err) {

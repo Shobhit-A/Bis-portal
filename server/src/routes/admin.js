@@ -6,6 +6,7 @@ const { PrismaClient } = require('@prisma/client');
 const { adminMiddleware } = require('../middleware/authMiddleware');
 const { generateExcel } = require('../services/excelExport');
 const { getObjectStream } = require('../services/storage');
+const { sendActivationEmail } = require('../services/emailService');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -19,7 +20,7 @@ router.get('/users', async (req, res) => {
     const users = await prisma.user.findMany({
       where: { role: 'CLIENT' },
       select: {
-        id: true, username: true, createdAt: true,
+        id: true, username: true, email: true, createdAt: true, approved: true,
         submissions: { select: { id: true, label: true, status: true, updatedAt: true }, orderBy: { updatedAt: 'desc' } }
       },
       orderBy: { createdAt: 'desc' }
@@ -44,9 +45,24 @@ router.post('/users', [
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
       data: { username, passwordHash, role: 'CLIENT' },
-      select: { id: true, username: true, role: true, createdAt: true }
+      select: { id: true, username: true, role: true, createdAt: true, approved: true }
     });
     res.status(201).json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PATCH /api/admin/users/:id/approve — approve a self-registered client
+router.patch('/users/:id/approve', async (req, res) => {
+  try {
+    const user = await prisma.user.update({
+      where: { id: req.params.id },
+      data: { approved: true }
+    });
+    if (user.email) sendActivationEmail({ username: user.username, email: user.email }); // fire-and-forget, don't make the admin wait on Brevo
+    res.json({ message: 'Account approved', user: { id: user.id, username: user.username, approved: user.approved } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
