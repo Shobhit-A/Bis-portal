@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const { PrismaClient } = require('@prisma/client');
 
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
@@ -32,8 +33,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', authMiddleware, adminRoutes);
 app.use('/api/submissions', authMiddleware, submissionsRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
+// Health check — also touches the DB so external uptime pings (e.g. every 5-10min)
+// double as keep-alive for both Render's free-tier sleep and Supabase's 7-day pause
+const prisma = new PrismaClient();
+app.get('/api/health', async (req, res) => {
+  await prisma.$queryRaw`SELECT 1`;
+  res.json({ status: 'ok', time: new Date().toISOString() });
+});
 
 // Global error handler
 app.use((err, req, res, next) => {
