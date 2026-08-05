@@ -1,4 +1,5 @@
 import React from 'react';
+import { Field, FileUpload } from '../../../components/FormField';
 
 const DOCUMENTS = [
   { no: 1, doc: 'Address Proof (Registered Office)', requirement: 'Mandatory' },
@@ -33,7 +34,7 @@ const DOCUMENTS = [
   { no: 30, doc: 'Weekly Off Declaration (Working Days)', requirement: 'Mandatory' },
 ];
 
-export default function DocumentChecklist({ formData, updateSection, isSubmitted }) {
+export default function DocumentChecklist({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const statuses = formData.checklist || {};
   const setStatus = (docNo, status) => updateSection('checklist', { ...statuses, [String(docNo)]: status });
 
@@ -90,6 +91,13 @@ export default function DocumentChecklist({ formData, updateSection, isSubmitted
                 })}
               </tbody>
             </table>
+          </div>
+
+          <div className="mt-6">
+            <Field label="Miscellaneous Document" hint="Any other supporting document not covered above — included with the rest when documents are downloaded.">
+              <FileUpload fieldKey="checklist_misc" fieldLabel="Miscellaneous Document"
+                existingDoc={getDocForField('checklist_misc')} onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
+            </Field>
           </div>
         </div>
       </div>
