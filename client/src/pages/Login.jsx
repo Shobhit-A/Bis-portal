@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import api from '../lib/axios';
 import toast from 'react-hot-toast';
@@ -122,6 +122,10 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center text-xs text-gray-400 mt-6">
+            New client?{' '}
+            <Link to="/register" className="text-primary hover:underline">Create an account</Link>
+          </p>
+          <p className="text-center text-xs text-gray-400 mt-2">
             Having trouble? Contact{' '}
             <a href="mailto:cs@absoluteveritas.com" className="text-primary hover:underline">
               cs@absoluteveritas.com

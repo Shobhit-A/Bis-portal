@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import LoginPage from './pages/Login';
+import RegisterPage from './pages/Register';
 import AdminDashboard from './pages/admin/Dashboard';
 import SubmissionView from './pages/admin/SubmissionView';
 import PortalLayout from './pages/portal/PortalLayout';
@@ -22,6 +23,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/portal'} /> : <LoginPage />} />
+      <Route path="/register" element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/portal'} /> : <RegisterPage />} />
       <Route path="/admin" element={<ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/submissions/:id" element={<ProtectedRoute role="ADMIN"><SubmissionView /></ProtectedRoute>} />
       <Route path="/portal" element={<ProtectedRoute role="CLIENT"><MyForms /></ProtectedRoute>} />

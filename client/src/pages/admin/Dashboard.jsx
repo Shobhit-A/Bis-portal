@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2 } from 'lucide-react';
+import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck } from 'lucide-react';
 
 function StatusBadge({ status }) {
   if (status === 'SUBMITTED') return <span className="badge-submitted">Submitted</span>;
@@ -146,6 +146,27 @@ export default function AdminDashboard() {
     } catch { toast.error('Delete failed'); }
   };
 
+  const [approvingId, setApprovingId] = useState(null);
+
+  const handleApprove = async (id, username) => {
+    setApprovingId(id);
+    try {
+      await api.patch(`/admin/users/${id}/approve`);
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, approved: true } : u));
+      toast.success(`${username} approved`);
+    } catch { toast.error('Approval failed'); }
+    finally { setApprovingId(null); }
+  };
+
+  const handleReject = async (id, username) => {
+    if (!window.confirm(`Reject registration for "${username}"? This deletes their pending account.`)) return;
+    try {
+      await api.delete(`/admin/users/${id}`);
+      setUsers(prev => prev.filter(u => u.id !== id));
+      toast.success('Registration rejected');
+    } catch { toast.error('Rejection failed'); }
+  };
+
   const handleDownloadExcel = async (submissionId, username) => {
     setDownloadingId(submissionId);
     try {
@@ -168,9 +189,12 @@ export default function AdminDashboard() {
     finally { setDownloadingDocsId(null); }
   };
 
-  const allSubmissions = users.flatMap(u => u.submissions || []);
+  const pendingUsers = users.filter(u => !u.approved);
+  const approvedUsers = users.filter(u => u.approved);
+
+  const allSubmissions = approvedUsers.flatMap(u => u.submissions || []);
   const stats = {
-    total: users.length,
+    total: approvedUsers.length,
     submitted: allSubmissions.filter(s => s.status === 'SUBMITTED').length,
     inProgress: allSubmissions.filter(s => s.status === 'IN_PROGRESS').length,
     notStarted: allSubmissions.filter(s => s.status === 'NOT_STARTED').length,
@@ -178,7 +202,7 @@ export default function AdminDashboard() {
 
   // One row per form; clients with zero forms still get one row so their
   // account remains visible/manageable (reset password, delete).
-  const rows = users.flatMap(u =>
+  const rows = approvedUsers.flatMap(u =>
     u.submissions && u.submissions.length > 0
       ? u.submissions.map(s => ({ ...s, userId: u.id, username: u.username, accountCreatedAt: u.createdAt }))
       : [{ id: null, label: null, status: null, updatedAt: null, userId: u.id, username: u.username, accountCreatedAt: u.createdAt }]
@@ -218,6 +242,37 @@ export default function AdminDashboard() {
           ))}
         </div>
 
+        {/* Pending Approvals */}
+        {pendingUsers.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2 mb-3">
+              <UserCheck size={16} className="text-yellow-600" /> Pending Approvals ({pendingUsers.length})
+            </h2>
+            <div className="card overflow-hidden border-yellow-200">
+              <div className="divide-y divide-border">
+                {pendingUsers.map(u => (
+                  <div key={u.id} className="flex items-center justify-between px-4 py-3 bg-yellow-50/50">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{u.username}</div>
+                      <div className="text-xs text-gray-500">{u.email} · registered {new Date(u.createdAt).toLocaleDateString('en-IN')}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => handleApprove(u.id, u.username)} disabled={approvingId === u.id}
+                        className="btn-primary bg-green-600 hover:bg-green-700 flex items-center gap-1.5 px-3 py-1.5 text-xs disabled:opacity-60">
+                        {approvingId === u.id ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Approve
+                      </button>
+                      <button onClick={() => handleReject(u.id, u.username)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 rounded hover:bg-red-50" title="Reject">
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -243,7 +298,7 @@ export default function AdminDashboard() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={5} className="text-center py-12 text-gray-400 text-sm">Loading...</td></tr>
-              ) : users.length === 0 ? (
+              ) : approvedUsers.length === 0 ? (
                 <tr><td colSpan={5} className="text-center py-12 text-gray-400 text-sm">No client accounts yet. Create one to get started.</td></tr>
               ) : rows.map((row, i) => (
                 <tr key={row.id || `${row.userId}-empty`} className={`border-b border-border last:border-0 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
