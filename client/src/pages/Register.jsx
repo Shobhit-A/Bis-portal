@@ -5,7 +5,7 @@ import { RefreshCw, Eye, EyeOff } from 'lucide-react';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [form, setForm] = useState({ username: '', email: '', password: '', confirmPassword: '' });
   const [captcha, setCaptcha] = useState(null);
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,6 +23,10 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.post('/auth/register', {
@@ -117,6 +121,19 @@ export default function RegisterPage() {
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
+                  </div>
+                  <div>
+                    <label className="label">Confirm Password <span className="required">*</span></label>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      className="input"
+                      placeholder="Retype the password"
+                      value={form.confirmPassword}
+                      onChange={e => setForm(p => ({ ...p, confirmPassword: e.target.value }))}
+                      autoComplete="new-password"
+                      minLength={6}
+                      required
+                    />
                   </div>
                   <div>
                     <label className="label">Security Check <span className="required">*</span></label>
