@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/authMiddleware');
-const { sendRegistrationAlert, sendActivationEmail } = require('../services/emailService');
+const { sendRegistrationAlert, sendActivationEmail, sendPasswordResetEmail } = require('../services/emailService');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -141,6 +141,57 @@ router.post('/login', loginLimiter, [
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
     res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// POST /api/auth/forgot-password — request a password reset link. Always returns the same
+// generic message regardless of whether the account exists or has an email on file, so the
+// response never reveals which usernames are registered.
+router.post('/forgot-password', loginLimiter, [
+  body('username').trim().notEmpty().withMessage('Username is required'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  const GENERIC_MESSAGE = "If an account with that username has an email on file, a password reset link has been sent. If you don't have an email on file, contact info@absoluteveritas.com to reset your password.";
+  try {
+    const user = await prisma.user.findUnique({ where: { username: req.body.username.trim() } });
+    if (user?.email) {
+      const token = jwt.sign({ type: 'reset-password', userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
+      sendPasswordResetEmail({ username: user.username, email: user.email, resetUrl }); // fire-and-forget, don't make the client wait on Brevo
+    }
+    res.json({ message: GENERIC_MESSAGE });
+  } catch (err) {
+    console.error(err);
+    res.json({ message: GENERIC_MESSAGE }); // never leak whether the lookup itself failed
+  }
+});
+
+// POST /api/auth/reset-password/:token — set a new password from a reset link
+router.post('/reset-password/:token', loginLimiter, [
+  body('password').notEmpty().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+  let payload;
+  try {
+    payload = jwt.verify(req.params.token, process.env.JWT_SECRET);
+  } catch {
+    return res.status(400).json({ error: 'Reset link expired or invalid. Please request a new one.' });
+  }
+  if (payload.type !== 'reset-password') return res.status(400).json({ error: 'Invalid reset link.' });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) return res.status(400).json({ error: 'Reset link expired or invalid. Please request a new one.' });
+
+    const passwordHash = await bcrypt.hash(req.body.password, 12);
+    await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+    res.json({ message: 'Password reset successful. You can now log in.' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
