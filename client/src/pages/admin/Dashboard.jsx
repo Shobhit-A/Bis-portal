@@ -313,7 +313,11 @@ export default function AdminDashboard() {
                     {row.username}
                     {row.label && <span className="text-gray-400 font-normal"> — {row.label}</span>}
                     {row.formType && (
-                      <span className={`ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded ${row.formType === 'ISI' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                      <span className={`ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                        row.formType === 'ISI' ? 'bg-purple-100 text-purple-700' :
+                        row.formType === 'CRS' ? 'bg-amber-100 text-amber-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
                         {row.formType}
                       </span>
                     )}
