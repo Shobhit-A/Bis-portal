@@ -4,7 +4,7 @@ const archiver = require('archiver');
 const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 const { adminMiddleware } = require('../middleware/authMiddleware');
-const { generateExcel } = require('../services/excelExport');
+const { generateExcel, generateExcelCRS } = require('../services/excelExport');
 const { getObjectStream } = require('../services/storage');
 const { sendActivationEmail } = require('../services/emailService');
 
@@ -153,7 +153,7 @@ router.get('/submissions/:id/excel', async (req, res) => {
     if (submission.formType === 'ISI') {
       return res.status(501).json({ error: 'Excel export for ISI forms is not yet available. Contact the developer to enable it.' });
     }
-    const wb = await generateExcel(submission);
+    const wb = submission.formType === 'CRS' ? await generateExcelCRS(submission) : await generateExcel(submission);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${submission.user.username}_BIS_Form.xlsx"`);
     await wb.xlsx.write(res);
