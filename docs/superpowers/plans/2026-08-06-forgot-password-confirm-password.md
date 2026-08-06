@@ -15,14 +15,8 @@
 ### Task 1: Backend — password reset email
 
 **Files:**
-- Modify: `server/src/services/emailService.js`
+- Modify: `server/src/services/emailServ
 
-- [ ] **Step 1: Add `sendPasswordResetEmail`**
-
-Add this function right after `sendActivationEmail` (before the closing `module.exports` line):
-
-```javascript
-async function sendPasswordResetEmail({ username, email, resetUrl }) {
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
   sendSmtpEmail.sender = FROM;
   sendSmtpEmail.to = [{ email }];
