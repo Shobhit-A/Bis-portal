@@ -22,7 +22,7 @@ const SECTIONS_BY_TYPE = {
     { key: 'standard', label: 'Indian Standard & Product Variety' },
     { key: 'management', label: 'Management Details' },
     { key: 'manufacturing', label: 'Manufacturing Process' },
-    { key: 'packagingBrand', label: 'Packaging & Brand Details' },
+    { key: 'packaging', label: 'Packaging & Brand Details' },
     { key: 'testing', label: 'Testing & Inspection' },
     { key: 'testReport', label: 'Test Report Details' },
     { key: 'declaration', label: 'Declaration & Undertaking' },
