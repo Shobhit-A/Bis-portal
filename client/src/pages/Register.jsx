@@ -45,10 +45,10 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-surface flex flex-col">
       {/* Header */}
       <div className="bg-primary px-6 py-4 flex items-center gap-3">
-        <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-          <span className="text-white font-bold text-sm">AV</span>
+        <div className="bg-white rounded px-2 py-1.5 flex items-center">
+          <img src="/logo.png" alt="Absolute Veritas" className="h-6 w-auto object-contain" />
         </div>
-        <span className="text-white font-semibold text-sm tracking-wide">ABSOLUTE VERITAS</span>
+        <span className="text-white font-semibold text-sm tracking-wide">ABSOLUTE VERITAS FORM SUBMISSION</span>
       </div>
 
       {/* Main */}

@@ -213,10 +213,10 @@ export default function AdminDashboard() {
       {/* Navbar */}
       <nav className="bg-primary px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 bg-white/20 rounded flex items-center justify-center">
-            <span className="text-white font-bold text-xs">AV</span>
+          <div className="bg-white rounded px-1.5 py-1 flex items-center">
+            <img src="/logo.png" alt="Absolute Veritas" className="h-5 w-auto object-contain" />
           </div>
-          <span className="text-white font-semibold text-sm">Absolute Veritas · Admin</span>
+          <span className="text-white font-semibold text-sm">Absolute Veritas Form Submission · Admin</span>
         </div>
         <div className="flex items-center gap-4">
           <span className="text-white/70 text-xs">{user?.email || user?.username}</span>

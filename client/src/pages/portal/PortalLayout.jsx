@@ -123,11 +123,11 @@ export default function PortalLayout() {
               <button onClick={() => navigate('/portal')} className="text-white/70 hover:text-white" title="Back to My Forms">
                 <ArrowLeft size={16} />
               </button>
-              <div className="w-7 h-7 bg-white/20 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-xs">AV</span>
+              <div className="bg-white rounded px-1.5 py-1 flex items-center">
+                <img src="/logo.png" alt="Absolute Veritas" className="h-5 w-auto object-contain" />
               </div>
               <div>
-                <span className="text-white font-semibold text-sm">{submission?.label || 'BIS Application Portal'}</span>
+                <span className="text-white font-semibold text-sm">{submission?.label || 'Absolute Veritas Form Submission'}</span>
                 {isSubmitted && <span className="ml-3 text-xs bg-green-400/20 text-green-200 px-2 py-0.5 rounded">Submitted</span>}
               </div>
             </div>
