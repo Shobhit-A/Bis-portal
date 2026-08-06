@@ -81,7 +81,7 @@ export default function RegistrationForm({ formData, updateSection, getDocForFie
           <div className="form-row">
             <Field label="Hint Question" required>
               <Select value={data.hintQuestion} onChange={v => set('hintQuestion', v)}
-                options={["What is your mother's maiden name?", "What was the name of your first pet?", "What was the name of your primary school?", "What is your favourite movie?", "What city were you born in?", "What is your eldest sibling's middle name?"]}
+                options={["In what city were your father born?", "In what city were your mother born?", "What is the name of the hospital you born?", "What is your pet's name?", "What was your childhood nickname?", "Who is your favorite author?", "Who was your childhood hero?"]}
                 placeholder="Select a question" />
             </Field>
             <Field label="Hint Answer" required>
