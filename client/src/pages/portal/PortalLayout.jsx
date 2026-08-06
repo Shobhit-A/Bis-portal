@@ -194,7 +194,7 @@ export default function PortalLayout() {
                   <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">Form Submitted Successfully!</h2>
                   <p className="text-gray-500 text-sm mb-6">Our team at Absolute Veritas will review your information and get back to you shortly.</p>
-                  <a href="mailto:cs@absoluteveritas.com" className="btn-primary inline-block">Contact Us</a>
+                  <a href="mailto:info@absoluteveritas.com" className="btn-primary inline-block">Contact Us</a>
                 </div>
               } />
             </Routes>
