@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { LogOut, Plus, X } from 'lucide-react';
+import { LogOut, Plus, X, ArrowLeft } from 'lucide-react';
 
 function StatusBadge({ status }) {
   if (status === 'SUBMITTED') return <span className="badge-submitted">Submitted</span>;
@@ -11,7 +11,7 @@ function StatusBadge({ status }) {
   return <span className="badge-notstarted">Not Started</span>;
 }
 
-function NewFormModal({ forms, onClose, onCreated }) {
+function NewFormModal({ forms, formType, onClose, onCreated }) {
   const [label, setLabel] = useState('');
   const [cloneFromId, setCloneFromId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ function NewFormModal({ forms, onClose, onCreated }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post('/submissions', { label, cloneFromId: cloneFromId || undefined });
+      const res = await api.post('/submissions', { label, formType, cloneFromId: cloneFromId || undefined });
       toast.success(`"${res.data.label}" created`);
       onCreated(res.data);
     } catch (err) {
@@ -65,7 +65,7 @@ function NewFormModal({ forms, onClose, onCreated }) {
   );
 }
 
-export default function MyForms() {
+export default function MyForms({ formType, basePath, title }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [forms, setForms] = useState([]);
@@ -73,20 +73,23 @@ export default function MyForms() {
   const [showNew, setShowNew] = useState(false);
 
   useEffect(() => {
-    api.get('/submissions')
+    api.get('/submissions', { params: { formType } })
       .then(res => setForms(res.data))
       .catch(() => toast.error('Failed to load forms'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [formType]);
 
   return (
     <div className="min-h-screen bg-surface">
       <nav className="bg-primary px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/portal')} className="text-white/70 hover:text-white" title="Back to Application Types">
+            <ArrowLeft size={16} />
+          </button>
           <div className="w-7 h-7 bg-white/20 rounded flex items-center justify-center">
             <span className="text-white font-bold text-xs">AV</span>
           </div>
-          <span className="text-white font-semibold text-sm">BIS Application Portal</span>
+          <span className="text-white font-semibold text-sm">{title}</span>
         </div>
         <div className="flex items-center gap-4">
           <span className="text-white/60 text-xs">{user?.username}</span>
@@ -98,7 +101,7 @@ export default function MyForms() {
 
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-lg font-semibold text-gray-900">My Forms</h1>
+          <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
           <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-2">
             <Plus size={15} /> Start New Form
           </button>
@@ -112,7 +115,7 @@ export default function MyForms() {
           ) : (
             <div className="divide-y divide-border">
               {forms.map(f => (
-                <button key={f.id} onClick={() => navigate(`/portal/${f.id}`)}
+                <button key={f.id} onClick={() => navigate(`${basePath}/${f.id}`)}
                   className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50">
                   <div>
                     <div className="text-sm font-medium text-gray-900">{f.label}</div>
@@ -126,7 +129,7 @@ export default function MyForms() {
         </div>
       </div>
 
-      {showNew && <NewFormModal forms={forms} onClose={() => setShowNew(false)} onCreated={f => { setForms(prev => [f, ...prev]); setShowNew(false); navigate(`/portal/${f.id}`); }} />}
+      {showNew && <NewFormModal forms={forms} formType={formType} onClose={() => setShowNew(false)} onCreated={f => { setForms(prev => [f, ...prev]); setShowNew(false); navigate(`${basePath}/${f.id}`); }} />}
     </div>
   );
 }
