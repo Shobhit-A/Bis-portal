@@ -103,4 +103,35 @@ async function sendActivationEmail({ username, email }) {
   }
 }
 
-module.exports = { sendAdminAlert, sendRegistrationAlert, sendActivationEmail };
+async function sendPasswordResetEmail({ username, email, resetUrl }) {
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+  sendSmtpEmail.sender = FROM;
+  sendSmtpEmail.to = [{ email }];
+  sendSmtpEmail.subject = 'Reset Your Absolute Veritas Portal Password';
+  sendSmtpEmail.htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: #1F5C99; padding: 24px; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 20px;">Absolute Veritas Portal</h1>
+      </div>
+      <div style="padding: 32px; background: #f8f9fa;">
+        <h2 style="color: #1A1A2E; margin-top: 0;">Password Reset Requested</h2>
+        <p style="color: #333;">Hi ${username}, we received a request to reset your portal password. This link expires in 1 hour.</p>
+        <div style="margin-top: 24px;">
+          <a href="${resetUrl}" style="background: #1F5C99; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Reset Password →</a>
+        </div>
+        <p style="color: #999; font-size: 12px; margin-top: 24px;">If you didn't request this, you can safely ignore this email.</p>
+      </div>
+      <div style="padding: 16px; background: #e9ecef; text-align: center; font-size: 12px; color: #666;">
+        Absolute Veritas — BIS Certification Consultancy
+      </div>
+    </div>
+  `;
+  try {
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Password reset email sent');
+  } catch (err) {
+    console.error('Email send failed:', err.message);
+  }
+}
+
+module.exports = { sendAdminAlert, sendRegistrationAlert, sendActivationEmail, sendPasswordResetEmail };
