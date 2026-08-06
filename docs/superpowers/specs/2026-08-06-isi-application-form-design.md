@@ -152,155 +152,95 @@ start with its tab's `sectionKey` (e.g. `factory_addr_proof`, not `isi_factory_a
 `doc.fieldKey.startsWith(activeTab)` — breaking this prefix hides uploaded documents from the
 admin view for that tab.
 
-## 8. ISI tab-by-tab field spec
+## 8. ISI tab-by-tab field spec — REVISED against the real reference workbook
 
-All 10 tabs follow the same coding pattern as the existing FMCS tabs: `const data =
-formData.<section> || {}`, `set(key, val) => updateSection('<section>', { ...data, [key]: val })`,
-built from `Field`/`Select`/`FileUpload`/`RepeatingTable`, `disabled={isSubmitted}` on every
-input. Route paths are kebab-case.
+**This section was rewritten after the user shared screenshots of the actual
+`ISI_Application_form-Duly_Filled` workbook.** The original version of this spec (based on a
+build-prompt written before anyone had opened the real file) assumed a 3-way split
+(Firm/Office, Factory, Standard/Variety as three separate wizard tabs) that does not match
+reality — the real workbook has these three as ONE combined "Application form" sheet. It was
+also missing two real fields (`User ID`, `Application ID`) and had address fields split into
+Line 1/Line 2 that don't exist in the source (`Office Address` and `Factory Address` are each
+a single field). This revision corrects both, and — per the user's explicit direction — folds
+in a second simplification: everything **after** the Application Form sheet (Document
+Checklist, Management, Manufacturing, Packaging & Brand, Testing, Test Report, Declaration)
+is **not** rebuilt for ISI at all; the ISI wizard reuses the existing FMCS tab components for
+those sections verbatim, unmodified. Net effect: ISI now has **8 client-facing wizard tabs**
+instead of 10, and only **one new tab component** needs to be written.
 
-### Tab 1 — `checklist` (path `''`, index route)
-Same pattern as `DocumentChecklist.jsx` (status dropdown per row: Provided / Pending / Not
-Applicable, plus one misc upload `fieldKey="checklist_misc"`). 30-item list:
-1. Address Proof (Registered Office) — Mandatory
-2. GST Certificate — Mandatory
-3. Proof of Establishment of Firm (Business Licence) — Mandatory
-4. Business Licence (Company Incorporation Certificate) — Mandatory
-5. Address Proof (Factory / Manufacturing Unit) — Mandatory
-6. Supporting Docs of Product Variety — Optional
-7. Qualification Document & Photograph of Technical Manager — Mandatory
-8. Process Flowchart covering all Manufacturing Processes — Mandatory
-9. Layout Plan of Factory — Mandatory
-10. Manufacturing Machinery List — Mandatory
-11. Trademark Registration Details (Certification & Declaration) — Mandatory
-12. List of Testing Equipment — Mandatory
-13. In-House Test Report for the Product — Mandatory
-14. Agreement with Manufacturing Unit for Outsourcing — Mandatory
-15. Controls Exercised on Outsourced Process & Product on Receipt (IQC docs) — Mandatory
-16. Test Report / Test Certificate — Mandatory
-17. Statutory Permissions required for the Product Category — Optional
-18. Authorization Letter of Person Submitting the Application — Mandatory
-19. Form of Label(s) (Nature of Packaging) — Mandatory
-20. Payment Receipt — Mandatory
-21. Scope of Licence — Mandatory
-22. List of Models to be covered in BIS Certification — Mandatory
-23. Quality Assurance System (Quality Manual) — Mandatory
-24. Drawing of Product — Mandatory
-25. Calibration Certificates (for testing equipment) — Mandatory
-26. Location Plan of Factory (Google Coordinates) — Mandatory
-27. Undertaking (Acceptance of Marking Fee & STI) — Mandatory
-28. Declaration — Mandatory
-29. Undertaking for Arrangement of Water / Electricity — Mandatory
-30. Weekly Off Declaration (Working Days) — Mandatory
+| # | Tab key (routing) | Label | Component |
+|---|---|---|---|
+| 1 | `checklist` | Document Checklist | **Reused** — `tabs/DocumentChecklist.jsx` (FMCS's, unmodified) |
+| 2 | `applicationForm` | Application Form | **New** — `isi/ApplicationForm.jsx` |
+| 3 | `management` | Management Details | **Reused** — `tabs/ManagementDetails.jsx` |
+| 4 | `manufacturing` | Manufacturing Process | **Reused** — `tabs/ManufacturingProcess.jsx` |
+| 5 | `packaging` | Packaging & Brand Details | **Reused** — `tabs/PackagingBrandDetails.jsx` |
+| 6 | `testing` | Testing & Inspection | **Reused** — `tabs/TestingInspection.jsx` |
+| 7 | `testReport` | Test Report Details | **Reused** — `tabs/TestReportDetails.jsx` |
+| 8 | `declaration` | Declaration & Undertaking | **Reused** — `tabs/DeclarationUndertaking.jsx` |
 
-### Tab 2 — `firmOffice` ("Firm, Office & Registration Details", path `firm-office`)
-- User/Contact: Registered Email*, Registered Mobile No.*
-- Firm/Office Details: Firm Name*, CEO/MD Name*, Office Address Line 1*, Line 2, Country*
-  (reuse `COUNTRIES` from `OrganizationProfile.jsx`), State*, District*, City*, PIN Code,
-  Office Email*, Office Mobile, Landline STD Code, Landline Number, Alternate Mobile.
-  - Address Proof Document Type* — `Select`: `['GST Registration Certificate', 'Business Licence', 'Any Other']`
-  - Address Proof Document — `FileUpload fieldKey="firmOffice_office_addr_proof"`
-- Registration Details: Nature of Firm* — `Select`: `['Proprietorship', 'Partnership', 'Pvt Ltd', 'Public Ltd', 'LLP', 'Others']`;
-  Scale* — `Select`: `['Micro', 'Small', 'Medium', 'Large']`; Sector* — `Select`: `['Private', 'Public']`;
-  Women Entrepreneur* — `Select`: `['Yes', 'No']`; Startup* — `Select`: `['Yes', 'No']`;
-  Registration Number, PAN Number, Date of Registration (date).
-  - GST Number* + `FileUpload fieldKey="firmOffice_gst_cert"` (label "GST Certificate")
-  - Proof of Establishment Type* — `Select`: `['Certificate of Incorporation', 'Business Licence', 'Partnership Deed', 'Proprietorship Declaration', 'GST Registration Certificate', 'Udyam Registration Certificate', 'Trade Licence', 'Others']`
-    + `FileUpload fieldKey="firmOffice_estab_proof"`
-  - Business Licence Number
+Reused components are imported directly into `isiTabs.js` from the existing `pages/portal/tabs/`
+folder — no new files, no content changes. Their internal `formData` section keys
+(`checklist`, `management`, `manufacturing`, `packaging`, `testing`, `testReport`,
+`declaration`) are whatever they already are in the FMCS code; the ISI tab-routing `key` for
+each must match so `TABS`/`tabComponents` stay aligned (see §6/§8 wiring below).
 
-### Tab 3 — `factory` ("Factory Details", path `factory`)
-- "Is Factory Address same as Office Address?" — `Select`: `['Yes', 'No']`. If Yes, a
-  "Copy from Office" button one-time copies address fields from `formData.firmOffice` into
-  `formData.factory` (one-time copy, not two-way bound — editable after copying).
-- Factory Address Line 1*, Line 2, Country*, State*, District*, City*, PIN Code, Factory
-  Email*, Factory Mobile, Landline STD Code, Landline Number, Alternate Mobile, Latitude,
-  Longitude, SEZ — `Select`: `['Yes', 'No']`.
-  - Factory Address Proof Type* — `Select`: `['GST Registration Certificate', 'Business Licence', 'Any Other']`
-    + `FileUpload fieldKey="factory_addr_proof"`
+### `applicationForm` — the one new tab (path `application-form`)
 
-### Tab 4 — `standard` ("Indian Standard & Product Variety", path `standard-variety`)
-- "Do you know the Indian Standard applicable to your product?" — `Select`: `['Yes', 'No']`.
+Combines three underlying `formData` namespaces — `firmOffice`, `factory`, `standard` — onto
+a single scrolling page, matching the real workbook's single "Application form" sheet. Each
+namespace keeps its own `set(key, val)` helper internally (three independent
+`updateSection('firmOffice'|'factory'|'standard', ...)` calls), so the admin viewer can still
+review them as three separate sections (see §9) even though the client sees one page.
+
+**Section: Firm / Office Details** (→ `formData.firmOffice`)
+- Firm Name*, Office Address* (single field, not split into lines)
+- Country* (reuse `COUNTRIES` from `OrganizationProfile.jsx`), State*, District*, City*, PIN Code
+- CEO Name*, Registered Email*, Office Email*, Registered Mobile No.* (max 10), Alternate Mobile No., Landline No.
+- Address Proof Document Type* — `Select`: `['GST Registration Certificate', 'Business Licence', 'Any Other']`
+  + `FileUpload fieldKey="firmOffice_office_addr_proof"`
+
+**Section: Registration Details** (→ same `formData.firmOffice` namespace)
+- User ID (hint: "BIS portal user ID, if already known"), Application ID (same hint pattern) — both optional text
+- Nature of Firm* — `Select`: `['Proprietorship', 'Partnership', 'Pvt Ltd', 'Public Ltd', 'LLP', 'Others']`
+- Scale* — `Select`: `['Micro', 'Small', 'Medium', 'Large']`
+- Sector* — `Select`: `['Private', 'Public']`
+- Women Entrepreneur* — `Select`: `['Yes', 'No']`
+- Startup* — `Select`: `['Yes', 'No']`
+- Date of Registration (date), Registration Number
+- GST Number* + `FileUpload fieldKey="firmOffice_gst_cert"` (label "GST Certificate")
+- PAN Number
+- Proof of Establishment Type* — `Select`: `['Certificate of Incorporation', 'Business Licence', 'Partnership Deed', 'Proprietorship Declaration', 'GST Registration Certificate', 'Udyam Registration Certificate', 'Trade Licence', 'Others']`
+  + `FileUpload fieldKey="firmOffice_estab_proof"`
+- Business Licence Number (plain text, no upload — matches the real sheet, which has no "ALSO UPLOAD DOCS" note next to this field)
+
+**Section: Factory Details** (→ `formData.factory`)
+- "Is Factory Address same as Office Address?"* — `Select`: `['Yes', 'No']`. If Yes, a
+  "Copy from Office" button one-time copies `officeAddress`/`officeCountry`/`officeState`/
+  `officeDistrict`/`officeCity`/`officePIN`/`officeEmail`/`officeMobile` from `formData.firmOffice`
+  into the equivalent factory fields (one-time copy, not two-way bound — editable after).
+- Factory Address* (single field), Country*, State*, District*, City*, PIN Code
+- Factory Email*, Registered Email (factory has its own, distinct from Firm/Office's — matches
+  the real sheet, which lists both "Factory email" and "Registered email" as separate rows)
+- Registered Mobile No., Alternate Mobile No., Landline Number
+- Latitude (hint: "Check your address proof documents for exact coordinates"), Longitude
+- SEZ (Special Economic Zone)?* — `Select`: `['Yes', 'No']`
+- Address Proof Document Type* — `Select`: `['GST Registration Certificate', 'Business Licence', 'Any Other']`
+  + `FileUpload fieldKey="factory_addr_proof"`
+
+**Section: Indian Standard Details** (→ `formData.standard`)
+- "Do you know the Indian Standard applicable to your product?"* — `Select`: `['Yes', 'No']`.
   If Yes: Indian Standard (text, e.g. `IS 10617:2018`). If No: hint text, "Absolute Veritas
   will help identify the applicable standard."
+
+**Section: Scheme of Inspection and Testing** (→ same `formData.standard` namespace)
 - "Do you accept the Scheme of Inspection & Testing (SIT) specified by BIS w.r.t. frequency
-  of testing and inspection?" — `Select`: `['Yes', 'No']`.
-- Product Variety — `RepeatingTable` (`sectionKey="standard"`, rows at `formData.standard.rows`):
-  columns Variety Applied For (text), Supporting Document (file, `fieldKeySuffix="variety"`).
+  of testing and inspection?"* — `Select`: `['Yes', 'No']`.
 
-### Tab 5 — `management` ("Management Details", path `management`)
-- Top Management — `RepeatingTable` (rows at `formData.management.topRows`): Name,
-  Designation, Contact No., Email, DIN (optional) — all text, no upload.
-- Correspondence Details (flat fields): Name of Contact Person, Designation of Contact
-  Person, Contact No., Email.
-- Technical Management — `RepeatingTable` (rows at `formData.management.techRows`): Name,
-  Designation, Qualification (text), Qualification Document (file,
-  `fieldKeySuffix="tech_qual"`), Experience in Years (number), Photo (file,
-  `fieldKeySuffix="tech_photo"`) — two file columns per row.
-
-### Tab 6 — `manufacturing` ("Manufacturing Process", path `manufacturing`)
-- Raw Material Details — `RepeatingTable` (rows at `formData.manufacturing.rawRows`): Raw
-  Material (with grade, text), Name of Supplier (text), Conformity of Material — `select`:
-  `['BIS Certified', 'Test Certificate', 'Any Other']`, How Received (text), Records
-  Maintained — `select`: `['Yes', 'No']`. No upload column.
-- "Do you outsource any part of the manufacturing process?" — `Select`: `['Yes', 'No']`. If
-  Yes: Agreement with Manufacturing Unit for Outsourcing
-  (`fieldKey="manufacturing_outsource_agreement"`), Controls Exercised on Outsourced Process
-  & Product on Receipt / IQC docs (`fieldKey="manufacturing_outsource_iqc"`).
-- "Maintenance of Hygienic Conditions?" — `Select`: `['Yes', 'No']`. If Yes: upload
-  (`fieldKey="manufacturing_hygiene_docs"`).
-- Process Flow-Chart — `FileUpload fieldKey="manufacturing_process_flowchart"`.
-- Layout Plan of Factory — `FileUpload fieldKey="manufacturing_factory_layout"`.
-- Manufacturing Machinery List — `FileUpload fieldKey="manufacturing_machinery_list"`.
-- Production Details: Unit of Production (text), Production Value — Actual Approx. Value
-  per Annum in ₹ (number), Present Installed Capacity (text).
-
-### Tab 7 — `packagingBrand` ("Packaging & Brand Details", path `packaging-brand`)
-- Packaging & Marking Details — `RepeatingTable` (rows at
-  `formData.packagingBrand.packagingRows`): Nature of Packaging (text), Marking on Article
-  (text), Method of Marking (text), Quantity per Package (number), Form of Label(s) (file,
-  `fieldKeySuffix="label"`), Batch/Code/Serial Numbering (text).
-- Brand Details — `RepeatingTable` (rows at `formData.packagingBrand.brandRows`): Brand
-  Name/Trademark (text), Owned By — `select`: `['Self', 'Others']`, Registered/Unregistered
-  — `select`: `['Registered', 'Unregistered']`, Date of Registration/Introduction (date),
-  Trademark Certificate (file, `fieldKeySuffix="brand"`).
-
-### Tab 8 — `testing` ("Testing & Inspection", path `testing`)
-- "Do you have in-house facility for complete testing of the product as per the Indian
-  Standard?" — `Select`: `['Yes', 'No']`.
-- If No: Subcontracted Testing — `RepeatingTable` (rows at
-  `formData.testing.subcontractRows`): Clause No. of IS (text), Test to be Sub-Contracted
-  (text), Consent Letter (file, `fieldKeySuffix="subcontract"`), Name of Lab — must be a BIS
-  Recognised or Empanelled Lab (text).
-- List of Testing Equipment — `FileUpload fieldKey="testing_equipment_list"`.
-
-### Tab 9 — `testReport` ("Test Report Details", path `test-report`)
-- Product Test Reports — `RepeatingTable` (rows at `formData.testReport.varietyRows`):
-  Product Variety Description (text), IS No. (text), Sample Code (text), Test Report Issue
-  Date (date), Reason for Delay if older than 90/180 days (text), Test Report (file,
-  `fieldKeySuffix="variety"`), Test Report Complete? — `select`: `['Yes', 'No']`, Conformity
-  of Sample as per IS? — `select`: `['Yes', 'No']`.
-- Long Duration Tests: "Is a long duration test applicable for the product?" — `Select`:
-  `['Yes', 'No']`. If Yes:
-  - "Has the firm NOT uploaded the Long Duration Test Report and is opting for relaxation
-    per the Guidelines for Grant of Licence?" — `Select`: `['Yes', 'No']`. If Yes, Undertaking
-    upload (`fieldKey="testReport_ldt_undertaking"`).
-  - Clause No. of IS (text), Long Duration Test Specified (text), Name of Lab where Test is
-    in Progress (text), Date Test Report Likely to be Available (date), In-House Test Report
-    (file, `fieldKey="testReport_ldt_inhouse"`), Test Report on Receipt from Lab (file,
-    `fieldKey="testReport_ldt_lab_report"`).
-- Raw Material Conformity: "Does the applicable Indian Standard require raw material
-  conformity?" — `Select`: `['Yes', 'No']`. If Yes: `RepeatingTable` (rows at
-  `formData.testReport.rawMatRows`): Raw Material Description (text), Test
-  Report/Certificate (file, `fieldKeySuffix="rawmat"`), Complete? — `select`: `['Yes', 'No']`,
-  Conformity of Sample as per Indian Standard? — `select`: `['Yes', 'No']`.
-
-### Tab 10 — `declaration` ("Declaration & Undertaking", path `declaration`)
-Functionally identical to FMCS's `DeclarationUndertaking.jsx` — same structure, same field
-names (`statutoryPermissions`, `otherInfo`, `otherRequest`, `submitterName`,
-`submitterDesignation`, `weeklyOff`, `weeklyOffDays`, `signatoryName`, `signDate`,
-`confirmed`), same `onSubmit`/`submitting` wiring and final "Submit Form to Absolute
-Veritas" button. No field differences from the FMCS version.
+**Section: Product Variety** (→ same `formData.standard` namespace, `rows` array)
+- `RepeatingTable` (`sectionKey="standard"`, rows at `formData.standard.rows`): columns
+  "Variety Applied For" (text), "Upload Supporting Documents" (file, `fieldKeySuffix="variety"`)
+  — matches the real sheet's 3-column table (S.No. is the row's position, not stored data).
 
 ## 9. Admin-side changes
 
@@ -308,12 +248,18 @@ Veritas" button. No field differences from the FMCS version.
 type (`FMCS`/`ISI`), since `label` alone won't disambiguate anymore.
 
 `client/src/pages/admin/SubmissionView.jsx`: `SECTIONS` becomes conditional on
-`submission.formType` — existing array stays for `FMCS`; new array for `ISI` uses the 10
-section keys from §8 (`checklist, firmOffice, factory, standard, management, manufacturing,
-packagingBrand, testing, testReport, declaration`). No other change needed — the generic
-renderer already handles both flat key/value sections and arrays-of-objects (the new `rows`
-arrays) via its existing `isObjectArray` branch, and the document list already buckets
-correctly given the `fieldKey` prefix convention in §7.
+`submission.formType` — existing array stays for `FMCS`; new array for `ISI` lists the
+**underlying `formData` namespaces**, independent of how many client-facing wizard tabs they're
+grouped into: `checklist, firmOffice, factory, standard, management, manufacturing, packaging,
+testing, testReport, declaration` (10 admin review sections from 8 client tabs — `firmOffice`/
+`factory`/`standard` all live under the one `applicationForm` client tab but stay three separate
+admin sections, since the admin viewer renders `formData[key]` directly and was never coupled to
+the client's tab grouping). Note `packaging`, not `packagingBrand` — since Packaging & Brand
+Details is now reused verbatim from FMCS, it uses FMCS's existing section key. No other change
+needed — the generic renderer already handles both flat key/value sections and arrays-of-objects
+(the `standard.rows` array) via its existing `isObjectArray` branch, and the document list
+already buckets correctly given the `fieldKey` prefix convention in §7 (unaffected by this
+revision — `firmOffice_*`/`factory_*`/`standard_*` prefixes are unchanged).
 
 ## 10. Rollout / manual QA checklist
 
@@ -325,7 +271,8 @@ convention documented in `CLAUDE.md`.)
 2. Backend: `formType` accepted on create, returned on read, clone-type guard in place.
 3. Frontend routing: `/portal` → chooser → `/portal/fmcs/*` (regression-test the untouched
    FMCS flow end-to-end) and `/portal/isi/*` (new flow).
-4. All 10 ISI tab components built and wired into the generalized wizard shell.
+4. The one new `applicationForm` tab and the 7 reused-from-FMCS tabs are all wired into the
+   generalized wizard shell and render correctly under `/portal/isi/*`.
 5. `RepeatingTable`: verify add/remove row, and that removing row 2 of 3 doesn't corrupt row
    3's uploaded file — this is the top risk, test it explicitly.
 6. Admin dashboard shows form type; `SubmissionView.jsx` renders both types correctly,
