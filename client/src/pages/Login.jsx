@@ -127,8 +127,8 @@ export default function LoginPage() {
           </p>
           <p className="text-center text-xs text-gray-400 mt-2">
             Having trouble? Contact{' '}
-            <a href="mailto:cs@absoluteveritas.com" className="text-primary hover:underline">
-              cs@absoluteveritas.com
+            <a href="mailto:info@absoluteveritas.com" className="text-primary hover:underline">
+              info@absoluteveritas.com
             </a>
           </p>
         </div>
