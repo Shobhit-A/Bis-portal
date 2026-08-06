@@ -11,6 +11,7 @@ import MyForms from './pages/portal/MyForms';
 import FormTypeSelect from './pages/portal/FormTypeSelect';
 import { FMCS_TABS, FMCS_TAB_COMPONENTS } from './pages/portal/fmcsTabs';
 import { ISI_TABS, ISI_TAB_COMPONENTS } from './pages/portal/isiTabs';
+import { CRS_TABS, CRS_TAB_COMPONENTS } from './pages/portal/crsTabs';
 
 function ProtectedRoute({ children, role }) {
   const { user, loading } = useAuth();
@@ -34,6 +35,8 @@ function AppRoutes() {
       <Route path="/portal/fmcs/:submissionId/*" element={<ProtectedRoute role="CLIENT"><PortalLayout basePath="/portal/fmcs" TABS={FMCS_TABS} tabComponents={FMCS_TAB_COMPONENTS} /></ProtectedRoute>} />
       <Route path="/portal/isi" element={<ProtectedRoute role="CLIENT"><MyForms formType="ISI" basePath="/portal/isi" title="ISI (BIS Standard Mark) Forms" /></ProtectedRoute>} />
       <Route path="/portal/isi/:submissionId/*" element={<ProtectedRoute role="CLIENT"><PortalLayout basePath="/portal/isi" TABS={ISI_TABS} tabComponents={ISI_TAB_COMPONENTS} /></ProtectedRoute>} />
+      <Route path="/portal/crs" element={<ProtectedRoute role="CLIENT"><MyForms formType="CRS" basePath="/portal/crs" title="CRS Forms" /></ProtectedRoute>} />
+      <Route path="/portal/crs/:submissionId/*" element={<ProtectedRoute role="CLIENT"><PortalLayout basePath="/portal/crs" TABS={CRS_TABS} tabComponents={CRS_TAB_COMPONENTS} /></ProtectedRoute>} />
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

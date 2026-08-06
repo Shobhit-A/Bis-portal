@@ -26,7 +26,7 @@ async function ownSubmission(userId, submissionId, extra = {}) {
   return submission;
 }
 
-const FORM_TYPES = ['FMCS', 'ISI'];
+const FORM_TYPES = ['FMCS', 'ISI', 'CRS'];
 
 // GET /api/submissions — list my forms, optionally filtered to one form type
 router.get('/', async (req, res) => {
