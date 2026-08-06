@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './lib/AuthContext';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
+import ForgotPasswordPage from './pages/ForgotPassword';
+import ResetPasswordPage from './pages/ResetPassword';
 import AdminDashboard from './pages/admin/Dashboard';
 import SubmissionView from './pages/admin/SubmissionView';
 import PortalLayout from './pages/portal/PortalLayout';
@@ -24,6 +26,8 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/portal'} /> : <LoginPage />} />
       <Route path="/register" element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/portal'} /> : <RegisterPage />} />
+      <Route path="/forgot-password" element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/portal'} /> : <ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={user ? <Navigate to={user.role === 'ADMIN' ? '/admin' : '/portal'} /> : <ResetPasswordPage />} />
       <Route path="/admin" element={<ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/submissions/:id" element={<ProtectedRoute role="ADMIN"><SubmissionView /></ProtectedRoute>} />
       <Route path="/portal" element={<ProtectedRoute role="CLIENT"><MyForms /></ProtectedRoute>} />
