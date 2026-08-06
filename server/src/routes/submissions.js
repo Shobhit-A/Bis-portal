@@ -26,12 +26,16 @@ async function ownSubmission(userId, submissionId, extra = {}) {
   return submission;
 }
 
-// GET /api/submissions — list my forms
+const FORM_TYPES = ['FMCS', 'ISI'];
+
+// GET /api/submissions — list my forms, optionally filtered to one form type
 router.get('/', async (req, res) => {
   try {
+    const where = { userId: req.user.id };
+    if (FORM_TYPES.includes(req.query.formType)) where.formType = req.query.formType;
     const submissions = await prisma.submission.findMany({
-      where: { userId: req.user.id },
-      select: { id: true, label: true, status: true, updatedAt: true, createdAt: true },
+      where,
+      select: { id: true, label: true, formType: true, status: true, updatedAt: true, createdAt: true },
       orderBy: { updatedAt: 'desc' }
     });
     res.json(submissions);
@@ -41,21 +45,23 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/submissions — create a new form, optionally cloning formData from an existing one
+// POST /api/submissions — create a new form, optionally cloning formData from an existing one of the same type
 router.post('/', async (req, res) => {
   try {
     const { label, cloneFromId } = req.body;
     if (!label || !label.trim()) return res.status(400).json({ error: 'Label is required' });
+    const formType = FORM_TYPES.includes(req.body.formType) ? req.body.formType : 'FMCS';
 
     let formData = {};
     if (cloneFromId) {
       const source = await ownSubmission(req.user.id, cloneFromId);
       if (!source) return res.status(404).json({ error: 'Form to clone from was not found' });
+      if (source.formType !== formType) return res.status(400).json({ error: 'Cannot clone from a form of a different type' });
       formData = source.formData;
     }
 
     const submission = await prisma.submission.create({
-      data: { userId: req.user.id, label: label.trim(), formData }
+      data: { userId: req.user.id, label: label.trim(), formType, formData }
     });
     res.status(201).json(submission);
   } catch (err) {
