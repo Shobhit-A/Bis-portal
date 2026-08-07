@@ -213,10 +213,11 @@ async function generateExcel(submission) {
     lv1(ws, r++, 'Middle Name', reg.middleName || '');
     spacer(ws, r++, 4, 4);
     lv2(ws, r++, 'Date of Birth *', reg.dob || '', 'Mobile Number *', reg.mobile ? '+91 ' + reg.mobile : '');
-    lv2(ws, r++, 'Nationality *', reg.nationality || '', '', '');
+    lv2(ws, r++, 'Nationality *', reg.nationality || '', reg.nationality === 'Others' ? 'Specify Nationality' : '', reg.nationalityOther || '');
     lv2(ws, r++, 'ID Card Type *', reg.idCardType || '', 'ID Card Number *', reg.idCardNumber || '');
     lv1(ws, r++, 'Hint Question *', reg.hintQuestion || '');
     lv2(ws, r++, 'Hint Answer *', reg.hintAnswer || '', '', '');
+    lv1(ws, r++, 'Government ID Card (Upload) *', getDoc(docs, 'registration_id_card'));
     spacer(ws, r++, 4, 6);
     infoRow(ws, r++, 4, 'NOTE: CAPTCHA is filled directly on the BIS portal — not required here.');
 
@@ -243,10 +244,11 @@ async function generateExcel(submission) {
     spacer(ws, r++, 4, 8);
     secHeader(ws, r++, 4, '2.  Firm / Office Details');
     spacer(ws, r++, 4, 6);
-    lv2(ws, r++, 'Firm Name *', org.firmName || '', 'CEO / MD Name *', org.ceoName || '');
-    lv2(ws, r++, 'Office Address Line 1 *', org.officeAddr1 || '', 'Country *', org.officeCountry || '');
-    lv2(ws, r++, 'Office Address Line 2', org.officeAddr2 || '', 'District *', org.officeDistrict || '');
-    lv2(ws, r++, 'City *', org.officeCity || '', 'PIN Code', org.officePIN || '');
+    lv2(ws, r++, 'Firm Name *', org.firmName || '', 'CEO Name *', org.ceoName || '');
+    lv1(ws, r++, 'Office Address *', [org.officeAddressLine1, org.officeAddressLine2].filter(Boolean).join(' / '));
+    lv2(ws, r++, 'Country *', org.officeCountry || '', 'Address 1 *', org.officeAddr1 || '');
+    lv2(ws, r++, 'Address 2 *', org.officeAddr2 || '', 'City *', org.officeCity || '');
+    lv1(ws, r++, 'PIN code', org.officePIN || '');
     // Address proof type + doc filename
     ws.getRow(r).height = 20;
     setCell(ws, r, 1, 'Address Proof Document Type *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
@@ -255,34 +257,35 @@ async function generateExcel(submission) {
     const officeDoc = getDoc(docs, 'organization_office_addr_proof');
     setCell(ws, r, 4, officeDoc || '', { fg: officeDoc ? 'FF000000' : 'FFFF0000', bg: 'FFFFFFFF', size: 10 });
     r++;
-    lv2(ws, r++, 'Firm / Office Email *', org.officeEmail || '', 'Firm / Office Mobile', org.officeMobile || '');
+    lv2(ws, r++, 'Firm/Office Email *', org.officeEmail || '', 'Firm/Office Mobile Number', org.officeMobile || '');
     lv2(ws, r++, 'Landline STD Code', org.landlineSTD || '', 'Landline Number', org.landlineNumber || '');
     spacer(ws, r++, 4, 8);
     secHeader(ws, r++, 4, '3.  Registration Details');
     spacer(ws, r++, 4, 6);
     lv2(ws, r++, 'Sector *', org.sector || '', 'Scale *', org.scale || '');
     ws.getRow(r).height = 20;
-    setCell(ws, r, 1, 'Proof of Establishment Type *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
+    setCell(ws, r, 1, 'Proof of Establishment of Firm Document Type *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
     setCell(ws, r, 2, org.estabProofType || '', { bg: 'FFFFFFFF', size: 10 });
-    setCell(ws, r, 3, 'Proof of Establishment Document *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
+    setCell(ws, r, 3, 'Proof of Establishment of Firm *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
     const estabDoc = getDoc(docs, 'organization_estab_proof');
     setCell(ws, r, 4, estabDoc || '', { fg: estabDoc ? 'FF000000' : 'FFFF0000', bg: 'FFFFFFFF', size: 10 });
     r++;
-    lv2(ws, r++, 'Registration / License Number', org.regNumber || '', 'Date of Registration', org.regDate || '');
+    lv2(ws, r++, 'Registration Number/Business License Number', org.regNumber || '', 'Date Of Registration', org.regDate || '');
     spacer(ws, r++, 4, 8);
     secHeader(ws, r++, 4, '4.  Factory Details');
     spacer(ws, r++, 4, 6);
-    lv2(ws, r++, 'Factory Address Line 1 *', org.factoryAddr1 || '', 'Country *', org.factoryCountry || '');
-    lv2(ws, r++, 'Factory Address Line 2', org.factoryAddr2 || '', 'Factory District *', org.factoryDistrict || '');
-    lv2(ws, r++, 'Factory City *', org.factoryCity || '', 'Factory PIN Code', org.factoryPIN || '');
+    lv1(ws, r++, 'Factory Address *', [org.factoryAddressLine1, org.factoryAddressLine2].filter(Boolean).join(' / '));
+    lv2(ws, r++, 'Country *', org.factoryCountry || '', 'Address 1 *', org.factoryAddr1 || '');
+    lv2(ws, r++, 'Address 2 *', org.factoryAddr2 || '', 'City *', org.factoryCity || '');
+    lv1(ws, r++, 'PIN code', org.factoryPIN || '');
     ws.getRow(r).height = 20;
-    setCell(ws, r, 1, 'Factory Address Proof Type *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
+    setCell(ws, r, 1, 'Address Proof Document Type *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
     setCell(ws, r, 2, org.factoryAddrProofType || '', { bg: 'FFFFFFFF', size: 10 });
-    setCell(ws, r, 3, 'Factory Address Proof Document *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
+    setCell(ws, r, 3, 'Address Proof Document *', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
     const factDoc = getDoc(docs, 'organization_factory_addr_proof');
     setCell(ws, r, 4, factDoc || '', { fg: factDoc ? 'FF000000' : 'FFFF0000', bg: 'FFFFFFFF', size: 10 });
     r++;
-    lv2(ws, r++, 'Factory Landline STD Code', org.factorySTD || '', 'Factory Landline Number', org.factoryLandline || '');
+    lv2(ws, r++, 'Landline STD Code', org.factorySTD || '', 'Landline Number', org.factoryLandline || '');
     lv2(ws, r++, 'Manufacturer Email **', org.manufacturerEmail || '', 'Manufacturer Mobile Number', org.manufacturerMobile || '');
     spacer(ws, r++, 4, 6);
     noteRow(ws, r++, 4, '** Disclaimer: Manufacturer contact details must be accurate. Incorrect details will lead to application rejection.');
@@ -325,14 +328,15 @@ async function generateExcel(submission) {
 
     // AIR table — single row
     const airLetter = getDoc(docs, 'management_air_letter');
+    const airRowData = (mgmt.airRow && mgmt.airRow[0]) || {};
     const airData = [{
-      name: mgmt.airName || '',
-      designation: mgmt.airDesignation || '',
-      contact: mgmt.airContact || '',
-      email: mgmt.airEmail || '',
-      din: mgmt.airDIN || '',
+      name: airRowData.name || '',
+      designation: airRowData.designation || '',
+      contact: airRowData.contact || '',
+      email: airRowData.email || '',
+      din: airRowData.din || '',
       letter: airLetter || '',
-      residency: mgmt.airResidency || ''
+      residency: airRowData.residency || ''
     }];
     ws.getRow(r).height = 28;
     ['Name *', 'Designation *', 'Contact No. *', 'Email ID *', 'DIN (If Applicable)', 'AIR Nomination Letter *', 'Residency Status *'].forEach((h, i) => {
@@ -377,15 +381,13 @@ async function generateExcel(submission) {
     spacer(ws, r++, NC, 4);
 
     // Tech table
-    const qualDoc = getDoc(docs, 'management_qual_docs');
-    const photoDoc = getDoc(docs, 'management_photo');
-    const techRows = (mgmt.techPersonnel || []).map(p => ({
+    const techRows = (mgmt.techPersonnel || []).map((p, i) => ({
       name: p.name || '',
       designation: p.designation || '',
       qualification: p.qualification || '',
-      qualDoc: qualDoc || '',
+      qualDoc: getDoc(docs, `management_qual_doc_${i}`),
       experience: p.experience || '',
-      photo: photoDoc || ''
+      photo: getDoc(docs, `management_photo_${i}`)
     }));
     ws.getRow(r).height = 28;
     ['Name *', 'Designation *', 'Qualification *', 'Qualification Document *\n(write filename)', 'Experience (in years) *', 'Photo *\n(write filename)', ''].forEach((h, i) => {
@@ -419,8 +421,8 @@ async function generateExcel(submission) {
   // ============================================================
   {
     const ws = wb.addWorksheet('Manufacturing Process');
-    ws.columns = [{ width: 28 }, { width: 22 }, { width: 22 }, { width: 24 }, { width: 20 }, { width: 20 }];
-    const NC = 6;
+    ws.columns = [{ width: 28 }, { width: 24 }, { width: 30 }, { width: 30 }, { width: 20 }];
+    const NC = 5;
     let r = 1;
     spacer(ws, r++, NC, 8);
     titleRow(ws, r++, NC, 'MANUFACTURING PROCESS');
@@ -435,7 +437,6 @@ async function generateExcel(submission) {
       { col: 3, label: 'Conformity of Material', key: 'conformity' },
       { col: 4, label: 'How Received\n(Batches/Lots/Nature of Package) *', key: 'howReceived' },
       { col: 5, label: 'Records Maintained', key: 'records' },
-      { col: 6, label: 'Any Other', key: 'other' },
     ], mfg.rawMaterials || [], NC);
 
     spacer(ws, r++, NC, 6);
@@ -447,11 +448,25 @@ async function generateExcel(submission) {
       { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
     mergeSet(ws, r, 4, r, NC, mfg.outsourcing || '', { bg: 'FFFFFFFF', size: 10 });
     r++;
+    if (mfg.outsourcing === 'Yes') {
+      const outsourceDoc = getDoc(docs, 'manufacturing_outsource_doc');
+      ws.getRow(r).height = 20;
+      mergeSet(ws, r, 1, r, 3, 'Outsourcing Agreement Document', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
+      mergeSet(ws, r, 4, r, NC, outsourceDoc || '', { fg: outsourceDoc ? 'FF000000' : 'FFFF0000', bg: 'FFFFFFFF', size: 10 });
+      r++;
+    }
     ws.getRow(r).height = 28;
     mergeSet(ws, r, 1, r, 3, 'Maintenance of Hygienic Conditions? *\n(If Yes, submit supporting docs)',
       { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
     mergeSet(ws, r, 4, r, NC, mfg.hygiene || '', { bg: 'FFFFFFFF', size: 10 });
     r++;
+    if (mfg.hygiene === 'Yes') {
+      const hygieneDoc = getDoc(docs, 'manufacturing_hygiene_doc');
+      ws.getRow(r).height = 20;
+      mergeSet(ws, r, 1, r, 3, 'Hygiene Supporting Document', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
+      mergeSet(ws, r, 4, r, NC, hygieneDoc || '', { fg: hygieneDoc ? 'FF000000' : 'FFFF0000', bg: 'FFFFFFFF', size: 10 });
+      r++;
+    }
     spacer(ws, r++, NC, 6);
     secHeader2(ws, r++, NC, '3.  Process Flow Chart & Factory Layout');
     spacer(ws, r++, NC, 5);
@@ -514,17 +529,20 @@ async function generateExcel(submission) {
     secHeader2(ws, r++, NC, '1.  Packaging and Marking Details');
     spacer(ws, r++, NC, 5);
 
-    const pkgRows = pkg.packagingRows || (pkg.packagingNature ? [{
-      packagingNature: pkg.packagingNature, markingOnArticle: pkg.markingOnArticle,
-      markingMethod: pkg.markingMethod, qtyPerPackage: pkg.qtyPerPackage,
-      labelFile: getDoc(docs, 'packaging_label'), batchCode: pkg.batchCode
-    }] : []);
+    const pkgRows = (pkg.packagingRows || []).map((row, i) => ({
+      nature: row.nature || '',
+      marking: row.marking || '',
+      method: row.method || '',
+      qty: row.qty || '',
+      labelFile: getDoc(docs, `packaging_label_${i}`),
+      batchCode: row.batchCode || '',
+    }));
 
     r = drawTable(ws, r, [
-      { col: 1, label: 'Nature of Packaging *', key: 'packagingNature' },
-      { col: 2, label: 'Marking on Article *', key: 'markingOnArticle' },
-      { col: 3, label: 'Method of Marking *\n(brand, product description, type, rating etc.)', key: 'markingMethod' },
-      { col: 4, label: 'Quantity per Package *', key: 'qtyPerPackage' },
+      { col: 1, label: 'Nature of Packaging *', key: 'nature' },
+      { col: 2, label: 'Marking on Article *', key: 'marking' },
+      { col: 3, label: 'Method of Marking *\n(brand, product description, type, rating etc.)', key: 'method' },
+      { col: 4, label: 'Quantity per Package *', key: 'qty' },
       { col: 5, label: 'Form of Label(s) *\n(write filename)', key: 'labelFile' },
       { col: 6, label: 'Batch / Code / Serial No.\nfor Identification *', key: 'batchCode' },
     ], pkgRows, NC);
@@ -538,7 +556,7 @@ async function generateExcel(submission) {
       ownedBy: b.ownedBy || '',
       status: b.status || '',
       regDate: b.regDate || '',
-      file: getDoc(docs, `packaging_trademark_${i}`) || ''
+      file: getDoc(docs, `packaging_brand_file_${i}`) || ''
     }));
 
     r = drawTable(ws, r, [
@@ -577,12 +595,19 @@ async function generateExcel(submission) {
     subLabel(ws, r++, NC, 'If No — Sub-Contracted Tests');
     spacer(ws, r++, NC, 4);
 
+    const subTestRows = (testing.subContractedTests || []).map((row, i) => ({
+      clauseNo: row.clauseNo || '',
+      testName: row.testName || '',
+      consentLetter: getDoc(docs, `testing_consent_letter_${i}`),
+      labName: row.labName || '',
+    }));
+
     r = drawTable(ws, r, [
       { col: 1, label: 'Clause No.\nof IS *', key: 'clauseNo' },
       { col: 2, label: 'Test to be\nSub-Contracted *', key: 'testName' },
       { col: 3, label: 'Upload Consent\nLetter (filename) *', key: 'consentLetter', merge: 2 },
       { col: 5, label: 'Name of Lab Intended for Sub-Contracting\n(Must be BIS Recognised or Empanelled Lab) *', key: 'labName', merge: 2 },
-    ], testing.subContractedTests || [], NC);
+    ], subTestRows, NC);
 
     spacer(ws, r++, NC, 6);
     secHeader2(ws, r++, NC, '2.  List of Testing Equipment');
@@ -790,6 +815,15 @@ async function generateExcel(submission) {
       setCell(ws, r, 5, status, { fg: statusFg, bg: statusBg, align: 'center', size: 9, bold: !!status });
       r++;
     });
+
+    const miscDoc = getDoc(docs, 'checklist_misc');
+    ws.getRow(r).height = 22;
+    setCell(ws, r, 1, '', { bg: 'FFFFFFFF' });
+    setCell(ws, r, 2, 'Miscellaneous Document', { bg: 'FFFFFFFF', size: 9, wrap: true });
+    setCell(ws, r, 3, 'Optional', { bold: true, fg: 'FF666600', bg: 'FFFFFDE7', align: 'center', size: 9 });
+    setCell(ws, r, 4, '', { bg: 'FFFFFFFF' });
+    setCell(ws, r, 5, miscDoc || '', { bg: 'FFFFFFFF', size: 9 });
+    r++;
 
     spacer(ws, r++, NC, 5);
     mergeSet(ws, r, 1, r, NC, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
