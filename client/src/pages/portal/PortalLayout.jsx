@@ -135,7 +135,7 @@ export default function PortalLayout({ basePath, TABS, tabComponents }) {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="px-8 py-8">
             {isSubmitted && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded flex items-center gap-3">
                 <CheckCircle size={18} className="text-green-500 shrink-0" />
