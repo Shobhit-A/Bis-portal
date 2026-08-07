@@ -90,34 +90,32 @@ export default function PortalLayout({ basePath, TABS, tabComponents }) {
     <SubmissionIdContext.Provider value={submissionId}>
       <div className="min-h-screen bg-surface flex flex-col">
         <div className="sticky top-0 z-20 shrink-0">
-          <nav className="bg-primary px-6 py-3 flex items-center justify-between">
+          <nav className="bg-white border-b border-border shadow-sm px-6 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate(basePath)} className="text-white/70 hover:text-white" title="Back to My Forms">
+              <button onClick={() => navigate(basePath)} className="text-gray-400 hover:text-primary" title="Back to My Forms">
                 <ArrowLeft size={16} />
               </button>
-              <div className="bg-white rounded px-2 py-1.5 flex items-center">
-                <img src="/logo.png" alt="Absolute Veritas" className="h-8 w-auto object-contain" />
-              </div>
+              <img src="/logo.png" alt="Absolute Veritas" className="h-9 w-auto object-contain" />
               <div>
-                <span className="text-white font-semibold text-sm">{submission?.label || 'Absolute Veritas Form Submission'}</span>
-                {isSubmitted && <span className="ml-3 text-xs bg-green-400/20 text-green-200 px-2 py-0.5 rounded">Submitted</span>}
+                <span className="text-gray-900 font-semibold text-sm">{submission?.label || 'Absolute Veritas Form Submission'}</span>
+                {isSubmitted && <span className="ml-3 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Submitted</span>}
               </div>
             </div>
             <div className="flex items-center gap-4">
               {!isSubmitted && (
                 <div className="flex items-center gap-2">
                   {saving ? (
-                    <span className="text-white/50 text-xs flex items-center gap-1"><Clock size={11} /> Saving...</span>
+                    <span className="text-gray-400 text-xs flex items-center gap-1"><Clock size={11} /> Saving...</span>
                   ) : lastSaved ? (
-                    <span className="text-white/50 text-xs flex items-center gap-1"><CheckCircle size={11} /> Saved {lastSaved.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span className="text-gray-400 text-xs flex items-center gap-1"><CheckCircle size={11} /> Saved {lastSaved.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                   ) : null}
-                  <button onClick={handleManualSave} className="text-white/70 hover:text-white text-xs flex items-center gap-1 px-2 py-1 rounded border border-white/20 hover:border-white/50">
+                  <button onClick={handleManualSave} className="text-gray-500 hover:text-primary text-xs flex items-center gap-1 px-2 py-1 rounded border border-border hover:border-primary/50">
                     <Save size={12} /> Save
                   </button>
                 </div>
               )}
-              <span className="text-white/60 text-xs">{user?.username}</span>
-              <button onClick={() => { logout(); navigate('/login'); }} className="text-white/70 hover:text-white text-xs flex items-center gap-1.5">
+              <span className="text-gray-400 text-xs">{user?.username}</span>
+              <button onClick={() => { logout(); navigate('/login'); }} className="text-gray-500 hover:text-primary text-xs flex items-center gap-1.5">
                 <LogOut size={13} /> Sign out
               </button>
             </div>

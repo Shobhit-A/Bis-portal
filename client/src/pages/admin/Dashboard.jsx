@@ -218,16 +218,14 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-surface">
       {/* Navbar */}
-      <nav className="bg-primary px-6 py-3 flex items-center justify-between">
+      <nav className="bg-white border-b border-border shadow-sm px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded px-2 py-1.5 flex items-center">
-            <img src="/logo.png" alt="Absolute Veritas" className="h-8 w-auto object-contain" />
-          </div>
-          <span className="text-white font-semibold text-sm">Absolute Veritas Form Submission · Admin</span>
+          <img src="/logo.png" alt="Absolute Veritas" className="h-9 w-auto object-contain" />
+          <span className="text-gray-900 font-semibold text-sm">Absolute Veritas Form Submission · Admin</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-white/70 text-xs">{user?.email || user?.username}</span>
-          <button onClick={() => { logout(); navigate('/login'); }} className="text-white/70 hover:text-white flex items-center gap-1.5 text-xs">
+          <span className="text-gray-400 text-xs">{user?.email || user?.username}</span>
+          <button onClick={() => { logout(); navigate('/login'); }} className="text-gray-500 hover:text-primary flex items-center gap-1.5 text-xs">
             <LogOut size={14} /> Sign out
           </button>
         </div>

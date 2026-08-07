@@ -81,19 +81,17 @@ export default function MyForms({ formType, basePath, title }) {
 
   return (
     <div className="min-h-screen bg-surface">
-      <nav className="bg-primary px-6 py-3 flex items-center justify-between">
+      <nav className="bg-white border-b border-border shadow-sm px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/portal')} className="text-white/70 hover:text-white" title="Back to Application Types">
+          <button onClick={() => navigate('/portal')} className="text-gray-400 hover:text-primary" title="Back to Application Types">
             <ArrowLeft size={16} />
           </button>
-          <div className="bg-white rounded px-2 py-1.5 flex items-center">
-            <img src="/logo.png" alt="Absolute Veritas" className="h-8 w-auto object-contain" />
-          </div>
-          <span className="text-white font-semibold text-sm">{title}</span>
+          <img src="/logo.png" alt="Absolute Veritas" className="h-9 w-auto object-contain" />
+          <span className="text-gray-900 font-semibold text-sm">{title}</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-white/60 text-xs">{user?.username}</span>
-          <button onClick={() => { logout(); navigate('/login'); }} className="text-white/70 hover:text-white text-xs flex items-center gap-1.5">
+          <span className="text-gray-400 text-xs">{user?.username}</span>
+          <button onClick={() => { logout(); navigate('/login'); }} className="text-gray-500 hover:text-primary text-xs flex items-center gap-1.5">
             <LogOut size={13} /> Sign out
           </button>
         </div>
