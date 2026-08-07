@@ -641,9 +641,14 @@ async function generateExcel(submission) {
     secHeader(ws, r++, 4, 'Test Report');
     spacer(ws, r++, 4, 4);
 
-    lv1(ws, r++, 'A) In House Test Report For The Product (In the Format as per Form IV in Scheme I of Regulations) *', getDoc(docs, 'testReport_inhouse'));
-    lv1(ws, r++, 'B) For Raw Material (Used in Finished Product Sample Lot) — If Indian Standard requires raw material conformity *', tr.rawMaterialConformity);
-    if (tr.rawMaterialConformity === 'Yes') {
+    // Fall back to the pre-rebuild field/fieldKey names for submissions filled out before
+    // this tab was rebuilt to match the real BIS portal — old data must not just vanish.
+    const inHouseDoc = getDoc(docs, 'testReport_inhouse') || getDoc(docs, 'testReport_product_files');
+    const rawMatConformity = tr.rawMaterialConformity || tr.rawMatConformityRequired || '';
+
+    lv1(ws, r++, 'A) In House Test Report For The Product (In the Format as per Form IV in Scheme I of Regulations) *', inHouseDoc, 4, 34);
+    lv1(ws, r++, 'B) For Raw Material (Used in Finished Product Sample Lot) — If Indian Standard requires raw material conformity *', rawMatConformity, 4, 34);
+    if (rawMatConformity === 'Yes') {
       lv1(ws, r++, 'Raw Material Conformity Test Report *', getDoc(docs, 'testReport_raw_material_conformity'));
     }
 
