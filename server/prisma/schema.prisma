@@ -28,6 +28,7 @@ enum Role {
 enum FormType {
   FMCS
   ISI
+  CRS
 }
 
 model Submission {
