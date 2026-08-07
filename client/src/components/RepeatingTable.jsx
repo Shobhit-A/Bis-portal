@@ -9,7 +9,7 @@ import { FileUpload } from './FormField';
 // A file column's upload fieldKey is `${sectionKey}_${column.fieldKeySuffix}_${row.id}` —
 // never derive it from the row's array index, or removing/reordering rows will silently
 // reassign an uploaded document to the wrong row.
-export function RepeatingTable({ sectionKey, columns, rows, onChange, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
+export function RepeatingTable({ sectionKey, columns, rows, onChange, getDocForField, onDocUploaded, onDocRemoved, isSubmitted, protectFirstRow = false }) {
   const list = rows || [];
 
   const addRow = () => onChange([...list, { id: crypto.randomUUID() }]);
@@ -31,7 +31,7 @@ export function RepeatingTable({ sectionKey, columns, rows, onChange, getDocForF
           <tbody>
             {list.length === 0 ? (
               <tr><td colSpan={columns.length + 1} className="text-center py-4 text-gray-400">No rows added yet</td></tr>
-            ) : list.map(row => (
+            ) : list.map((row, idx) => (
               <tr key={row.id} className="border-b border-border last:border-0">
                 {columns.map(c => (
                   <td key={c.key} className="px-2 py-1.5 align-top">
@@ -58,7 +58,9 @@ export function RepeatingTable({ sectionKey, columns, rows, onChange, getDocForF
                 ))}
                 {!isSubmitted && (
                   <td className="px-2 py-1.5 align-top">
-                    <button type="button" onClick={() => removeRow(row.id)} className="text-gray-400 hover:text-red-500"><X size={14} /></button>
+                    {!(protectFirstRow && idx === 0) && (
+                      <button type="button" onClick={() => removeRow(row.id)} className="text-gray-400 hover:text-red-500"><X size={14} /></button>
+                    )}
                   </td>
                 )}
               </tr>

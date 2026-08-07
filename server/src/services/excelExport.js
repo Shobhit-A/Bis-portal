@@ -847,4 +847,216 @@ async function generateExcel(submission) {
   return wb;
 }
 
-module.exports = { generateExcel };
+async function generateExcelCRS(submission) {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Absolute Veritas Portal';
+  wb.created = new Date();
+
+  const fd = submission.formData || {};
+  const docs = submission.documents || [];
+  const checklist = fd.checklist || {};
+  const account = fd.account || {};
+  const address = fd.address || {};
+  const brand = fd.brand || {};
+  const mgmt = fd.management || {};
+  const contact = fd.contact || {};
+  const air = fd.air || {};
+  const uploads = fd.uploads || {};
+  const decl = fd.declaration || {};
+
+  const clientInfo = `Client: ${submission.user?.username || '—'}   |   Status: ${submission.status}   |   Last Updated: ${new Date(submission.updatedAt).toLocaleDateString('en-IN')}`;
+
+  const CHECKLIST_DOCS = [
+    { no: 1, doc: 'Brand Registration Certificate(s)' },
+    { no: 2, doc: 'Brand Authorization Letter' },
+    { no: 3, doc: 'Authorization from Factory CEO/MD/Head for Filling and Signing Form-1' },
+    { no: 4, doc: 'Authorization Letter from CEO/Top Management of AIR Firm' },
+    { no: 5, doc: 'ID Card of Authorized Signatory of AIR' },
+    { no: 6, doc: 'Raw Materials/Components' },
+  ];
+
+  // ============================================================
+  // SHEET 1 — REGISTRATION & ADDRESS
+  // ============================================================
+  {
+    const ws = wb.addWorksheet('Registration & Address');
+    ws.columns = [{ width: 28 }, { width: 42 }, { width: 28 }, { width: 42 }];
+    let r = 1;
+    spacer(ws, r++, 4, 8);
+    titleRow(ws, r++, 4, 'CRS APPLICATION — REGISTRATION & ADDRESS');
+    noteRow(ws, r++, 4, '* Mandatory Fields');
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Document Checklist');
+    spacer(ws, r++, 4, 4);
+    CHECKLIST_DOCS.forEach(d => {
+      const status = checklist[String(d.no)] || '';
+      lv2(ws, r++, `${d.no}. ${d.doc}`, status, '', '');
+    });
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Basic Details');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'User Name *', account.userName);
+    lv2(ws, r++, 'Company URL', account.companyUrl || '', 'Email *', account.email || '');
+    lv2(ws, r++, 'Name *', account.name || '', 'Designation', account.designation || '');
+    lv1(ws, r++, 'Mobile No. *', account.mobile);
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Manufacturer Unit Details');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Manufacturing Unit Name *', account.unitName);
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Address of the Manufacturing Unit');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Email *', address.mfgEmail);
+    lv1(ws, r++, 'Address *', address.mfgAddress);
+    lv2(ws, r++, 'Country *', address.mfgCountry || '', 'State/Province *', address.mfgState || '');
+    lv2(ws, r++, 'Zip Code *', address.mfgZip || '', 'Fax No.', address.mfgFax || '');
+    lv1(ws, r++, 'Contact No. *', address.mfgContact);
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Address for Correspondence');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Email *', address.corrEmail);
+    lv1(ws, r++, 'Address *', address.corrAddress);
+    lv2(ws, r++, 'Country *', address.corrCountry || '', 'State/Province *', address.corrState || '');
+    lv2(ws, r++, 'Zip Code *', address.corrZip || '', 'Fax No.', address.corrFax || '');
+    lv1(ws, r++, 'Contact No. *', address.corrContact);
+    lv1(ws, r++, 'Correspondence Address Selection *', address.correspondenceSelection);
+    lv1(ws, r++, 'Address Authentication Document', getDoc(docs, 'address_auth_doc'));
+
+    spacer(ws, r++, 4, 5);
+    mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+  }
+
+  // ============================================================
+  // SHEET 2 — BRAND & MANAGEMENT
+  // ============================================================
+  {
+    const ws = wb.addWorksheet('Brand & Management');
+    ws.columns = [{ width: 6 }, { width: 30 }, { width: 30 }, { width: 20 }, { width: 20 }, { width: 18 }];
+    let r = 1;
+    spacer(ws, r++, 6, 8);
+    titleRow(ws, r++, 6, 'CRS APPLICATION — BRAND & MANAGEMENT DETAILS');
+    spacer(ws, r++, 6, 6);
+
+    secHeader(ws, r++, 6, 'Brand Details');
+    spacer(ws, r++, 6, 4);
+    const brandRows = (brand.rows || []).map((row, i) => ({
+      sno: i + 1, brandName: row.brandName || '', cert: getDoc(docs, `brand_cert_${row.id}`),
+      ownedBy: row.ownedBy || '', registered: row.registered || '', registrationDate: row.registrationDate || '',
+    }));
+    r = drawTable(ws, r, [
+      { col: 1, label: 'S.No.', key: 'sno' },
+      { col: 2, label: 'Brand Name', key: 'brandName' },
+      { col: 3, label: 'Registration Certificate', key: 'cert' },
+      { col: 4, label: 'Owned By', key: 'ownedBy' },
+      { col: 5, label: 'Registered?', key: 'registered' },
+      { col: 6, label: 'Registration Date', key: 'registrationDate' },
+    ], brandRows, 6);
+    spacer(ws, r++, 6, 6);
+
+    secHeader(ws, r++, 6, 'Top Management Details');
+    spacer(ws, r++, 6, 4);
+    const topRows = (mgmt.topRows || []).map((row, i) => ({ sno: i + 1, name: row.name || '', designation: row.designation || '' }));
+    r = drawTable(ws, r, [
+      { col: 1, label: 'S.No.', key: 'sno' },
+      { col: 2, label: 'Name', key: 'name', merge: 2 },
+      { col: 4, label: 'Designation', key: 'designation', merge: 3 },
+    ], topRows, 6);
+    spacer(ws, r++, 6, 6);
+
+    secHeader(ws, r++, 6, 'Technical Management Details');
+    spacer(ws, r++, 6, 4);
+    const techRows = (mgmt.techRows || []).map((row, i) => ({ sno: i + 1, name: row.name || '', designation: row.designation || '' }));
+    r = drawTable(ws, r, [
+      { col: 1, label: 'S.No.', key: 'sno' },
+      { col: 2, label: 'Name', key: 'name', merge: 2 },
+      { col: 4, label: 'Designation', key: 'designation', merge: 3 },
+    ], techRows, 6);
+
+    spacer(ws, r++, 6, 5);
+    mergeSet(ws, r, 1, r, 6, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+  }
+
+  // ============================================================
+  // SHEET 3 — CONTACT & AIR
+  // ============================================================
+  {
+    const ws = wb.addWorksheet('Contact & AIR');
+    ws.columns = [{ width: 28 }, { width: 42 }, { width: 28 }, { width: 42 }];
+    let r = 1;
+    spacer(ws, r++, 4, 8);
+    titleRow(ws, r++, 4, 'CRS APPLICATION — CONTACT PERSON & AIR');
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Contact Person');
+    spacer(ws, r++, 4, 4);
+    lv2(ws, r++, 'Name *', contact.name || '', 'Designation *', contact.designation || '');
+    lv2(ws, r++, 'Mobile Number *', contact.mobile || '', 'Email *', contact.email || '');
+    lv1(ws, r++, 'Fax', contact.fax);
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Manufacturer Details');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Firm Name', account.unitName);
+    lv1(ws, r++, 'Firm Address', address.mfgAddress);
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'AIR / Authorized Signatory');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Representative Scenario *', air.scenario);
+    lv2(ws, r++, 'Firm Name *', air.repFirmName || '', 'Firm Address *', air.repFirmAddress || '');
+    lv2(ws, r++, 'Aadhar Number', air.aadharNumber || '', 'Govt. Issued Document', air.govtDocType || '');
+    lv1(ws, r++, 'Document Number', air.govtDocNumber);
+    lv2(ws, r++, 'Person Name', air.personName || '', 'Designation', air.personDesignation || '');
+    lv2(ws, r++, 'Mobile Number', air.personMobile || '', 'Email', air.personEmail || '');
+    lv2(ws, r++, 'State', air.state || '', 'Zip Code/Pin', air.zipCode || '');
+
+    spacer(ws, r++, 4, 5);
+    mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+  }
+
+  // ============================================================
+  // SHEET 4 — UPLOADS & DECLARATION
+  // ============================================================
+  {
+    const ws = wb.addWorksheet('Uploads & Declaration');
+    ws.columns = [{ width: 40 }, { width: 40 }, { width: 28 }, { width: 42 }];
+    let r = 1;
+    spacer(ws, r++, 4, 8);
+    titleRow(ws, r++, 4, 'CRS APPLICATION — UPLOAD DOCUMENTS & DECLARATION');
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Upload Documents');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Authorization from Factory CEO/MD/Head', getDoc(docs, 'uploads_ceo_auth'));
+    lv1(ws, r++, 'Raw Materials/Components', getDoc(docs, 'uploads_raw_materials'));
+    lv1(ws, r++, 'Authorization Letter from AIR Firm CEO/Top Mgmt', getDoc(docs, 'uploads_air_ceo_auth'));
+    lv1(ws, r++, 'In-house Testing Facility?', uploads.inHouseTesting);
+    lv1(ws, r++, 'Complete Manufacturing Facility?', uploads.completeManufacturing);
+    lv1(ws, r++, 'ID Card of Authorized Signatory of AIR', getDoc(docs, 'uploads_air_id_card'));
+    lv1(ws, r++, 'Other Document', getDoc(docs, 'uploads_other'));
+    lv1(ws, r++, 'Factory Address Proof / Business License', getDoc(docs, 'uploads_factory_proof'));
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Declaration & Undertaking');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Statutory Permissions Required?', decl.statutoryPermissions);
+    lv1(ws, r++, 'Other Information?', decl.otherInfo);
+    lv1(ws, r++, 'Other Request?', decl.otherRequest);
+    lv2(ws, r++, 'Submitter Name *', decl.submitterName || '', 'Submitter Designation *', decl.submitterDesignation || '');
+    lv1(ws, r++, 'Weekly Off?', decl.weeklyOff);
+    lv1(ws, r++, 'Weekly Off Days', decl.weeklyOffDays);
+    lv2(ws, r++, 'Signatory Name *', decl.signatoryName || '', 'Date *', decl.signDate || '');
+
+    spacer(ws, r++, 4, 5);
+    mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+  }
+
+  return wb;
+}
+
+module.exports = { generateExcel, generateExcelCRS };

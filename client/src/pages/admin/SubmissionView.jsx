@@ -27,6 +27,19 @@ const SECTIONS_BY_TYPE = {
     { key: 'testReport', label: 'Test Report Details' },
     { key: 'declaration', label: 'Declaration & Undertaking' },
   ],
+  CRS: [
+    { key: 'checklist', label: 'Document Checklist' },
+    { key: 'account', label: 'Registration & Manufacturing Unit' },
+    { key: 'address', label: 'Manufacturing Unit & Correspondence Address' },
+    { key: 'product', label: 'Product & Testing' },
+    { key: 'modelBrand', label: 'Model & Brand Mapping' },
+    { key: 'brand', label: 'Brand Details' },
+    { key: 'management', label: 'Management Details' },
+    { key: 'contact', label: 'Contact Person' },
+    { key: 'air', label: 'AIR / Authorized Signatory' },
+    { key: 'uploads', label: 'Upload Documents' },
+    { key: 'declaration', label: 'Declaration & Undertaking' },
+  ],
 };
 
 export default function SubmissionView() {

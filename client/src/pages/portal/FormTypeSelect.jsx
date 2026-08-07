@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
-import { LogOut, FileCheck2, ShieldCheck } from 'lucide-react';
+import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck } from 'lucide-react';
 
 export default function FormTypeSelect() {
   const { user, logout } = useAuth();
@@ -22,10 +22,10 @@ export default function FormTypeSelect() {
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-6 py-16">
+      <div className="max-w-4xl mx-auto px-6 py-16">
         <h1 className="text-lg font-semibold text-gray-900 mb-1 text-center">Choose Application Type</h1>
         <p className="text-sm text-gray-500 mb-10 text-center">Select the certification scheme you'd like to apply for.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <button onClick={() => navigate('/portal/fmcs')} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
             <FileCheck2 size={28} className="text-primary mb-4" />
             <div className="text-base font-semibold text-gray-900 mb-1">FMCS</div>
@@ -35,6 +35,11 @@ export default function FormTypeSelect() {
             <ShieldCheck size={28} className="text-primary mb-4" />
             <div className="text-base font-semibold text-gray-900 mb-1">ISI — BIS Standard Mark</div>
             <p className="text-xs text-gray-500">Indian Standards Institute (ISI) certification mark application.</p>
+          </button>
+          <button onClick={() => navigate('/portal/crs')} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
+            <ClipboardCheck size={28} className="text-primary mb-4" />
+            <div className="text-base font-semibold text-gray-900 mb-1">CRS</div>
+            <p className="text-xs text-gray-500">Compulsory Registration Scheme application.</p>
           </button>
         </div>
       </div>
