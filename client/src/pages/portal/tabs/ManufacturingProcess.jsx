@@ -2,6 +2,15 @@ import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 import { Plus, Trash2 } from 'lucide-react';
 
+const CONFORMITY_OPTIONS = [
+  'Raw material is ISI marked',
+  'Test report from BIS/BIS approved lab',
+  'Supplier test certificate/test report from NABL accredited laboratory',
+  'Test Certificate from Supplier',
+  'In house test report',
+  'Any Other',
+];
+
 export default function ManufacturingProcess({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.manufacturing || {};
   const set = (key, val) => updateSection('manufacturing', { ...data, [key]: val });
@@ -35,8 +44,16 @@ export default function ManufacturingProcess({ formData, updateSection, getDocFo
                 <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                   {['material', 'supplier', 'conformity', 'howReceived', 'records', 'other'].map(key => (
                     <td key={key} className="px-2 py-1.5 border-t border-border">
-                      <input className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5 min-w-24"
-                        value={row[key] || ''} onChange={e => updateRaw(i, key, e.target.value)} disabled={isSubmitted} />
+                      {key === 'conformity' ? (
+                        <select className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5 min-w-24"
+                          value={row[key] || ''} onChange={e => updateRaw(i, key, e.target.value)} disabled={isSubmitted}>
+                          <option value="">Select</option>
+                          {CONFORMITY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      ) : (
+                        <input className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5 min-w-24"
+                          value={row[key] || ''} onChange={e => updateRaw(i, key, e.target.value)} disabled={isSubmitted} />
+                      )}
                     </td>
                   ))}
                   {!isSubmitted && <td className="px-2 py-1.5 border-t border-border"><button onClick={() => set('rawMaterials', rawMaterials.filter((_, idx) => idx !== i))} className="text-gray-300 hover:text-red-500"><Trash2 size={13} /></button></td>}
