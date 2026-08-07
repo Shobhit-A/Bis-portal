@@ -46,7 +46,7 @@ export default function RegisterPage() {
       {/* Header */}
       <div className="bg-primary px-6 py-4 flex items-center gap-3">
         <div className="bg-white rounded px-2 py-1.5 flex items-center">
-          <img src="/logo.png" alt="Absolute Veritas" className="h-6 w-auto object-contain" />
+          <img src="/logo.png" alt="Absolute Veritas" className="h-8 w-auto object-contain" />
         </div>
         <span className="text-white font-semibold text-sm tracking-wide">ABSOLUTE VERITAS FORM SUBMISSION</span>
       </div>
