@@ -421,8 +421,8 @@ async function generateExcel(submission) {
   // ============================================================
   {
     const ws = wb.addWorksheet('Manufacturing Process');
-    ws.columns = [{ width: 28 }, { width: 24 }, { width: 30 }, { width: 30 }, { width: 20 }];
-    const NC = 5;
+    ws.columns = [{ width: 28 }, { width: 22 }, { width: 18 }, { width: 30 }, { width: 30 }, { width: 20 }];
+    const NC = 6;
     let r = 1;
     spacer(ws, r++, NC, 8);
     titleRow(ws, r++, NC, 'MANUFACTURING PROCESS');
@@ -434,9 +434,10 @@ async function generateExcel(submission) {
     r = drawTable(ws, r, [
       { col: 1, label: 'Raw Material\n(with grade, if any) *', key: 'material' },
       { col: 2, label: 'Name of Supplier *', key: 'supplier' },
-      { col: 3, label: 'Conformity of Material', key: 'conformity' },
-      { col: 4, label: 'How Received\n(Batches/Lots/Nature of Package) *', key: 'howReceived' },
-      { col: 5, label: 'Records Maintained', key: 'records' },
+      { col: 3, label: 'Supplier Country *', key: 'supplierCountry' },
+      { col: 4, label: 'Conformity of Material', key: 'conformity' },
+      { col: 5, label: 'How Received\n(Batches/Lots/Nature of Package) *', key: 'howReceived' },
+      { col: 6, label: 'Records Maintained', key: 'records' },
     ], mfg.rawMaterials || [], NC);
 
     spacer(ws, r++, NC, 6);
