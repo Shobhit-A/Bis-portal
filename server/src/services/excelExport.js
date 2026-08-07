@@ -578,8 +578,8 @@ async function generateExcel(submission) {
   // ============================================================
   {
     const ws = wb.addWorksheet('Testing & Inspection Details');
-    ws.columns = [{ width: 10 }, { width: 28 }, { width: 22 }, { width: 18 }, { width: 18 }, { width: 24 }];
-    const NC = 6;
+    ws.columns = [{ width: 14 }, { width: 24 }, { width: 28 }, { width: 20 }, { width: 24 }];
+    const NC = 5;
     let r = 1;
     spacer(ws, r++, NC, 8);
     titleRow(ws, r++, NC, 'TESTING & INSPECTION DETAILS');
@@ -588,26 +588,35 @@ async function generateExcel(submission) {
     secHeader2(ws, r++, NC, '1.  In-House Testing Facility');
     spacer(ws, r++, NC, 5);
     ws.getRow(r).height = 24;
-    mergeSet(ws, r, 1, r, 4, 'Do you have in-house facility for complete testing of product as per Indian Standard? *',
+    mergeSet(ws, r, 1, r, 3, 'Do you have in house facility for complete testing of product as per Indian Standard *',
       { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
-    mergeSet(ws, r, 5, r, NC, testing.inHouseTesting || '', { bg: 'FFFFFFFF', size: 10 });
+    mergeSet(ws, r, 4, r, NC, testing.inHouseTesting || '', { bg: 'FFFFFFFF', size: 10 });
     r++;
+    if (testing.inHouseTesting === 'No') {
+      const consentDoc = getDoc(docs, 'testing_consent_letter');
+      ws.getRow(r).height = 20;
+      mergeSet(ws, r, 1, r, 3, 'Upload Consent Letter', { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
+      mergeSet(ws, r, 4, r, NC, consentDoc || '', { fg: consentDoc ? 'FF000000' : 'FFFF0000', bg: 'FFFFFFFF', size: 10 });
+      r++;
+    }
     spacer(ws, r++, NC, 5);
-    subLabel(ws, r++, NC, 'If No — Sub-Contracted Tests');
+    subLabel(ws, r++, NC, 'Please list the tests you intend to sub-contract');
     spacer(ws, r++, NC, 4);
 
-    const subTestRows = (testing.subContractedTests || []).map((row, i) => ({
+    const subTestRows = (testing.subContractedTests || []).map(row => ({
       clauseNo: row.clauseNo || '',
       testName: row.testName || '',
-      consentLetter: getDoc(docs, `testing_consent_letter_${i}`),
+      labRelationship: row.labRelationship || '',
       labName: row.labName || '',
+      bisRecognized: row.bisRecognized || '',
     }));
 
     r = drawTable(ws, r, [
-      { col: 1, label: 'Clause No.\nof IS *', key: 'clauseNo' },
-      { col: 2, label: 'Test to be\nSub-Contracted *', key: 'testName' },
-      { col: 3, label: 'Upload Consent\nLetter (filename) *', key: 'consentLetter', merge: 2 },
-      { col: 5, label: 'Name of Lab Intended for Sub-Contracting\n(Must be BIS Recognised or Empanelled Lab) *', key: 'labName', merge: 2 },
+      { col: 1, label: 'Clause No.\nof IS', key: 'clauseNo' },
+      { col: 2, label: 'Test to be\nSub-Contracted', key: 'testName' },
+      { col: 3, label: 'Name of the lab/ group co. / CM/L-no.\nof the licence with whom sharing is intended', key: 'labRelationship' },
+      { col: 4, label: 'Name Of LAB', key: 'labName' },
+      { col: 5, label: 'BIS Recognised or\nEmpanelled Lab?', key: 'bisRecognized' },
     ], subTestRows, NC);
 
     spacer(ws, r++, NC, 6);
