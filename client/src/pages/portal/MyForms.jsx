@@ -83,8 +83,8 @@ export default function MyForms() {
     <div className="min-h-screen bg-surface">
       <nav className="bg-primary px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded px-1.5 py-1 flex items-center">
-            <img src="/logo.png" alt="Absolute Veritas" className="h-5 w-auto object-contain" />
+          <div className="bg-white rounded px-2 py-1.5 flex items-center">
+            <img src="/logo.png" alt="Absolute Veritas" className="h-8 w-auto object-contain" />
           </div>
           <span className="text-white font-semibold text-sm">Absolute Veritas Form Submission</span>
         </div>
