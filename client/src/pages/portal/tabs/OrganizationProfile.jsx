@@ -10,10 +10,15 @@ export default function OrganizationProfile({ formData, updateSection, getDocFor
 
   return (
     <div className="space-y-6">
+      <p className="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded p-3">
+        Following Details are crucial while appling for BIS Certification License. Please fill correct details and upload corresponding documents. Incorrect details or/and documents may lead to rejection of your application.
+      </p>
+
       {/* User Details */}
       <div className="card">
-        <div className="section-header">1. User Details</div>
+        <div className="section-header">Organization Profile</div>
         <div className="p-6">
+          <div className="text-sm font-medium text-gray-700 mb-3">User Details</div>
           <div className="form-row">
             <Field label="Registered Email" required><input type="email" {...d('registeredEmail')} /></Field>
             <Field label="Registered Mobile Number" required><input {...d('registeredMobile')} maxLength={10} /></Field>
@@ -23,23 +28,30 @@ export default function OrganizationProfile({ formData, updateSection, getDocFor
 
       {/* Firm / Office Details */}
       <div className="card">
-        <div className="section-header">2. Firm / Office Details</div>
+        <div className="section-header">Firm/Office Details</div>
         <div className="p-6 space-y-4">
           <div className="form-row">
-            <Field label="Firm Name" required><input {...d('firmName')} /></Field>
-            <Field label="CEO / MD Name" required><input {...d('ceoName')} /></Field>
+            <Field label="Firm Name" required><input {...d('firmName')} placeholder="Enter Firm Name" /></Field>
+            <Field label="CEO Name" required><input {...d('ceoName')} placeholder="Enter Firm CEO Name" /></Field>
           </div>
-          <Field label="Address Line 1" required><input {...d('officeAddr1')} /></Field>
-          <Field label="Address Line 2"><input {...d('officeAddr2')} /></Field>
           <div className="form-row">
+            <Field label="Office Address" required>
+              <div className="space-y-2">
+                <input {...d('officeAddressLine1')} placeholder="Enter Office Address" />
+                <input {...d('officeAddressLine2')} placeholder="Enter Office Address" />
+              </div>
+            </Field>
             <Field label="Country" required>
               <Select value={data.officeCountry} onChange={v => set('officeCountry', v)} options={COUNTRIES} />
             </Field>
-            <Field label="District" required><input {...d('officeDistrict')} /></Field>
           </div>
           <div className="form-row">
-            <Field label="City" required><input {...d('officeCity')} /></Field>
-            <Field label="PIN Code"><input {...d('officePIN')} maxLength={6} /></Field>
+            <Field label="Address 1" required><input {...d('officeAddr1')} placeholder="Enter firm Address" /></Field>
+            <Field label="Address 2" required><input {...d('officeAddr2')} placeholder="Enter Firm District Name" /></Field>
+          </div>
+          <div className="form-row">
+            <Field label="City" required><input {...d('officeCity')} placeholder="Enter Firm City Name" /></Field>
+            <Field label="PIN code"><input {...d('officePIN')} maxLength={6} placeholder="Enter PIN Code" /></Field>
           </div>
           <div className="form-row">
             <Field label="Address Proof Document Type" required>
@@ -51,19 +63,21 @@ export default function OrganizationProfile({ formData, updateSection, getDocFor
             </Field>
           </div>
           <div className="form-row">
-            <Field label="Firm / Office Email" required><input type="email" {...d('officeEmail')} /></Field>
-            <Field label="Firm / Office Mobile"><input {...d('officeMobile')} /></Field>
+            <Field label="Firm/Office Email" required><input type="email" {...d('officeEmail')} placeholder="Enter Office E-Mail" /></Field>
+            <Field label="Firm/Office Mobile Number"><input {...d('officeMobile')} placeholder="Enter Office Contact Number" /></Field>
           </div>
-          <div className="form-row">
-            <Field label="Landline STD Code"><input {...d('landlineSTD')} /></Field>
-            <Field label="Landline Number"><input {...d('landlineNumber')} /></Field>
-          </div>
+          <Field label="Landline Number">
+            <div className="grid grid-cols-2 gap-3">
+              <input {...d('landlineSTD')} placeholder="Enter Office STD Code" />
+              <input {...d('landlineNumber')} placeholder="Enter Office Landline" />
+            </div>
+          </Field>
         </div>
       </div>
 
       {/* Registration Details */}
       <div className="card">
-        <div className="section-header">3. Registration Details</div>
+        <div className="section-header">Registration Details</div>
         <div className="p-6 space-y-4">
           <div className="form-row">
             <Field label="Sector" required>
@@ -74,58 +88,67 @@ export default function OrganizationProfile({ formData, updateSection, getDocFor
             </Field>
           </div>
           <div className="form-row">
-            <Field label="Proof of Establishment Type" required>
+            <Field label="Proof of Establishment of Firm Document Type" required>
               <Select value={data.estabProofType} onChange={v => set('estabProofType', v)}
                 options={['Certificate of Incorporation', 'Business Licence', 'Partnership Deed', 'Proprietorship Declaration', 'GST Registration Certificate', 'Udyam Registration Certificate', 'Trade Licence']} />
             </Field>
-            <Field label="Proof of Establishment Document" required>
+            <Field label="Proof of Establishment of Firm" required>
               <FileUpload fieldKey="organization_estab_proof" fieldLabel="Proof of Establishment"
                 existingDoc={getDocForField('organization_estab_proof')} onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
             </Field>
           </div>
           <div className="form-row">
-            <Field label="Registration / Business License Number"><input {...d('regNumber')} /></Field>
-            <Field label="Date of Registration"><input type="date" {...d('regDate')} /></Field>
+            <Field label="Registration Number/Business License Number"><input {...d('regNumber')} placeholder="Enter Registration/License Number" /></Field>
+            <Field label="Date Of Registration"><input type="date" {...d('regDate')} /></Field>
           </div>
         </div>
       </div>
 
       {/* Factory Details */}
       <div className="card">
-        <div className="section-header">4. Factory Details</div>
+        <div className="section-header">Factory Details</div>
         <div className="p-6 space-y-4">
-          <Field label="Address Line 1" required><input {...d('factoryAddr1')} /></Field>
-          <Field label="Address Line 2"><input {...d('factoryAddr2')} /></Field>
           <div className="form-row">
+            <Field label="Factory Address" required>
+              <div className="space-y-2">
+                <input {...d('factoryAddressLine1')} placeholder="Enter Factory Address" />
+                <input {...d('factoryAddressLine2')} placeholder="Enter Factory Address" />
+              </div>
+            </Field>
             <Field label="Country" required>
               <Select value={data.factoryCountry} onChange={v => set('factoryCountry', v)} options={COUNTRIES} />
             </Field>
-            <Field label="District" required><input {...d('factoryDistrict')} /></Field>
           </div>
           <div className="form-row">
-            <Field label="City" required><input {...d('factoryCity')} /></Field>
-            <Field label="PIN Code"><input {...d('factoryPIN')} maxLength={6} /></Field>
+            <Field label="Address 1" required><input {...d('factoryAddr1')} placeholder="Enter Factory Address 1" /></Field>
+            <Field label="Address 2" required><input {...d('factoryAddr2')} placeholder="Enter Factory Address 2" /></Field>
           </div>
           <div className="form-row">
-            <Field label="Factory Address Proof Type" required>
+            <Field label="City" required><input {...d('factoryCity')} placeholder="Enter Factory City Name" /></Field>
+            <Field label="PIN code"><input {...d('factoryPIN')} maxLength={6} placeholder="Enter PIN Code" /></Field>
+          </div>
+          <div className="form-row">
+            <Field label="Address Proof Document Type" required>
               <Select value={data.factoryAddrProofType} onChange={v => set('factoryAddrProofType', v)} options={['Business Licence', 'Any Other']} />
             </Field>
-            <Field label="Factory Address Proof Document" required>
+            <Field label="Address Proof Document" required>
               <FileUpload fieldKey="organization_factory_addr_proof" fieldLabel="Factory Address Proof"
                 existingDoc={getDocForField('organization_factory_addr_proof')} onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
             </Field>
           </div>
-          <div className="form-row">
-            <Field label="Factory Landline STD Code"><input {...d('factorySTD')} /></Field>
-            <Field label="Factory Landline Number"><input {...d('factoryLandline')} /></Field>
-          </div>
+          <Field label="Landline Number">
+            <div className="grid grid-cols-2 gap-3">
+              <input {...d('factorySTD')} placeholder="Enter Factory STD Code" />
+              <input {...d('factoryLandline')} placeholder="Enter Factory Landline" />
+            </div>
+          </Field>
           <div className="form-row">
             <Field label="Manufacturer Email **" required>
-              <input type="email" {...d('manufacturerEmail')} />
+              <input type="email" {...d('manufacturerEmail')} placeholder="Enter Factory E-Mail" />
             </Field>
-            <Field label="Manufacturer Mobile Number"><input {...d('manufacturerMobile')} /></Field>
+            <Field label="Manufacturer Mobile Number"><input {...d('manufacturerMobile')} placeholder="Enter Factory Contact Number" /></Field>
           </div>
-          <p className="text-xs text-red-600 mt-2">** Disclaimer: Please ensure the manufacturer contact details are accurate. During the processing of the application, if these details are found to be incorrect, the application is liable for rejection.</p>
+          <p className="text-xs text-red-600 mt-2">** Disclaimer: Please ensure to provide the accurate contact details of the manufacturer. During the processing of the application, if these details are found to be incorrect, the application is liable for rejection.</p>
         </div>
       </div>
     </div>
