@@ -15,9 +15,9 @@ export default function ManufacturingProcess({ formData, updateSection, getDocFo
   const data = formData.manufacturing || {};
   const set = (key, val) => updateSection('manufacturing', { ...data, [key]: val });
   const rawMaterials = data.rawMaterials || [
-    { material: '', supplier: '', conformity: '', howReceived: '', records: '', other: '' },
-    { material: '', supplier: '', conformity: '', howReceived: '', records: '', other: '' },
-    { material: '', supplier: '', conformity: '', howReceived: '', records: '', other: '' },
+    { material: '', supplier: '', conformity: '', howReceived: '', records: '' },
+    { material: '', supplier: '', conformity: '', howReceived: '', records: '' },
+    { material: '', supplier: '', conformity: '', howReceived: '', records: '' },
   ];
 
   const updateRaw = (i, key, val) => {
@@ -33,7 +33,7 @@ export default function ManufacturingProcess({ formData, updateSection, getDocFo
           <table className="w-full text-xs border border-border rounded">
             <thead>
               <tr className="bg-primary text-white">
-                {['Raw Material (with grade) *', 'Name of Supplier *', 'Conformity of Material', 'How Received (Batches/Lots/Package) *', 'Records Maintained', 'Any Other'].map(h => (
+                {['Raw Material (with grade) *', 'Name of Supplier *', 'Conformity of Material', 'How Received (Batches/Lots/Package) *', 'Records Maintained'].map(h => (
                   <th key={h} className="px-3 py-2 text-left font-medium whitespace-nowrap">{h}</th>
                 ))}
                 {!isSubmitted && <th className="w-8 px-2"></th>}
@@ -42,13 +42,20 @@ export default function ManufacturingProcess({ formData, updateSection, getDocFo
             <tbody>
               {rawMaterials.map((row, i) => (
                 <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  {['material', 'supplier', 'conformity', 'howReceived', 'records', 'other'].map(key => (
+                  {['material', 'supplier', 'conformity', 'howReceived', 'records'].map(key => (
                     <td key={key} className="px-2 py-1.5 border-t border-border">
                       {key === 'conformity' ? (
                         <select className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5 min-w-24"
                           value={row[key] || ''} onChange={e => updateRaw(i, key, e.target.value)} disabled={isSubmitted}>
                           <option value="">Select</option>
                           {CONFORMITY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
+                      ) : key === 'records' ? (
+                        <select className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5 min-w-24"
+                          value={row[key] || ''} onChange={e => updateRaw(i, key, e.target.value)} disabled={isSubmitted}>
+                          <option value="">Select</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
                         </select>
                       ) : (
                         <input className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5 min-w-24"
@@ -61,7 +68,7 @@ export default function ManufacturingProcess({ formData, updateSection, getDocFo
               ))}
             </tbody>
           </table>
-          {!isSubmitted && <button onClick={() => set('rawMaterials', [...rawMaterials, { material: '', supplier: '', conformity: '', howReceived: '', records: '', other: '' }])} className="mt-2 text-xs text-primary hover:underline flex items-center gap-1"><Plus size={13} /> Add row</button>}
+          {!isSubmitted && <button onClick={() => set('rawMaterials', [...rawMaterials, { material: '', supplier: '', conformity: '', howReceived: '', records: '' }])} className="mt-2 text-xs text-primary hover:underline flex items-center gap-1"><Plus size={13} /> Add row</button>}
         </div>
       </div>
 
