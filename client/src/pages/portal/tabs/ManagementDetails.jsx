@@ -2,6 +2,8 @@ import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 import { Plus, Trash2 } from 'lucide-react';
 
+const JPEG_ONLY = { 'image/jpeg': ['.jpg', '.jpeg'] };
+
 function TableSection({ title, rows, setRows, cols, isSubmitted, fixedRows, note, getDocForField, onDocUploaded, onDocRemoved }) {
   const addRow = () => setRows([...rows, Object.fromEntries(cols.map(c => [c.key, '']))]);
   const removeRow = (i) => setRows(rows.filter((_, idx) => idx !== i));
@@ -32,6 +34,7 @@ function TableSection({ title, rows, setRows, cols, isSubmitted, fixedRows, note
                       <div className="min-w-45">
                         <FileUpload fieldKey={fixedRows ? c.fieldKey : `${c.fieldKey}_${i}`} fieldLabel={c.label.replace(' *', '')}
                           existingDoc={getDocForField(fixedRows ? c.fieldKey : `${c.fieldKey}_${i}`)}
+                          accept={c.accept} acceptLabel={c.acceptLabel}
                           onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
                       </div>
                     ) : (
@@ -134,7 +137,7 @@ export default function ManagementDetails({ formData, updateSection, getDocForFi
               { key: 'qualification', label: 'Qualification *' },
               { key: 'qualDoc', label: 'Qualification Document *', type: 'file', fieldKey: 'management_qual_doc' },
               { key: 'experience', label: 'Experience (in years) *' },
-              { key: 'photo', label: 'Photo *', type: 'file', fieldKey: 'management_photo' },
+              { key: 'photo', label: 'Photo *', type: 'file', fieldKey: 'management_photo', accept: JPEG_ONLY, acceptLabel: 'JPEG' },
             ]} />
         </div>
       </div>
