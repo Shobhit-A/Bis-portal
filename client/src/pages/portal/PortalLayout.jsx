@@ -95,8 +95,8 @@ export default function PortalLayout({ basePath, TABS, tabComponents }) {
               <button onClick={() => navigate(basePath)} className="text-white/70 hover:text-white" title="Back to My Forms">
                 <ArrowLeft size={16} />
               </button>
-              <div className="bg-white rounded px-1.5 py-1 flex items-center">
-                <img src="/logo.png" alt="Absolute Veritas" className="h-5 w-auto object-contain" />
+              <div className="bg-white rounded px-2 py-1.5 flex items-center">
+                <img src="/logo.png" alt="Absolute Veritas" className="h-8 w-auto object-contain" />
               </div>
               <div>
                 <span className="text-white font-semibold text-sm">{submission?.label || 'Absolute Veritas Form Submission'}</span>

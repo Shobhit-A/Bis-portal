@@ -86,8 +86,8 @@ export default function MyForms({ formType, basePath, title }) {
           <button onClick={() => navigate('/portal')} className="text-white/70 hover:text-white" title="Back to Application Types">
             <ArrowLeft size={16} />
           </button>
-          <div className="bg-white rounded px-1.5 py-1 flex items-center">
-            <img src="/logo.png" alt="Absolute Veritas" className="h-5 w-auto object-contain" />
+          <div className="bg-white rounded px-2 py-1.5 flex items-center">
+            <img src="/logo.png" alt="Absolute Veritas" className="h-8 w-auto object-contain" />
           </div>
           <span className="text-white font-semibold text-sm">{title}</span>
         </div>
