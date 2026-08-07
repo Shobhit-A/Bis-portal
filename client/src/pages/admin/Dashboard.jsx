@@ -174,7 +174,14 @@ export default function AdminDashboard() {
       const url = URL.createObjectURL(res.data);
       const a = document.createElement('a'); a.href = url; a.download = `${username}_BIS_Form.xlsx`; a.click();
       URL.revokeObjectURL(url);
-    } catch { toast.error('Download failed'); }
+    } catch (err) {
+      if (err.response?.status === 501) {
+        const text = await err.response.data.text();
+        toast.error(JSON.parse(text).error);
+      } else {
+        toast.error('Download failed');
+      }
+    }
     finally { setDownloadingId(null); }
   };
 
@@ -303,6 +310,11 @@ export default function AdminDashboard() {
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {row.username}
                     {row.label && <span className="text-gray-400 font-normal"> — {row.label}</span>}
+                    {row.formType && (
+                      <span className={`ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded ${row.formType === 'ISI' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                        {row.formType}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={row.status} /></td>
                   <td className="px-4 py-3 text-gray-500 text-xs">

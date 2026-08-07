@@ -6,30 +6,7 @@ import toast from 'react-hot-toast';
 import { LogOut, CheckCircle, Clock, Save, ArrowLeft } from 'lucide-react';
 import { SubmissionIdContext } from '../../components/FormField';
 
-// Tab components
-import RegistrationForm from './tabs/RegistrationForm';
-import OrganizationProfile from './tabs/OrganizationProfile';
-import ManagementDetails from './tabs/ManagementDetails';
-import ManufacturingProcess from './tabs/ManufacturingProcess';
-import PackagingBrandDetails from './tabs/PackagingBrandDetails';
-import TestingInspection from './tabs/TestingInspection';
-import TestReportDetails from './tabs/TestReportDetails';
-import DeclarationUndertaking from './tabs/DeclarationUndertaking';
-import DocumentChecklist from './tabs/DocumentChecklist';
-
-const TABS = [
-  { key: 'checklist', label: 'Document Checklist', path: '' },
-  { key: 'registration', label: 'Registration Form', path: 'registration' },
-  { key: 'organization', label: 'Organization Profile', path: 'organization' },
-  { key: 'management', label: 'Management Details', path: 'management' },
-  { key: 'manufacturing', label: 'Manufacturing Process', path: 'manufacturing' },
-  { key: 'packaging', label: 'Packaging & Brand Details', path: 'packaging' },
-  { key: 'testing', label: 'Testing & Inspection', path: 'testing' },
-  { key: 'testReport', label: 'Test Report Details', path: 'test-report' },
-  { key: 'declaration', label: 'Declaration & Undertaking', path: 'declaration' },
-];
-
-export default function PortalLayout() {
+export default function PortalLayout({ basePath, TABS, tabComponents }) {
   const { user, logout } = useAuth();
   const { submissionId } = useParams();
   const navigate = useNavigate();
@@ -41,7 +18,6 @@ export default function PortalLayout() {
   const [submitting, setSubmitting] = useState(false);
   const saveTimer = useRef(null);
 
-  // Load submission on mount
   useEffect(() => {
     api.get(`/submissions/${submissionId}`)
       .then(res => {
@@ -51,7 +27,6 @@ export default function PortalLayout() {
       .catch(() => toast.error('Failed to load form data'));
   }, [submissionId]);
 
-  // Auto-save with debounce
   const saveData = useCallback(async (data) => {
     if (submission?.status === 'SUBMITTED') return;
     setSaving(true);
@@ -87,7 +62,7 @@ export default function PortalLayout() {
       await api.post(`/submissions/${submissionId}/submit`, { formData });
       setSubmission(prev => ({ ...prev, status: 'SUBMITTED' }));
       toast.success('Form submitted successfully!');
-      navigate(`/portal/${submissionId}/submitted`);
+      navigate(`${basePath}/${submissionId}/submitted`);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Submit failed');
     } finally {
@@ -102,25 +77,23 @@ export default function PortalLayout() {
   const onDocUploaded = (doc) => setSubmission(prev => ({ ...prev, documents: [...(prev?.documents || []).filter(d => d.fieldKey !== doc.fieldKey), doc] }));
   const onDocRemoved = (docId) => setSubmission(prev => ({ ...prev, documents: (prev?.documents || []).filter(d => d.id !== docId) }));
 
-  const basePath = `/portal/${submissionId}`;
+  const formBasePath = `${basePath}/${submissionId}`;
   const activeTab = TABS.findIndex(t => {
-    const path = location.pathname.replace(basePath, '').replace(/^\//, '');
+    const path = location.pathname.replace(formBasePath, '').replace(/^\//, '');
     return t.path === path || (t.path === '' && path === '');
   });
 
   const currentIndex = Math.max(0, activeTab);
-
   const sharedProps = { formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted };
 
   return (
     <SubmissionIdContext.Provider value={submissionId}>
       <div className="min-h-screen bg-surface flex flex-col">
-        {/* Header (navbar + step indicator) — stays fixed while form content scrolls */}
         <div className="sticky top-0 z-20 shrink-0">
           {/* Navbar */}
           <nav className="bg-white border-b border-border shadow-sm px-6 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/portal')} className="text-gray-400 hover:text-primary" title="Back to My Forms">
+              <button onClick={() => navigate(basePath)} className="text-gray-400 hover:text-primary" title="Back to My Forms">
                 <ArrowLeft size={16} />
               </button>
               <img src="/logo.png" alt="Absolute Veritas" className="h-9 w-auto object-contain" />
@@ -130,7 +103,6 @@ export default function PortalLayout() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              {/* Save status */}
               {!isSubmitted && (
                 <div className="flex items-center gap-2">
                   {saving ? (
@@ -150,12 +122,11 @@ export default function PortalLayout() {
             </div>
           </nav>
 
-          {/* Step indicator */}
           <div className="bg-white border-b border-border px-6 py-3 overflow-x-auto scrollbar-hide">
             <div className="flex gap-1 min-w-max">
               {TABS.map((tab, idx) => (
                 <button key={tab.key}
-                  onClick={() => navigate(`${basePath}/${tab.path}`)}
+                  onClick={() => navigate(`${formBasePath}/${tab.path}`)}
                   className={`px-3 py-1.5 rounded text-xs font-medium transition-colors whitespace-nowrap ${idx === currentIndex ? 'bg-primary text-white' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'}`}>
                   <span className="mr-1.5 opacity-60">{idx + 1}.</span>{tab.label}
                 </button>
@@ -164,7 +135,6 @@ export default function PortalLayout() {
           </div>
         </div>
 
-        {/* Form content */}
         <div className="flex-1 overflow-y-auto">
           <div className="px-8 py-8">
             {isSubmitted && (
@@ -178,15 +148,13 @@ export default function PortalLayout() {
             )}
 
             <Routes>
-              <Route index element={<DocumentChecklist {...sharedProps} />} />
-              <Route path="registration" element={<RegistrationForm {...sharedProps} />} />
-              <Route path="organization" element={<OrganizationProfile {...sharedProps} />} />
-              <Route path="management" element={<ManagementDetails {...sharedProps} />} />
-              <Route path="manufacturing" element={<ManufacturingProcess {...sharedProps} />} />
-              <Route path="packaging" element={<PackagingBrandDetails {...sharedProps} />} />
-              <Route path="testing" element={<TestingInspection {...sharedProps} />} />
-              <Route path="test-report" element={<TestReportDetails {...sharedProps} />} />
-              <Route path="declaration" element={<DeclarationUndertaking {...sharedProps} onSubmit={handleSubmit} submitting={submitting} />} />
+              {TABS.map((tab, idx) => {
+                const Component = tabComponents[tab.key];
+                const extraProps = idx === TABS.length - 1 ? { onSubmit: handleSubmit, submitting } : {};
+                return tab.path === ''
+                  ? <Route key={tab.key} index element={<Component {...sharedProps} {...extraProps} />} />
+                  : <Route key={tab.key} path={tab.path} element={<Component {...sharedProps} {...extraProps} />} />;
+              })}
               <Route path="submitted" element={
                 <div className="text-center py-16">
                   <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
@@ -197,13 +165,12 @@ export default function PortalLayout() {
               } />
             </Routes>
 
-            {/* Navigation buttons */}
             {!location.pathname.includes('submitted') && (
               <div className="flex justify-between mt-8 pt-6 border-t border-border">
-                <button onClick={() => { const prev = TABS[currentIndex - 1]; if (prev) navigate(`${basePath}/${prev.path}`); }}
+                <button onClick={() => { const prev = TABS[currentIndex - 1]; if (prev) navigate(`${formBasePath}/${prev.path}`); }}
                   disabled={currentIndex === 0} className="btn-secondary disabled:opacity-30">← Previous</button>
                 {currentIndex < TABS.length - 1 ? (
-                  <button onClick={() => { const next = TABS[currentIndex + 1]; navigate(`${basePath}/${next.path}`); }} className="btn-primary">
+                  <button onClick={() => { const next = TABS[currentIndex + 1]; navigate(`${formBasePath}/${next.path}`); }} className="btn-primary">
                     Next →
                   </button>
                 ) : null}

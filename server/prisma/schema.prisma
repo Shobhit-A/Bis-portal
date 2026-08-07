@@ -25,10 +25,16 @@ enum Role {
   CLIENT
 }
 
+enum FormType {
+  FMCS
+  ISI
+}
+
 model Submission {
   id        String     @id @default(cuid())
   userId    String
   label     String     @default("Form 1")
+  formType  FormType   @default(FMCS)
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   status    Status     @default(NOT_STARTED)
   formData  Json       @default("{}")

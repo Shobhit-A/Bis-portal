@@ -4,16 +4,30 @@ import api from '../../lib/axios';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Download, FileText, Unlock, File, Loader2 } from 'lucide-react';
 
-const SECTIONS = [
-  { key: 'registration', label: 'Registration Form' },
-  { key: 'organization', label: 'Organization Profile' },
-  { key: 'management', label: 'Management Details' },
-  { key: 'manufacturing', label: 'Manufacturing Process' },
-  { key: 'packaging', label: 'Packaging & Brand Details' },
-  { key: 'testing', label: 'Testing & Inspection' },
-  { key: 'testReport', label: 'Test Report Details' },
-  { key: 'declaration', label: 'Declaration & Undertaking' },
-];
+const SECTIONS_BY_TYPE = {
+  FMCS: [
+    { key: 'registration', label: 'Registration Form' },
+    { key: 'organization', label: 'Organization Profile' },
+    { key: 'management', label: 'Management Details' },
+    { key: 'manufacturing', label: 'Manufacturing Process' },
+    { key: 'packaging', label: 'Packaging & Brand Details' },
+    { key: 'testing', label: 'Testing & Inspection' },
+    { key: 'testReport', label: 'Test Report Details' },
+    { key: 'declaration', label: 'Declaration & Undertaking' },
+  ],
+  ISI: [
+    { key: 'checklist', label: 'Document Checklist' },
+    { key: 'firmOffice', label: 'Firm, Office & Registration' },
+    { key: 'factory', label: 'Factory Details' },
+    { key: 'standard', label: 'Indian Standard & Product Variety' },
+    { key: 'management', label: 'Management Details' },
+    { key: 'manufacturing', label: 'Manufacturing Process' },
+    { key: 'packaging', label: 'Packaging & Brand Details' },
+    { key: 'testing', label: 'Testing & Inspection' },
+    { key: 'testReport', label: 'Test Report Details' },
+    { key: 'declaration', label: 'Declaration & Undertaking' },
+  ],
+};
 
 export default function SubmissionView() {
   const { id } = useParams();
@@ -21,7 +35,7 @@ export default function SubmissionView() {
   const [submission, setSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('registration');
+  const [activeTab, setActiveTab] = useState(null);
   const [downloadingExcel, setDownloadingExcel] = useState(false);
   const [downloadingDocs, setDownloadingDocs] = useState(false);
   const [downloadingDocId, setDownloadingDocId] = useState(null);
@@ -49,7 +63,14 @@ export default function SubmissionView() {
       const a = document.createElement('a'); a.href = url;
       a.download = `${submission.user.username}_BIS_Form.xlsx`; a.click();
       URL.revokeObjectURL(url);
-    } catch { toast.error('Failed to download Excel'); }
+    } catch (err) {
+      if (err.response?.status === 501) {
+        const text = await err.response.data.text();
+        toast.error(JSON.parse(text).error);
+      } else {
+        toast.error('Failed to download Excel');
+      }
+    }
     finally { setDownloadingExcel(false); }
   };
 
@@ -96,9 +117,12 @@ export default function SubmissionView() {
     </div>
   );
 
+  const SECTIONS = SECTIONS_BY_TYPE[submission.formType] || SECTIONS_BY_TYPE.FMCS;
+  const effectiveTab = activeTab && SECTIONS.some(s => s.key === activeTab) ? activeTab : SECTIONS[0].key;
+
   const formData = submission.formData || {};
-  const activeData = formData[activeTab] || {};
-  const activeDocs = submission.documents?.filter(d => d.fieldKey.startsWith(activeTab)) || [];
+  const activeData = formData[effectiveTab] || {};
+  const activeDocs = submission.documents?.filter(d => d.fieldKey.startsWith(effectiveTab)) || [];
 
   return (
     <div className="min-h-screen bg-surface">
@@ -140,14 +164,14 @@ export default function SubmissionView() {
         <div className="flex gap-1 overflow-x-auto mb-0 pb-0">
           {SECTIONS.map(s => (
             <button key={s.key} onClick={() => setActiveTab(s.key)}
-              className={`px-3 py-2 text-xs font-medium rounded-t whitespace-nowrap border-b-2 transition-colors ${activeTab === s.key ? 'bg-white border-primary text-primary' : 'bg-gray-100 border-transparent text-gray-500 hover:text-gray-700'}`}>
+              className={`px-3 py-2 text-xs font-medium rounded-t whitespace-nowrap border-b-2 transition-colors ${effectiveTab === s.key ? 'bg-white border-primary text-primary' : 'bg-gray-100 border-transparent text-gray-500 hover:text-gray-700'}`}>
               {s.label}
             </button>
           ))}
         </div>
 
         <div className="card rounded-tl-none">
-          <div className="section-header rounded-none">{SECTIONS.find(s => s.key === activeTab)?.label}</div>
+          <div className="section-header rounded-none">{SECTIONS.find(s => s.key === effectiveTab)?.label}</div>
           <div className="p-6">
             {Object.keys(activeData).length === 0 && activeDocs.length === 0 ? (
               <p className="text-gray-400 text-sm">No data filled for this section.</p>

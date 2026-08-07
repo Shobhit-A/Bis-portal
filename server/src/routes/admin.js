@@ -21,7 +21,7 @@ router.get('/users', async (req, res) => {
       where: { role: 'CLIENT' },
       select: {
         id: true, username: true, email: true, createdAt: true, approved: true,
-        submissions: { select: { id: true, label: true, status: true, updatedAt: true }, orderBy: { updatedAt: 'desc' } }
+        submissions: { select: { id: true, label: true, formType: true, status: true, updatedAt: true }, orderBy: { updatedAt: 'desc' } }
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -150,6 +150,9 @@ router.get('/submissions/:id/excel', async (req, res) => {
       include: { user: true, documents: true }
     });
     if (!submission) return res.status(404).json({ error: 'Not found' });
+    if (submission.formType === 'ISI') {
+      return res.status(501).json({ error: 'Excel export for ISI forms is not yet available. Contact the developer to enable it.' });
+    }
     const wb = await generateExcel(submission);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${submission.user.username}_BIS_Form.xlsx"`);
