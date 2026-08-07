@@ -2,6 +2,10 @@ import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 import { Plus, Trash2 } from 'lucide-react';
 
+const LAB_OPTIONS = ['Lab of same group of company', 'BIS lab', 'BIS approved/empaneled lab', 'BIS licensee lab'];
+
+const EXCEL_ACCEPT = { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] };
+
 export default function TestingInspection({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.testing || {};
   const set = (key, val) => updateSection('testing', { ...data, [key]: val });
@@ -46,8 +50,11 @@ export default function TestingInspection({ formData, updateSection, getDocForFi
                         </div>
                       </td>
                       <td className="px-2 py-1.5 border-t border-border">
-                        <input className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5"
-                          value={row.labName || ''} onChange={e => set('subContractedTests', subTests.map((r, idx) => idx === i ? { ...r, labName: e.target.value } : r))} disabled={isSubmitted} />
+                        <select className="w-full bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5"
+                          value={row.labName || ''} onChange={e => set('subContractedTests', subTests.map((r, idx) => idx === i ? { ...r, labName: e.target.value } : r))} disabled={isSubmitted}>
+                          <option value="">Select</option>
+                          {LAB_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                        </select>
                       </td>
                       {!isSubmitted && <td className="px-2 py-1.5 border-t border-border"><button onClick={() => set('subContractedTests', subTests.filter((_, idx) => idx !== i))} className="text-gray-300 hover:text-red-500"><Trash2 size={13} /></button></td>}
                     </tr>
@@ -63,8 +70,9 @@ export default function TestingInspection({ formData, updateSection, getDocForFi
       <div className="card">
         <div className="section-header">2. List of Testing Equipment</div>
         <div className="p-6">
-          <Field label="List of Testing Equipment (includes measuring instruments, chemicals, glassware etc.)" required hint="PDF Copy Required — template provided by us">
+          <Field label="List of Testing Equipment (includes measuring instruments, chemicals, glassware etc.)" required hint="Excel file required — template provided by us">
             <FileUpload fieldKey="testing_equipment_list" fieldLabel="Testing Equipment List"
+              accept={EXCEL_ACCEPT} acceptLabel="Excel (.xlsx, .xls)"
               existingDoc={getDocForField('testing_equipment_list')} onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
           </Field>
         </div>
