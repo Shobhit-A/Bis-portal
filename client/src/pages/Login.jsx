@@ -40,18 +40,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
-      {/* Header */}
-      <div className="bg-primary px-6 py-4 flex items-center gap-3">
-        <div className="bg-white rounded px-2 py-1.5 flex items-center">
-          <img src="/logo.png" alt="Absolute Veritas" className="h-6 w-auto object-contain" />
-        </div>
-        <span className="text-white font-semibold text-sm tracking-wide">ABSOLUTE VERITAS FORM SUBMISSION</span>
-      </div>
-
       {/* Main */}
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="card p-8">
+            <div className="flex justify-center mb-6">
+              <img src="/logo.png" alt="Absolute Veritas" className="h-12 w-auto object-contain" />
+            </div>
             <div className="mb-6">
               <h1 className="text-xl font-semibold text-gray-900">Sign in to your account</h1>
               <p className="text-sm text-gray-500 mt-1">BIS Certification Client Portal</p>
