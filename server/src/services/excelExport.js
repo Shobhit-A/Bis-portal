@@ -603,101 +603,27 @@ async function generateExcel(submission) {
 
   // ============================================================
   // SHEET 7 — TEST REPORT DETAILS
-  // Col widths: A=22, B=12, C=12, D=12, E=14, F=22, G=16, H=14, I=18
+  // Col widths: A=55, B=40, C=20, D=20
   // ============================================================
   {
     const ws = wb.addWorksheet('Test Report Details');
-    ws.columns = [
-      { width: 22 }, { width: 12 }, { width: 12 }, { width: 12 },
-      { width: 14 }, { width: 22 }, { width: 16 }, { width: 14 }, { width: 18 }
-    ];
-    const NC = 9;
+    ws.columns = [{ width: 55 }, { width: 40 }, { width: 20 }, { width: 20 }];
     let r = 1;
-    spacer(ws, r++, NC, 8);
-    titleRow(ws, r++, NC, 'TEST REPORT DETAILS');
-    noteRow(ws, r++, NC, '* Mandatory Fields   |   Independent Test Report from BIS / BIS Recognised / BIS Empanelled Lab required.');
-    spacer(ws, r++, NC, 6);
-    secHeader2(ws, r++, NC, '1.  Product Test Reports');
-    spacer(ws, r++, NC, 4);
-    infoRow(ws, r++, NC, 'A)  For Product:  Decision of acceptance of Test Reports beyond 90/180 days as applicable per Guidelines for grant of License rests with BIS.');
-    spacer(ws, r++, NC, 4);
+    spacer(ws, r++, 4, 8);
+    titleRow(ws, r++, 4, 'TEST REPORT - DETAILS');
+    noteRow(ws, r++, 4, '* Mandatory Fields');
+    spacer(ws, r++, 4, 6);
+    secHeader(ws, r++, 4, 'Test Report');
+    spacer(ws, r++, 4, 4);
 
-    r = drawTable(ws, r, [
-      { col: 1, label: 'Product Variety\nDescription *', key: 'variety' },
-      { col: 2, label: 'QR Code', key: 'qrCode' },
-      { col: 3, label: 'IS No. *', key: 'isNo' },
-      { col: 4, label: 'Sample Code *', key: 'sampleCode' },
-      { col: 5, label: 'Test Report\nIssue Date *', key: 'issueDate' },
-      { col: 6, label: 'If Report older than 90/180 days —\nReasons for Delay', key: 'delayReason' },
-      { col: 7, label: 'Test Report\n(write filename) *', key: 'reportFile' },
-      { col: 8, label: 'Test Report\nComplete? *', key: 'complete' },
-      { col: 9, label: 'Conformity of Sample\nas per IS *', key: 'conformity' },
-    ], tr.productReports || [], NC);
-
-    // PDF note
-    ws.getRow(r).height = 16;
-    for (let c = 1; c <= NC; c++) setCell(ws, r, c, '', { bg: 'FFFFFFFF' });
-    const prodDoc = getDoc(docs, 'testReport_product_files');
-    setCell(ws, r, 1, prodDoc ? `Report file: ${prodDoc}` : 'PDF Copy Required', { fg: prodDoc ? 'FF000000' : 'FFFF0000', bg: 'FFFFFFFF', size: 8 });
-    r++;
-
-    spacer(ws, r++, NC, 6);
-    secHeader2(ws, r++, NC, '2.  Long Duration Tests');
-    spacer(ws, r++, NC, 5);
-
-    ws.getRow(r).height = 24;
-    mergeSet(ws, r, 1, r, 6, 'A1)  Is Long Duration Test applicable for this product? *',
-      { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10 });
-    mergeSet(ws, r, 7, r, NC, tr.longDurationApplicable || '', { bg: 'FFFFFFFF', size: 10 });
-    r++;
-    ws.getRow(r).height = 22;
-    mergeSet(ws, r, 1, r, 6, 'If Yes — opting for relaxation as per Guidelines for Grant of License?',
-      { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10 });
-    mergeSet(ws, r, 7, r, NC, tr.longDurationRelaxation || '', { bg: 'FFFFFFFF', size: 10 });
-    r++;
-    const ldDoc = getDoc(docs, 'testReport_long_duration');
-    ws.getRow(r).height = 28;
-    mergeSet(ws, r, 1, r, 6, 'If Yes — Undertaking for Long Duration Test (as per Guidelines for GOL – Annex III) *\n(write filename)',
-      { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
-    mergeSet(ws, r, 7, r, NC, ldDoc || tr.longDurationUndertakingFile || '', { bg: 'FFFFFFFF', size: 10 });
-    r++;
-    spacer(ws, r++, NC, 4);
-
-    r = drawTable(ws, r, [
-      { col: 1, label: 'Clause No.\nof IS', key: 'clauseNo' },
-      { col: 2, label: 'Long Duration\nTest Specified', key: 'testSpecified' },
-      { col: 3, label: 'Name of Lab\nWhere Test in Progress', key: 'labName' },
-      { col: 4, label: 'Date Test Report\nLikely to be Available', key: 'likelyDate' },
-      { col: 5, label: 'Upload In-House\nTest Report (filename)', key: 'inHouseReport' },
-      { col: 6, label: 'Test Report on Receipt from Lab\n(Upload filename when received from Lab)', key: 'labReport', merge: 4 },
-    ], tr.longDurationRows || [], NC);
-
-    spacer(ws, r++, NC, 6);
-    secHeader2(ws, r++, NC, '3.  Raw Material Test Reports');
-    spacer(ws, r++, NC, 5);
-    ws.getRow(r).height = 28;
-    mergeSet(ws, r, 1, r, 6, 'For Raw Material used in finished product sample lot —\nDoes Indian Standard require raw material conformity? *',
-      { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', size: 10, wrap: true });
-    mergeSet(ws, r, 7, r, NC, tr.rawMatConformityRequired || '', { bg: 'FFFFFFFF', size: 10 });
-    r++;
-    spacer(ws, r++, NC, 4);
-
-    r = drawTable(ws, r, [
-      { col: 1, label: 'Raw Material Description *', key: 'material', merge: 2 },
-      { col: 3, label: 'Test Report / Test Certificate *\n(write filename)', key: 'reportFile', merge: 3 },
-      { col: 6, label: 'Test Report Complete? *', key: 'complete', merge: 2 },
-      { col: 8, label: 'Conformity of Raw Material\nas per Indian Standard *', key: 'conformity', merge: 2 },
-    ], tr.rawMaterialReports || [], NC);
-
-    const rmDoc = getDoc(docs, 'testReport_raw_material_files');
-    if (rmDoc) {
-      ws.getRow(r).height = 16;
-      for (let c = 1; c <= NC; c++) setCell(ws, r, c, '', { bg: 'FFFFFFFF' });
-      setCell(ws, r, 1, `Report file: ${rmDoc}`, { fg: 'FF000000', bg: 'FFFFFFFF', size: 8 });
-      r++;
+    lv1(ws, r++, 'A) In House Test Report For The Product (In the Format as per Form IV in Scheme I of Regulations) *', getDoc(docs, 'testReport_inhouse'));
+    lv1(ws, r++, 'B) For Raw Material (Used in Finished Product Sample Lot) — If Indian Standard requires raw material conformity *', tr.rawMaterialConformity);
+    if (tr.rawMaterialConformity === 'Yes') {
+      lv1(ws, r++, 'Raw Material Conformity Test Report *', getDoc(docs, 'testReport_raw_material_conformity'));
     }
-    spacer(ws, r++, NC, 5);
-    mergeSet(ws, r, 1, r, NC, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+
+    spacer(ws, r++, 4, 5);
+    mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
   }
 
   // ============================================================
