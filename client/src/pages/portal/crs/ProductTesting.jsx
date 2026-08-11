@@ -140,12 +140,16 @@ export default function ProductTesting({ formData, updateSection, isSubmitted })
 
   const mode = data.mode || 'category';
 
-  // Indian Standard Wise flow: picking a standard scopes the Product Name dropdown to
-  // products that list it, but the user still has to pick the product themselves.
+  // Indian Standard Wise flow: picking a standard scopes Product Category / Sub Category /
+  // Product Name to it, mirroring the Category Wise flow but driven by standard first.
   const standardProductOptions = productsForStandard(data.indianStandard);
   const handleStandardChange = (e) => {
     const indianStandard = e.target.value;
-    updateSection('product', { ...data, indianStandard, productName: '' });
+    updateSection('product', { ...data, indianStandard, productCategory: '', subCategory: '', productName: '' });
+  };
+  const handleStandardProductCategoryChange = (e) => {
+    const productCategory = e.target.value;
+    updateSection('product', { ...data, productCategory, subCategory: '', productName: '' });
   };
 
   // Category-wise flow: picking a category scopes the Indian Standard / Sub Category /
@@ -237,10 +241,24 @@ export default function ProductTesting({ formData, updateSection, isSubmitted })
                 </select>
               </Field>
 
-              <Field label="Product Name" required>
-                <select className="input" value={data.productName || ''} onChange={e => set('productName', e.target.value)} disabled={isSubmitted || !data.indianStandard}>
+              <Field label="Product Category" required>
+                <select className="input" value={data.productCategory || ''} onChange={handleStandardProductCategoryChange} disabled={isSubmitted || !data.indianStandard}>
                   <option value="">---Select---</option>
                   {standardProductOptions.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </Field>
+
+              <Field label="Sub Category" required>
+                <select className="input" value={data.subCategory || ''} onChange={e => set('subCategory', e.target.value)} disabled={isSubmitted || !data.productCategory}>
+                  <option value="">---Select---</option>
+                  {data.productCategory && <option value={data.productCategory}>{data.productCategory}</option>}
+                </select>
+              </Field>
+
+              <Field label="Product Name" required>
+                <select className="input" value={data.productName || ''} onChange={e => set('productName', e.target.value)} disabled={isSubmitted || !data.productCategory}>
+                  <option value="">---Select---</option>
+                  {data.productCategory && <option value={data.productCategory}>{data.productCategory}</option>}
                 </select>
               </Field>
             </>
