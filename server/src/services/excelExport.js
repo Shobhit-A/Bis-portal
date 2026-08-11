@@ -900,7 +900,7 @@ async function generateExcelCRS(submission) {
     spacer(ws, r++, 4, 4);
     lv1(ws, r++, 'User Name *', account.userName);
     lv2(ws, r++, 'Company URL', account.companyUrl || '', 'Email *', account.email || '');
-    lv2(ws, r++, 'Name *', account.name || '', 'Designation', account.designation || '');
+    lv2(ws, r++, 'Name *', [account.salutation, account.name].filter(Boolean).join(' ') || '', 'Designation', account.designation || '');
     lv1(ws, r++, 'Mobile No. *', account.mobile);
     spacer(ws, r++, 4, 6);
 
@@ -927,6 +927,7 @@ async function generateExcelCRS(submission) {
     lv1(ws, r++, 'Contact No. *', address.corrContact);
     lv1(ws, r++, 'Correspondence Address Selection *', address.correspondenceSelection);
     lv1(ws, r++, 'Address Authentication Document', getDoc(docs, 'address_auth_doc'));
+    lv1(ws, r++, 'Type of Document *', address.addrProofDocType || '');
     spacer(ws, r++, 4, 6);
 
     secHeader(ws, r++, 4, 'Product Details');

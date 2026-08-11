@@ -1,5 +1,11 @@
 import React from 'react';
-import { Field } from '../../../components/FormField';
+import { Field, Select } from '../../../components/FormField';
+
+const SALUTATIONS = ['Mr', 'Mrs', 'Ms', 'Dr', 'M/s'];
+
+function WarnHint({ children }) {
+  return <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1 mt-1">{children}</p>;
+}
 
 export default function AccountDetails({ formData, updateSection, isSubmitted }) {
   const data = formData.account || {};
@@ -13,20 +19,31 @@ export default function AccountDetails({ formData, updateSection, isSubmitted })
       <div className="card">
         <div className="section-header">Basic Details</div>
         <div className="p-6 space-y-4">
-          <Field label="User Name" required hint="Proposed BIS portal login username"><input {...d('userName')} /></Field>
+          <Field label="User Name" required><input {...d('userName')} /></Field>
           <div className="form-row">
-            <Field label="Password" required><input type="password" {...d('password')} /></Field>
+            <Field label="Password" required hint="Should contain uppercase, lowercase, numbers and special characters">
+              <input type="password" {...d('password')} />
+            </Field>
             <Field label="Confirm Password" required error={passwordMismatch ? 'Passwords do not match' : undefined}>
               <input type="password" {...d('confirmPassword')} />
             </Field>
           </div>
-          <Field label="Company URL"><input {...d('companyUrl')} /></Field>
-          <Field label="Email" required hint="Email will be sent to this Email Id"><input type="email" {...d('email')} /></Field>
-          <div className="form-row">
-            <Field label="Name" required><input {...d('name')} /></Field>
-            <Field label="Designation"><input {...d('designation')} /></Field>
-          </div>
-          <Field label="Mobile No." required hint="SMS will be sent to this No."><input {...d('mobile')} /></Field>
+          <Field label="Company URL://"><input {...d('companyUrl')} /></Field>
+          <Field label="Email" required>
+            <input type="email" {...d('email')} />
+            <WarnHint>Email will be send to this Email Id</WarnHint>
+          </Field>
+          <Field label="Name" required>
+            <div className="grid grid-cols-[auto_1fr] gap-2">
+              <Select value={data.salutation} onChange={v => set('salutation', v)} options={SALUTATIONS} className="w-24" />
+              <input className="input" value={data.name || ''} onChange={e => set('name', e.target.value)} disabled={isSubmitted} />
+            </div>
+          </Field>
+          <Field label="Designation"><input {...d('designation')} /></Field>
+          <Field label="Mobile No." required>
+            <input {...d('mobile')} />
+            <WarnHint>SMS will be send to this No.</WarnHint>
+          </Field>
         </div>
       </div>
 
