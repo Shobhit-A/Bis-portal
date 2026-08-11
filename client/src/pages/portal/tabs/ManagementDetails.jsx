@@ -60,6 +60,31 @@ function TableSection({ title, rows, setRows, cols, isSubmitted, fixedRows, note
   );
 }
 
+ManagementDetails.isComplete = (formData, getDocForField) => {
+  const d = formData.management || {};
+  const missing = [];
+  const topOk = (d.topManagement || []).some(r => r.name && r.designation && r.contact && r.email);
+  if (!topOk) missing.push('Top Management Details');
+
+  const air = (d.airRow && d.airRow[0]) || {};
+  if (!air.name || !air.designation || !air.contact || !air.email) missing.push('AIR Details');
+  if (!air.residency) missing.push('AIR Residency Status');
+  if (!getDocForField('management_air_letter')) missing.push('AIR Nomination Letter');
+
+  if (!d.corrAddress) missing.push('Correspondence Address Communication');
+  if (!d.corrName) missing.push('Name of Contact Person');
+  if (!d.corrDesignation) missing.push('Designation of Contact Person');
+  if (!d.corrEmail) missing.push('Correspondence E-Mail');
+  if (!d.corrContact) missing.push('Correspondence Contact Number');
+
+  const techOk = (d.techPersonnel || []).some((r, i) =>
+    r.name && r.designation && r.qualification && r.experience &&
+    getDocForField(`management_qual_doc_${i}`) && getDocForField(`management_photo_${i}`));
+  if (!techOk) missing.push('Technical Management Personnel');
+
+  return missing;
+};
+
 export default function ManagementDetails({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.management || {};
   const set = (key, val) => updateSection('management', { ...data, [key]: val });

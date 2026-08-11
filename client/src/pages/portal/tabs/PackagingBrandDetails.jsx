@@ -2,6 +2,18 @@ import React from 'react';
 import { FileUpload } from '../../../components/FormField';
 import { Plus, Trash2 } from 'lucide-react';
 
+PackagingBrandDetails.isComplete = (formData, getDocForField) => {
+  const d = formData.packaging || {};
+  const missing = [];
+  const pkgOk = (d.packagingRows || []).some((r, i) =>
+    r.nature && r.marking && r.method && r.qty && r.batchCode && getDocForField(`packaging_label_${i}`));
+  if (!pkgOk) missing.push('Packaging and Marking Details');
+  const brandOk = (d.brands || []).some((b, i) =>
+    b.brandName && b.ownedBy && b.status && b.regDate && getDocForField(`packaging_brand_file_${i}`));
+  if (!brandOk) missing.push('Brand / Trademark Details');
+  return missing;
+};
+
 export default function PackagingBrandDetails({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.packaging || {};
   const set = (key, val) => updateSection('packaging', { ...data, [key]: val });
