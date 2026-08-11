@@ -116,6 +116,15 @@ function ProductListModal({ onClose }) {
   );
 }
 
+// A product's isNo string may list multiple valid standards (old vs. new edition,
+// or an IS+IEC crosswalk) separated by " / " or " OR " — each becomes its own
+// selectable Indian Standard option instead of one combined free-text value.
+function standardOptionsFor(productName) {
+  const match = PRODUCT_LIST.find(p => p.product === productName);
+  if (!match) return [];
+  return match.isNo.split(/\s+OR\s+|\s+\/\s+/i).map(s => s.trim()).filter(Boolean);
+}
+
 export default function ProductTesting({ formData, updateSection, isSubmitted }) {
   const account = formData.account || {};
   const address = formData.address || {};
@@ -129,6 +138,21 @@ export default function ProductTesting({ formData, updateSection, isSubmitted })
     const productName = e.target.value;
     const match = PRODUCT_LIST.find(p => p.product === productName);
     updateSection('product', { ...data, productName, indianStandard: match?.isNo || '' });
+  };
+
+  // Category-wise flow: picking a category resolves the exact product match, then
+  // Indian Standard / Sub Category / Product Name all become dropdowns scoped to it.
+  const categoryStandardOptions = standardOptionsFor(data.productCategory);
+  const handleCategoryChange = (e) => {
+    const productCategory = e.target.value;
+    const options = standardOptionsFor(productCategory);
+    updateSection('product', {
+      ...data,
+      productCategory,
+      indianStandard: options.length === 1 ? options[0] : '',
+      subCategory: productCategory,
+      productName: productCategory,
+    });
   };
 
   return (
@@ -172,27 +196,49 @@ export default function ProductTesting({ formData, updateSection, isSubmitted })
           </Field>
           <p className="text-xs text-gray-500">Note: Kindly make your selection carefully, as once saved you cannot change these details.</p>
 
-          {mode === 'category' && (
-            <Field label="Product Category" required>
-              <input className="input" value={data.productCategory || ''} onChange={e => set('productCategory', e.target.value)} disabled={isSubmitted} />
-            </Field>
-          )}
+          {mode === 'category' ? (
+            <>
+              <Field label="Product Category" required hint="Pick from the QCO-notified product list">
+                <select className="input" value={data.productCategory || ''} onChange={handleCategoryChange} disabled={isSubmitted}>
+                  <option value="">---Select---</option>
+                  {PRODUCT_LIST.map(p => <option key={p.product} value={p.product}>{p.product}</option>)}
+                </select>
+              </Field>
 
-          <Field label="Product Name" required hint="Pick from the QCO-notified product list">
-            <select className="input" value={data.productName || ''} onChange={handleProductNameChange} disabled={isSubmitted}>
-              <option value="">---Select---</option>
-              {PRODUCT_LIST.map(p => <option key={p.product} value={p.product}>{p.product}</option>)}
-            </select>
-          </Field>
+              <Field label="Indian Standard" required>
+                <select className="input" value={data.indianStandard || ''} onChange={e => set('indianStandard', e.target.value)} disabled={isSubmitted || !data.productCategory}>
+                  <option value="">---Select---</option>
+                  {categoryStandardOptions.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </Field>
 
-          <Field label="Indian Standard" required hint="Auto-filled from the selected product">
-            <input className="input bg-gray-50" value={data.indianStandard || ''} readOnly />
-          </Field>
+              <Field label="Sub Category" required>
+                <select className="input" value={data.subCategory || ''} onChange={e => set('subCategory', e.target.value)} disabled={isSubmitted || !data.productCategory}>
+                  <option value="">---Select---</option>
+                  {data.productCategory && <option value={data.productCategory}>{data.productCategory}</option>}
+                </select>
+              </Field>
 
-          {mode === 'category' && (
-            <Field label="Sub Category">
-              <input className="input" value={data.subCategory || ''} onChange={e => set('subCategory', e.target.value)} disabled={isSubmitted} />
-            </Field>
+              <Field label="Product Name" required>
+                <select className="input" value={data.productName || ''} onChange={e => set('productName', e.target.value)} disabled={isSubmitted || !data.productCategory}>
+                  <option value="">---Select---</option>
+                  {data.productCategory && <option value={data.productCategory}>{data.productCategory}</option>}
+                </select>
+              </Field>
+            </>
+          ) : (
+            <>
+              <Field label="Product Name" required hint="Pick from the QCO-notified product list">
+                <select className="input" value={data.productName || ''} onChange={handleProductNameChange} disabled={isSubmitted}>
+                  <option value="">---Select---</option>
+                  {PRODUCT_LIST.map(p => <option key={p.product} value={p.product}>{p.product}</option>)}
+                </select>
+              </Field>
+
+              <Field label="Indian Standard" required hint="Auto-filled from the selected product">
+                <input className="input bg-gray-50" value={data.indianStandard || ''} readOnly />
+              </Field>
+            </>
           )}
         </div>
       </div>
