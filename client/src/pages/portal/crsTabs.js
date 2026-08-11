@@ -7,7 +7,7 @@ import ManagementDetails from './crs/ManagementDetails';
 import ContactPerson from './crs/ContactPerson';
 import AirSignatory from './crs/AirSignatory';
 import UploadDocuments from './crs/UploadDocuments';
-import DeclarationUndertaking from './tabs/DeclarationUndertaking';
+import Preview from './crs/Preview';
 
 export const CRS_TABS = [
   { key: 'registration', label: 'Registration & Manufacturing Unit Address', path: '' },
@@ -19,7 +19,7 @@ export const CRS_TABS = [
   { key: 'contact', label: 'Contact Person', path: 'contact-person' },
   { key: 'air', label: 'AIR / Authorized Signatory', path: 'air-signatory' },
   { key: 'uploads', label: 'Upload Documents', path: 'upload-documents' },
-  { key: 'declaration', label: 'Declaration & Undertaking', path: 'declaration' },
+  { key: 'preview', label: 'Preview', path: 'preview' },
 ];
 
 export const CRS_TAB_COMPONENTS = {
@@ -32,5 +32,5 @@ export const CRS_TAB_COMPONENTS = {
   contact: ContactPerson,
   air: AirSignatory,
   uploads: UploadDocuments,
-  declaration: DeclarationUndertaking,
+  preview: Preview,
 };
