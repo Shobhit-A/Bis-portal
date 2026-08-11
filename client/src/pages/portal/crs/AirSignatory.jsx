@@ -6,9 +6,9 @@ export const INDIAN_STATES = ['Andhra Pradesh','Arunachal Pradesh','Assam','Biha
 const GOVT_DOCUMENTS = ['PAN Card', 'Aadhaar Card', 'Passport', 'Voter ID', 'Driving License'];
 
 const SCENARIOS = [
-  'We have a liaison/branch office in India',
-  'We do not have a liaison/branch office in India, but the Proprietor/Registered User of the Brand/Trademark is located in India',
-  'We have neither, so we nominate our Authorized Indian Representative',
+  'We have a liaison office / branch office located in India. The details are given below.',
+  'We do not have a liaison office / branch office located in India, but Proprietor / Registered User of the Brand/Trademark appearing on the article, located in India. The details are given below.',
+  'We do no have a liaison office / branch office located in India and there is no Proprietor / Registered User of the Brand/Trademark appearing on the article, located in India. Therefore, we nominate our authorized Indian representative as per details given below.',
 ];
 
 export default function AirSignatory({ formData, updateSection, isSubmitted }) {
@@ -31,10 +31,14 @@ export default function AirSignatory({ formData, updateSection, isSubmitted }) {
 
       <div className="card">
         <div className="section-header">Representative Scenario</div>
-        <div className="p-6">
-          <Field label="Representative Scenario" required>
-            <Select value={data.scenario} onChange={v => set('scenario', v)} options={SCENARIOS} />
-          </Field>
+        <div className="p-6 space-y-3">
+          {SCENARIOS.map((s, i) => (
+            <label key={i} className="flex items-start gap-3 text-sm text-gray-700 cursor-pointer">
+              <input type="radio" name="scenario" className="mt-0.5" checked={data.scenario === s}
+                onChange={() => set('scenario', s)} disabled={isSubmitted} />
+              <span>{String.fromCharCode(97 + i)}) {s}</span>
+            </label>
+          ))}
         </div>
       </div>
 
