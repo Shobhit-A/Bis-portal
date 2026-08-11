@@ -1,6 +1,5 @@
 import DocumentChecklist from './crs/DocumentChecklist';
-import AccountDetails from './crs/AccountDetails';
-import AddressDetails from './crs/AddressDetails';
+import RegistrationDetails from './crs/RegistrationDetails';
 import ProductTesting from './crs/ProductTesting';
 import ModelBrandMapping from './crs/ModelBrandMapping';
 import BrandDetails from './crs/BrandDetails';
@@ -11,9 +10,8 @@ import UploadDocuments from './crs/UploadDocuments';
 import DeclarationUndertaking from './tabs/DeclarationUndertaking';
 
 export const CRS_TABS = [
-  { key: 'checklist', label: 'Document Checklist', path: '' },
-  { key: 'account', label: 'Registration & Manufacturing Unit', path: 'account' },
-  { key: 'address', label: 'Manufacturing Unit & Correspondence Address', path: 'address' },
+  { key: 'registration', label: 'Registration & Manufacturing Unit Address', path: '' },
+  { key: 'checklist', label: 'Document Checklist', path: 'checklist' },
   { key: 'product', label: 'Product & Testing', path: 'product-testing' },
   { key: 'modelBrand', label: 'Model & Brand Mapping', path: 'model-brands' },
   { key: 'brand', label: 'Brand Details', path: 'brand-details' },
@@ -25,9 +23,8 @@ export const CRS_TABS = [
 ];
 
 export const CRS_TAB_COMPONENTS = {
+  registration: RegistrationDetails,
   checklist: DocumentChecklist,
-  account: AccountDetails,
-  address: AddressDetails,
   product: ProductTesting,
   modelBrand: ModelBrandMapping,
   brand: BrandDetails,
