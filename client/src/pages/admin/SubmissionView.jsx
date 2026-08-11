@@ -38,7 +38,6 @@ const SECTIONS_BY_TYPE = {
     { key: 'contact', label: 'Contact Person' },
     { key: 'air', label: 'AIR / Authorized Signatory' },
     { key: 'uploads', label: 'Upload Documents' },
-    { key: 'declaration', label: 'Declaration & Undertaking' },
   ],
 };
 
