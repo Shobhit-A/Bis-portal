@@ -2,83 +2,87 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Field } from '../../../components/FormField';
 
-// From BIS's QCO-notified product list — used to auto-fill Indian Standard when a
-// product is picked, and to power the "Complete Product List" reference table.
+// From BIS's QCO-notified product list — used to power the Indian Standard dropdown
+// and the "Complete Product List" reference table. `standards` is an array: most
+// products have exactly one, but some offer a choice between an old and a new edition,
+// or an IS+IEC crosswalk — each array entry is one full, exact, selectable option, so
+// nothing here gets naively split on "/" (a "/" can appear both between alternatives
+// AND inside a single combined standard reference, e.g. "IS 616:2017 / IEC 60065:2014").
 const PRODUCT_LIST = [
-  { product: 'AMPLIFIERS WITH INPUT POWER 2000W AND ABOVE', isNo: 'IS 616:2017', qcoDate: '03 July 2013' },
-  { product: 'AUTOMATIC DATA PROCESSING MACHINE', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'ELECTRONIC CLOCKS WITH MAINS POWER', isNo: 'IS 302-2-26:2014', qcoDate: '03 July 2013' },
-  { product: 'ELECTRONIC GAMES (VIDEO)', isNo: 'IS 616:2017', qcoDate: '03 July 2013' },
-  { product: 'ELECTRONIC MUSICAL SYSTEMS WITH INPUT POWER 200W AND ABOVE', isNo: 'IS 616:2017', qcoDate: '03 July 2013' },
-  { product: 'LAPTOP/NOTEBOOK/TABLET', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'MICROWAVE OVENS', isNo: 'IS 302-2-25:2014', qcoDate: '03 July 2013' },
-  { product: 'OPTICAL DISC PLAYERS WITH BUILT IN AMPLIFIERS OF INPUT POWER 200W AND ABOVE', isNo: 'IS 616:2017', qcoDate: '03 July 2013' },
-  { product: 'PLASMA/LCD/LED TELEVISIONS OF SCREEN SIZE 32" AND ABOVE', isNo: 'IS 616:2017 OR IS 616:2017 & IS 18112:2025', qcoDate: '03 July 2013' },
-  { product: 'PRINTERS, PLOTTERS', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'SCANNERS', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'SET TOP BOX', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'TELEPHONE ANSWERING MACHINES', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'VISUAL DISPLAY UNITS, VIDEOS MONITORS OF SCREEN SIZE 32" AND ABOVE', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'WIRELESS KEYBOARDS', isNo: 'IS 13252(Part 1):2010', qcoDate: '03 July 2013' },
-  { product: 'CASH REGISTERS', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 May 2015' },
-  { product: 'COPYING MACHINES/DUPLICATORS', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 May 2015' },
-  { product: 'PASSPORT READER', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 May 2015' },
-  { product: 'POINT OF SALE TERMINALS', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 May 2015' },
-  { product: 'MAIL PROCESSING MACHINES/POSTAGE MACHINES/FRANKING MACHINES', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 May 2015' },
-  { product: 'POWER BANKS FOR USE IN PORTABLE APPLICATIONS', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 May 2015' },
-  { product: 'SMART CARD READER', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 May 2015' },
-  { product: 'MOBILE PHONES', isNo: 'IS 13252(Part 1):2010', qcoDate: '13 September 2015' },
-  { product: 'SELF-BALLASTED LED LAMPS FOR GENERAL LIGHTING SERVICES', isNo: 'IS 16102(Part 1):2012', qcoDate: '13 September 2015' },
-  { product: 'DC OR AC SUPPLIED ELECTRONIC CONTROLGEAR FOR LED MODULES', isNo: 'IS 15885(Part 2/Sec 13):2012', qcoDate: '01 December 2015' },
-  { product: 'POWER ADAPTORS FOR AUDIO, VIDEO & SIMILAR ELECTRONIC APPARATUS', isNo: 'IS 616:2010', qcoDate: '01 December 2015' },
-  { product: 'POWER ADAPTORS FOR IT EQUIPMENTS', isNo: 'IS 13252(Part 1):2010', qcoDate: '01 December 2015' },
-  { product: 'FIXED GENERAL PURPOSE LED LUMINAIRES', isNo: 'IS 10322(Part 5/Sec 1):2012', qcoDate: '01 March 2016' },
-  { product: 'UPS/INVERTORS OF RATING <= 5KVA', isNo: 'IS 16242(Part 1):2014', qcoDate: '01 March 2016' },
-  { product: 'SEALED SECONDARY CELLS/BATTERIES (NICKEL SYSTEMS) FOR PORTABLE APPLICATIONS', isNo: 'IS 16046(Part 1):2018', qcoDate: '01 June 2016' },
-  { product: 'SEALED SECONDARY CELLS/BATTERIES (LITHIUM SYSTEMS) FOR PORTABLE APPLICATIONS', isNo: 'IS 16046(Part 2):2018', qcoDate: '01 June 2016' },
-  { product: 'INDIAN LANGUAGE SUPPORT FOR MOBILE PHONE HANDSETS', isNo: 'IS 16333(Part 3):2022', qcoDate: '01 May 2018' },
-  { product: 'Recessed LED Luminaries', isNo: 'IS 10322(Part 5/Section 2):2012', qcoDate: '23 May 2018' },
-  { product: 'LED Luminaires for Road and Street lighting', isNo: 'IS 10322(Part 5/Section 3):2012', qcoDate: '23 May 2018' },
-  { product: 'LED Flood Lights', isNo: 'IS 10322(Part 5/Section 5):2013', qcoDate: '23 May 2018' },
-  { product: 'LED Hand lamps', isNo: 'IS 10322(Part 5/Section 6):2013', qcoDate: '23 May 2018' },
-  { product: 'LED Lighting Chains', isNo: 'IS 10322(Part 5/Section 7):2017', qcoDate: '23 May 2018' },
-  { product: 'LED Luminaires for Emergency Lighting', isNo: 'IS 10322(Part 5/Section 8):2013', qcoDate: '23 May 2018' },
-  { product: 'UPS/Inverters of rating <= 10kVA', isNo: 'IS 16242(Part 1):2014 / IS 16242(Part 1):2025 / IEC 62040-1:2017 +AMD1:2021 +AMD2:2022 CSV', qcoDate: '23 May 2018' },
-  { product: 'Plasma/LCD/LED Television of screen size up-to 32"', isNo: 'IS 616:2017 OR IS 616:2017 & IS 18112:2025', qcoDate: '23 May 2018' },
-  { product: 'Visual Display Units', isNo: 'IS 13252(Part 1):2010', qcoDate: '23 May 2018' },
-  { product: 'CCTV Cameras/CCTV Recorders', isNo: 'IS 13252(Part 1):2010, Essential Requirement(s) for Security of CCTV', qcoDate: '23 May 2018' },
-  { product: 'Adapters for household and similar electrical appliances', isNo: 'IS 302(Part 1):2008 / IS 302(Part 1):2024/IEC 60335-1:2020', qcoDate: '23 May 2018' },
-  { product: 'USB driven Barcode readers, barcode scanners, Iris scanners, Optical fingerprint scanners', isNo: 'IS 13252(Part 1):2010', qcoDate: '23 May 2018' },
-  { product: 'Smart watches', isNo: 'IS 13252(Part 1):2010', qcoDate: '23 May 2018' },
-  { product: 'Crystalline Silicon Terrestrial Photovoltaic (PV) modules (Si wafer based)', isNo: 'IS 14286(Part 1/Sec 1):2023/IEC 61215-1-1:2021, IS/IEC 61730-1:2016, IS/IEC 61730-2:2016 OR ...:2023 variants', qcoDate: '31 March 2019' },
-  { product: 'Thin-Film Terrestrial Photovoltaic (PV) Modules (a-Si, CiGs and CdTe)', isNo: 'IS 14286(Part 1/Sec 2-4):2023 & IS/IEC 61730-1/2 (2016 or 2023 variants)', qcoDate: '31 March 2019' },
-  { product: 'Power converters for use in photovoltaic power system', isNo: 'IS 16221(Part 2):2015/IEC 62109-2:2011, IS/IEC 61683:1999', qcoDate: '30 June 2021' },
-  { product: 'Utility-Interconnected Photovoltaic inverters', isNo: 'IS 16221(Part 2):2015/IEC 62109-2:2011, IS 16169:2019/IEC 62116:2014, IS 17980:2022/IEC 62891:2020', qcoDate: '30 June 2021' },
-  { product: 'Storage battery', isNo: 'IS 16270:2023', qcoDate: '01 January 2019' },
-  { product: 'Independent LED Modules for General Lighting', isNo: 'IS 16103(Part 1):2012 / IS 16103(Part 1):2025 /IEC 62031:2018', qcoDate: '01 April 2021' },
-  { product: 'Lighting Chain (Rope Lights)', isNo: 'IS 10322(Part 5/Sec 9):2017', qcoDate: '01 April 2021' },
-  { product: 'Keyboard', isNo: 'IS 13252(Part 1):2010', qcoDate: '01 April 2021' },
-  { product: 'Induction Stove', isNo: 'IS 302-2-6:2009', qcoDate: '01 April 2021' },
-  { product: 'Automatic Teller Cash dispensing machines', isNo: 'IS 13252(Part 1):2010', qcoDate: '01 April 2021' },
-  { product: 'Standalone Hard Disk Drives', isNo: 'IS 13252(Part 1):2010', qcoDate: '01 April 2021' },
-  { product: 'Wireless Headphone and Earphone', isNo: 'IS 616:2017', qcoDate: '01 April 2021' },
-  { product: 'USB Type External Solid-State Storage Devices (above 256 GB capacity)', isNo: 'IS 13252(Part 1):2010', qcoDate: '01 April 2021' },
-  { product: 'Electronic Musical System with input power below 200 Watts', isNo: 'IS 616:2017', qcoDate: '01 April 2021' },
-  { product: 'Standalone Switch Mode Power Supplies (SMPS) with output voltage 48V (max)', isNo: 'IS 13252(Part 1):2010', qcoDate: '01 April 2021' },
-  { product: 'Television other than Plasma/LCD/LED TVs', isNo: 'IS 616:2017 OR IS 616:2017 & IS 18112:2025', qcoDate: '01 April 2021' },
-  { product: 'Rice Cooker', isNo: 'IS 302-2-15:2009', qcoDate: '01 April 2021' },
-  { product: 'Wireless Microphone', isNo: 'IS 616:2017', qcoDate: '01 October 2021' },
-  { product: 'Digital Camera', isNo: 'IS 13252(Part 1):2010', qcoDate: '01 October 2021' },
-  { product: 'Video Camera', isNo: 'IS 616:2017', qcoDate: '01 October 2021' },
-  { product: 'Webcam (Finished Product)', isNo: 'IS 616:2017', qcoDate: '01 October 2021' },
-  { product: 'Smart Speakers (with and without Display)', isNo: 'IS 616:2017', qcoDate: '01 October 2021' },
-  { product: 'Dimmers for LED products', isNo: 'IS 60669-2-1:2008', qcoDate: '01 October 2021' },
-  { product: 'Bluetooth Speakers', isNo: 'IS 616:2017', qcoDate: '01 October 2021' },
-  { product: 'Ortho Phosphoric Acid', isNo: 'IS 798:2020', qcoDate: '10 December 2022' },
-  { product: 'Polyphosphoric Acid', isNo: 'IS 17439:2020', qcoDate: '22 December 2022' },
-  { product: 'Trimethyl Phosphite Technical Grade', isNo: 'IS 17412:2020', qcoDate: '01 October 2022' },
-  { product: 'Television Sets', isNo: 'IS 18112:2025', qcoDate: '26 July 2026' },
-  { product: 'Extended Reality Products (Augmented Reality, Virtual Reality, Mixed Reality etc.)', isNo: 'IS/IEC 62368: Part 1: 2023', qcoDate: '05 December 2025' },
+  { product: 'AMPLIFIERS WITH INPUT POWER 2000W AND ABOVE', standards: ['IS/IEC 62368(Part 1):2023', 'IS 616:2017 / IEC 60065:2014'], qcoDate: '03 July 2013' },
+  { product: 'AUTOMATIC DATA PROCESSING MACHINE', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'ELECTRONIC CLOCKS WITH MAINS POWER', standards: ['IS 302-2-26:2014'], qcoDate: '03 July 2013' },
+  { product: 'ELECTRONIC GAMES (VIDEO)', standards: ['IS 616:2017'], qcoDate: '03 July 2013' },
+  { product: 'ELECTRONIC MUSICAL SYSTEMS WITH INPUT POWER 200W AND ABOVE', standards: ['IS 616:2017'], qcoDate: '03 July 2013' },
+  { product: 'LAPTOP/NOTEBOOK/TABLET', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'MICROWAVE OVENS', standards: ['IS 302-2-25:2014'], qcoDate: '03 July 2013' },
+  { product: 'OPTICAL DISC PLAYERS WITH BUILT IN AMPLIFIERS OF INPUT POWER 200W AND ABOVE', standards: ['IS 616:2017'], qcoDate: '03 July 2013' },
+  { product: 'PLASMA/LCD/LED TELEVISIONS OF SCREEN SIZE 32" AND ABOVE', standards: ['IS 616:2017', 'IS 616:2017 & IS 18112:2025'], qcoDate: '03 July 2013' },
+  { product: 'PRINTERS, PLOTTERS', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'SCANNERS', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'SET TOP BOX', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'TELEPHONE ANSWERING MACHINES', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'VISUAL DISPLAY UNITS, VIDEOS MONITORS OF SCREEN SIZE 32" AND ABOVE', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'WIRELESS KEYBOARDS', standards: ['IS 13252(Part 1):2010'], qcoDate: '03 July 2013' },
+  { product: 'CASH REGISTERS', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 May 2015' },
+  { product: 'COPYING MACHINES/DUPLICATORS', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 May 2015' },
+  { product: 'PASSPORT READER', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 May 2015' },
+  { product: 'POINT OF SALE TERMINALS', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 May 2015' },
+  { product: 'MAIL PROCESSING MACHINES/POSTAGE MACHINES/FRANKING MACHINES', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 May 2015' },
+  { product: 'POWER BANKS FOR USE IN PORTABLE APPLICATIONS', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 May 2015' },
+  { product: 'SMART CARD READER', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 May 2015' },
+  { product: 'MOBILE PHONES', standards: ['IS 13252(Part 1):2010'], qcoDate: '13 September 2015' },
+  { product: 'SELF-BALLASTED LED LAMPS FOR GENERAL LIGHTING SERVICES', standards: ['IS 16102(Part 1):2012'], qcoDate: '13 September 2015' },
+  { product: 'DC OR AC SUPPLIED ELECTRONIC CONTROLGEAR FOR LED MODULES', standards: ['IS 15885(Part 2/Sec 13):2012'], qcoDate: '01 December 2015' },
+  { product: 'POWER ADAPTORS FOR AUDIO, VIDEO & SIMILAR ELECTRONIC APPARATUS', standards: ['IS 616:2010'], qcoDate: '01 December 2015' },
+  { product: 'POWER ADAPTORS FOR IT EQUIPMENTS', standards: ['IS 13252(Part 1):2010'], qcoDate: '01 December 2015' },
+  { product: 'FIXED GENERAL PURPOSE LED LUMINAIRES', standards: ['IS 10322(Part 5/Sec 1):2012'], qcoDate: '01 March 2016' },
+  { product: 'UPS/INVERTORS OF RATING <= 5KVA', standards: ['IS 16242(Part 1):2014'], qcoDate: '01 March 2016' },
+  { product: 'SEALED SECONDARY CELLS/BATTERIES (NICKEL SYSTEMS) FOR PORTABLE APPLICATIONS', standards: ['IS 16046(Part 1):2018'], qcoDate: '01 June 2016' },
+  { product: 'SEALED SECONDARY CELLS/BATTERIES (LITHIUM SYSTEMS) FOR PORTABLE APPLICATIONS', standards: ['IS 16046(Part 2):2018'], qcoDate: '01 June 2016' },
+  { product: 'INDIAN LANGUAGE SUPPORT FOR MOBILE PHONE HANDSETS', standards: ['IS 16333(Part 3):2022'], qcoDate: '01 May 2018' },
+  { product: 'Recessed LED Luminaries', standards: ['IS 10322(Part 5/Section 2):2012'], qcoDate: '23 May 2018' },
+  { product: 'LED Luminaires for Road and Street lighting', standards: ['IS 10322(Part 5/Section 3):2012'], qcoDate: '23 May 2018' },
+  { product: 'LED Flood Lights', standards: ['IS 10322(Part 5/Section 5):2013'], qcoDate: '23 May 2018' },
+  { product: 'LED Hand lamps', standards: ['IS 10322(Part 5/Section 6):2013'], qcoDate: '23 May 2018' },
+  { product: 'LED Lighting Chains', standards: ['IS 10322(Part 5/Section 7):2017'], qcoDate: '23 May 2018' },
+  { product: 'LED Luminaires for Emergency Lighting', standards: ['IS 10322(Part 5/Section 8):2013'], qcoDate: '23 May 2018' },
+  { product: 'UPS/Inverters of rating <= 10kVA', standards: ['IS 16242(Part 1):2014 / IS 16242(Part 1):2025 / IEC 62040-1:2017 +AMD1:2021 +AMD2:2022 CSV'], qcoDate: '23 May 2018' },
+  { product: 'Plasma/LCD/LED Television of screen size up-to 32"', standards: ['IS 616:2017', 'IS 616:2017 & IS 18112:2025'], qcoDate: '23 May 2018' },
+  { product: 'Visual Display Units', standards: ['IS 13252(Part 1):2010'], qcoDate: '23 May 2018' },
+  { product: 'CCTV Cameras/CCTV Recorders', standards: ['IS 13252(Part 1):2010, Essential Requirement(s) for Security of CCTV'], qcoDate: '23 May 2018' },
+  { product: 'Adapters for household and similar electrical appliances', standards: ['IS 302(Part 1):2008', 'IS 302(Part 1):2024/IEC 60335-1:2020'], qcoDate: '23 May 2018' },
+  { product: 'USB driven Barcode readers, barcode scanners, Iris scanners, Optical fingerprint scanners', standards: ['IS 13252(Part 1):2010'], qcoDate: '23 May 2018' },
+  { product: 'Smart watches', standards: ['IS 13252(Part 1):2010'], qcoDate: '23 May 2018' },
+  { product: 'Crystalline Silicon Terrestrial Photovoltaic (PV) modules (Si wafer based)', standards: ['IS 14286(Part 1/Sec 1):2023/IEC 61215-1-1:2021, IS/IEC 61730-1:2016, IS/IEC 61730-2:2016 OR ...:2023 variants'], qcoDate: '31 March 2019' },
+  { product: 'Thin-Film Terrestrial Photovoltaic (PV) Modules (a-Si, CiGs and CdTe)', standards: ['IS 14286(Part 1/Sec 2-4):2023 & IS/IEC 61730-1/2 (2016 or 2023 variants)'], qcoDate: '31 March 2019' },
+  { product: 'Power converters for use in photovoltaic power system', standards: ['IS 16221(Part 2):2015/IEC 62109-2:2011, IS/IEC 61683:1999'], qcoDate: '30 June 2021' },
+  { product: 'Utility-Interconnected Photovoltaic inverters', standards: ['IS 16221(Part 2):2015/IEC 62109-2:2011, IS 16169:2019/IEC 62116:2014, IS 17980:2022/IEC 62891:2020'], qcoDate: '30 June 2021' },
+  { product: 'Storage battery', standards: ['IS 16270:2023'], qcoDate: '01 January 2019' },
+  { product: 'Independent LED Modules for General Lighting', standards: ['IS 16103(Part 1):2012 / IS 16103(Part 1):2025 /IEC 62031:2018'], qcoDate: '01 April 2021' },
+  { product: 'Lighting Chain (Rope Lights)', standards: ['IS 10322(Part 5/Sec 9):2017'], qcoDate: '01 April 2021' },
+  { product: 'Keyboard', standards: ['IS 13252(Part 1):2010'], qcoDate: '01 April 2021' },
+  { product: 'Induction Stove', standards: ['IS 302-2-6:2009'], qcoDate: '01 April 2021' },
+  { product: 'Automatic Teller Cash dispensing machines', standards: ['IS 13252(Part 1):2010'], qcoDate: '01 April 2021' },
+  { product: 'Standalone Hard Disk Drives', standards: ['IS 13252(Part 1):2010'], qcoDate: '01 April 2021' },
+  { product: 'Wireless Headphone and Earphone', standards: ['IS 616:2017'], qcoDate: '01 April 2021' },
+  { product: 'USB Type External Solid-State Storage Devices (above 256 GB capacity)', standards: ['IS 13252(Part 1):2010'], qcoDate: '01 April 2021' },
+  { product: 'Electronic Musical System with input power below 200 Watts', standards: ['IS 616:2017'], qcoDate: '01 April 2021' },
+  { product: 'Standalone Switch Mode Power Supplies (SMPS) with output voltage 48V (max)', standards: ['IS 13252(Part 1):2010'], qcoDate: '01 April 2021' },
+  { product: 'Television other than Plasma/LCD/LED TVs', standards: ['IS 616:2017', 'IS 616:2017 & IS 18112:2025'], qcoDate: '01 April 2021' },
+  { product: 'Rice Cooker', standards: ['IS 302-2-15:2009'], qcoDate: '01 April 2021' },
+  { product: 'Wireless Microphone', standards: ['IS 616:2017'], qcoDate: '01 October 2021' },
+  { product: 'Digital Camera', standards: ['IS 13252(Part 1):2010'], qcoDate: '01 October 2021' },
+  { product: 'Video Camera', standards: ['IS 616:2017'], qcoDate: '01 October 2021' },
+  { product: 'Webcam (Finished Product)', standards: ['IS 616:2017'], qcoDate: '01 October 2021' },
+  { product: 'Smart Speakers (with and without Display)', standards: ['IS 616:2017'], qcoDate: '01 October 2021' },
+  { product: 'Dimmers for LED products', standards: ['IS 60669-2-1:2008'], qcoDate: '01 October 2021' },
+  { product: 'Bluetooth Speakers', standards: ['IS 616:2017'], qcoDate: '01 October 2021' },
+  { product: 'Ortho Phosphoric Acid', standards: ['IS 798:2020'], qcoDate: '10 December 2022' },
+  { product: 'Polyphosphoric Acid', standards: ['IS 17439:2020'], qcoDate: '22 December 2022' },
+  { product: 'Trimethyl Phosphite Technical Grade', standards: ['IS 17412:2020'], qcoDate: '01 October 2022' },
+  { product: 'Television Sets', standards: ['IS 18112:2025'], qcoDate: '26 July 2026' },
+  { product: 'Extended Reality Products (Augmented Reality, Virtual Reality, Mixed Reality etc.)', standards: ['IS/IEC 62368: Part 1: 2023'], qcoDate: '05 December 2025' },
 ];
 
 function ProductListModal({ onClose }) {
@@ -104,7 +108,7 @@ function ProductListModal({ onClose }) {
                 <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                   <td className="px-3 py-1.5 border-t border-border align-top">{i + 1}</td>
                   <td className="px-3 py-1.5 border-t border-border align-top">{p.product}</td>
-                  <td className="px-3 py-1.5 border-t border-border align-top">{p.isNo}</td>
+                  <td className="px-3 py-1.5 border-t border-border align-top">{p.standards.join(' / ')}</td>
                   <td className="px-3 py-1.5 border-t border-border align-top whitespace-nowrap">{p.qcoDate}</td>
                 </tr>
               ))}
@@ -116,22 +120,15 @@ function ProductListModal({ onClose }) {
   );
 }
 
-// A product's isNo string may list multiple valid standards (old vs. new edition,
-// or an IS+IEC crosswalk) separated by " / " or " OR " — each becomes its own
-// selectable Indian Standard option instead of one combined free-text value.
-function splitStandards(isNo) {
-  return isNo.split(/\s+OR\s+|\s+\/\s+/i).map(s => s.trim()).filter(Boolean);
-}
-
 function standardOptionsFor(productName) {
   const match = PRODUCT_LIST.find(p => p.product === productName);
-  return match ? splitStandards(match.isNo) : [];
+  return match ? match.standards : [];
 }
 
-const ALL_STANDARDS = [...new Set(PRODUCT_LIST.flatMap(p => splitStandards(p.isNo)))].sort();
+const ALL_STANDARDS = [...new Set(PRODUCT_LIST.flatMap(p => p.standards))].sort();
 
 function productsForStandard(standard) {
-  return PRODUCT_LIST.filter(p => splitStandards(p.isNo).includes(standard)).map(p => p.product);
+  return PRODUCT_LIST.filter(p => p.standards.includes(standard)).map(p => p.product);
 }
 
 export default function ProductTesting({ formData, updateSection, isSubmitted }) {
