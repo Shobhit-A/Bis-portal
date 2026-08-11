@@ -969,6 +969,7 @@ async function generateExcelCRS(submission) {
   const checklist = fd.checklist || {};
   const account = fd.account || {};
   const address = fd.address || {};
+  const product = fd.product || {};
   const brand = fd.brand || {};
   const mgmt = fd.management || {};
   const contact = fd.contact || {};
@@ -1038,6 +1039,13 @@ async function generateExcelCRS(submission) {
     lv1(ws, r++, 'Contact No. *', address.corrContact);
     lv1(ws, r++, 'Correspondence Address Selection *', address.correspondenceSelection);
     lv1(ws, r++, 'Address Authentication Document', getDoc(docs, 'address_auth_doc'));
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Product Details');
+    spacer(ws, r++, 4, 4);
+    lv2(ws, r++, 'Selection Mode *', product.mode === 'standard' ? 'Indian Standard Wise' : 'Product Category Wise', 'Product Category', product.productCategory || '');
+    lv2(ws, r++, 'Product Name *', product.productName || '', 'Indian Standard *', product.indianStandard || '');
+    lv1(ws, r++, 'Sub Category', product.subCategory || '');
 
     spacer(ws, r++, 4, 5);
     mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
