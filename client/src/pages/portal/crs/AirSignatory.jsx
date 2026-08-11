@@ -11,6 +11,15 @@ const SCENARIOS = [
   'We do no have a liaison office / branch office located in India and there is no Proprietor / Registered User of the Brand/Trademark appearing on the article, located in India. Therefore, we nominate our authorized Indian representative as per details given below.',
 ];
 
+AirSignatory.isComplete = (formData) => {
+  const d = formData.air || {};
+  const missing = [];
+  if (!d.scenario) missing.push('Representative Scenario');
+  if (!d.repFirmName) missing.push('Indian Representative Firm Name');
+  if (!d.repFirmAddress) missing.push('Indian Representative Firm Address');
+  return missing;
+};
+
 export default function AirSignatory({ formData, updateSection, isSubmitted }) {
   const data = formData.air || {};
   const set = (key, val) => updateSection('air', { ...data, [key]: val });

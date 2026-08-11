@@ -86,6 +86,33 @@ export default function PortalLayout({ basePath, TABS, tabComponents }) {
   const currentIndex = Math.max(0, activeTab);
   const sharedProps = { formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted };
 
+  // A tab component may export `isComplete(formData, getDocForField)` returning an
+  // array of missing-field labels (empty = complete). Tabs without one (checklists,
+  // read-only summaries) are never blocked. Forward navigation past an incomplete tab
+  // is refused; going back is always allowed.
+  const missingOnTab = (idx) => {
+    const tab = TABS[idx];
+    const isComplete = tabComponents[tab?.key]?.isComplete;
+    if (!isComplete || isSubmitted) return [];
+    return isComplete(formData, getDocForField) || [];
+  };
+
+  const goToTab = (targetIdx) => {
+    if (targetIdx <= currentIndex) {
+      navigate(`${formBasePath}/${TABS[targetIdx].path}`);
+      return;
+    }
+    for (let i = currentIndex; i < targetIdx; i++) {
+      const missing = missingOnTab(i);
+      if (missing.length) {
+        toast.error(`Please fill in before continuing: ${missing.join(', ')}`);
+        if (i !== currentIndex) navigate(`${formBasePath}/${TABS[i].path}`);
+        return;
+      }
+    }
+    navigate(`${formBasePath}/${TABS[targetIdx].path}`);
+  };
+
   return (
     <SubmissionIdContext.Provider value={submissionId}>
       <div className="min-h-screen bg-surface flex flex-col">
@@ -126,7 +153,7 @@ export default function PortalLayout({ basePath, TABS, tabComponents }) {
             <div className="flex gap-1 min-w-max">
               {TABS.map((tab, idx) => (
                 <button key={tab.key}
-                  onClick={() => navigate(`${formBasePath}/${tab.path}`)}
+                  onClick={() => goToTab(idx)}
                   className={`px-3 py-1.5 rounded text-xs font-medium transition-colors whitespace-nowrap ${idx === currentIndex ? 'bg-primary text-white' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'}`}>
                   <span className="mr-1.5 opacity-60">{idx + 1}.</span>{tab.label}
                 </button>
@@ -167,10 +194,10 @@ export default function PortalLayout({ basePath, TABS, tabComponents }) {
 
             {!location.pathname.includes('submitted') && (
               <div className="flex justify-between mt-8 pt-6 border-t border-border">
-                <button onClick={() => { const prev = TABS[currentIndex - 1]; if (prev) navigate(`${formBasePath}/${prev.path}`); }}
+                <button onClick={() => goToTab(currentIndex - 1)}
                   disabled={currentIndex === 0} className="btn-secondary disabled:opacity-30">← Previous</button>
                 {currentIndex < TABS.length - 1 ? (
-                  <button onClick={() => { const next = TABS[currentIndex + 1]; navigate(`${formBasePath}/${next.path}`); }} className="btn-primary">
+                  <button onClick={() => goToTab(currentIndex + 1)} className="btn-primary">
                     Next →
                   </button>
                 ) : null}

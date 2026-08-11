@@ -131,6 +131,15 @@ function productsForStandard(standard) {
   return PRODUCT_LIST.filter(p => p.standards.includes(standard)).map(p => p.product);
 }
 
+ProductTesting.isComplete = (formData) => {
+  const d = formData.product || {};
+  const missing = [];
+  if (!d.productCategory) missing.push('Product Category');
+  if (!d.indianStandard) missing.push('Indian Standard');
+  if (!d.productName) missing.push('Product Name');
+  return missing;
+};
+
 export default function ProductTesting({ formData, updateSection, isSubmitted }) {
   const account = formData.account || {};
   const address = formData.address || {};

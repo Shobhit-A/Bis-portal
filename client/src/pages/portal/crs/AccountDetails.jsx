@@ -7,6 +7,19 @@ function WarnHint({ children }) {
   return <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1 mt-1">{children}</p>;
 }
 
+AccountDetails.isComplete = (formData) => {
+  const d = formData.account || {};
+  const missing = [];
+  if (!d.userName) missing.push('User Name');
+  if (!d.password) missing.push('Password');
+  if (!d.confirmPassword || d.password !== d.confirmPassword) missing.push('Confirm Password');
+  if (!d.email) missing.push('Email');
+  if (!d.name) missing.push('Name');
+  if (!d.mobile) missing.push('Mobile No.');
+  if (!d.unitName) missing.push('Manufacturing Unit Name');
+  return missing;
+};
+
 export default function AccountDetails({ formData, updateSection, isSubmitted }) {
   const data = formData.account || {};
   const set = (key, val) => updateSection('account', { ...data, [key]: val });

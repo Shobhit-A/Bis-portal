@@ -9,6 +9,13 @@ const BRAND_COLUMNS = [
   { key: 'registrationDate', label: 'Registration Date', type: 'date' },
 ];
 
+BrandDetails.isComplete = (formData, getDocForField) => {
+  const d = formData.brand || {};
+  const rowOk = (d.rows || []).some(r =>
+    r.brandName && r.ownedBy && r.registered && r.registrationDate && getDocForField(`brand_cert_${r.id}`));
+  return rowOk ? [] : ['Brand Details'];
+};
+
 export default function BrandDetails({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.brand || {};
   const set = (key, val) => updateSection('brand', { ...data, [key]: val });
