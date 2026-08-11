@@ -11,6 +11,26 @@ function WarnHint({ children }) {
   return <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1 mt-1">{children}</p>;
 }
 
+AddressDetails.isComplete = (formData, getDocForField) => {
+  const d = formData.address || {};
+  const missing = [];
+  if (!d.mfgEmail) missing.push('Manufacturing Unit Email');
+  if (!d.mfgAddress) missing.push('Manufacturing Unit Address');
+  if (!d.mfgCountry) missing.push('Manufacturing Unit Country');
+  if (!d.mfgState) missing.push('Manufacturing Unit State');
+  if (!d.mfgZip) missing.push('Manufacturing Unit Zip Code');
+  if (!d.mfgContact) missing.push('Manufacturing Unit Contact No.');
+  if (!d.corrEmail) missing.push('Correspondence Email');
+  if (!d.corrAddress) missing.push('Correspondence Address');
+  if (!d.corrCountry) missing.push('Correspondence Country');
+  if (!d.corrState) missing.push('Correspondence State');
+  if (!d.corrZip) missing.push('Correspondence Zip Code');
+  if (!d.corrContact) missing.push('Correspondence Contact No.');
+  if (!getDocForField('address_auth_doc')) missing.push('Address Authentication Document');
+  if (!d.addrProofDocType) missing.push('Type of Document');
+  return missing;
+};
+
 export default function AddressDetails({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.address || {};
   const set = (key, val) => updateSection('address', { ...data, [key]: val });

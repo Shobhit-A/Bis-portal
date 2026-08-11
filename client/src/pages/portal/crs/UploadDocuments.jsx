@@ -12,6 +12,16 @@ const ROWS = [
   { no: 8, label: 'Factory Address Proof/ Business license', required: true, type: 'file', fieldKey: 'uploads_factory_proof', fieldLabel: 'Factory Address Proof / Business License' },
 ];
 
+UploadDocuments.isComplete = (formData, getDocForField) => {
+  const d = formData.uploads || {};
+  const missing = [];
+  ROWS.filter(r => r.required).forEach(r => {
+    const ok = r.type === 'yesno' ? !!d[r.dataKey] : !!getDocForField(r.fieldKey);
+    if (!ok) missing.push(r.fieldLabel || r.label);
+  });
+  return missing;
+};
+
 export default function UploadDocuments({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.uploads || {};
   const set = (key, val) => updateSection('uploads', { ...data, [key]: val });

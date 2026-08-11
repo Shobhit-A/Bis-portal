@@ -2,6 +2,11 @@ import React from 'react';
 import AccountDetails from './AccountDetails';
 import AddressDetails from './AddressDetails';
 
+RegistrationDetails.isComplete = (formData, getDocForField) => [
+  ...AccountDetails.isComplete(formData, getDocForField),
+  ...AddressDetails.isComplete(formData, getDocForField),
+];
+
 // Real portal shows Registration & Manufacturing Unit and Manufacturing Unit &
 // Correspondence Address as a single combined section — compose the two existing
 // tab components rather than duplicating their fields into a new file.

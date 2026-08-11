@@ -1,6 +1,15 @@
 import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 
+TestReportDetails.isComplete = (formData, getDocForField) => {
+  const d = formData.testReport || {};
+  const missing = [];
+  if (!getDocForField('testReport_inhouse')) missing.push('In House Test Report');
+  if (!d.rawMaterialConformity) missing.push('Raw Material Conformity question');
+  if (d.rawMaterialConformity === 'Yes' && !getDocForField('testReport_raw_material_conformity')) missing.push('Raw Material Conformity Test Report');
+  return missing;
+};
+
 export default function TestReportDetails({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.testReport || {};
   const set = (key, val) => updateSection('testReport', { ...data, [key]: val });

@@ -11,6 +11,14 @@ const MGMT_COLUMNS = [
 // fresh randomUUID() each render would change the row's React key every render,
 // breaking focus/input stability. Once the user edits a cell, onChange persists the
 // row into formData with this same fixed id, so it only "generates" once in practice.
+ManagementDetails.isComplete = (formData) => {
+  const d = formData.management || {};
+  const missing = [];
+  if (!(d.topRows || []).some(r => r.name && r.designation)) missing.push('Top Management Details');
+  if (!(d.techRows || []).some(r => r.name && r.designation)) missing.push('Technical Management Details');
+  return missing;
+};
+
 export default function ManagementDetails({ formData, updateSection, isSubmitted }) {
   const data = formData.management || {};
   const set = (key, val) => updateSection('management', { ...data, [key]: val });

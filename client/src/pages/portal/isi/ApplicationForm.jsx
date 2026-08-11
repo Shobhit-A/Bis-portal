@@ -3,6 +3,53 @@ import { Field, Select, FileUpload } from '../../../components/FormField';
 import { RepeatingTable } from '../../../components/RepeatingTable';
 import { COUNTRIES } from '../tabs/OrganizationProfile';
 
+ApplicationForm.isComplete = (formData, getDocForField) => {
+  const office = formData.firmOffice || {};
+  const factory = formData.factory || {};
+  const standard = formData.standard || {};
+  const missing = [];
+
+  if (!office.firmName) missing.push('Firm Name');
+  if (!office.officeAddress) missing.push('Office Address');
+  if (!office.officeCountry) missing.push('Office Country');
+  if (!office.officeState) missing.push('Office State');
+  if (!office.officeDistrict) missing.push('Office District');
+  if (!office.officeCity) missing.push('Office City');
+  if (!office.ceoName) missing.push('CEO Name');
+  if (!office.registeredEmail) missing.push('Registered Email');
+  if (!office.officeEmail) missing.push('Office Email');
+  if (!office.officeAddrProofType) missing.push('Office Address Proof Type');
+  if (!getDocForField('firmOffice_office_addr_proof')) missing.push('Office Address Proof Document');
+  if (!office.natureOfFirm) missing.push('Nature of Firm');
+  if (!office.scale) missing.push('Scale');
+  if (!office.sector) missing.push('Sector');
+  if (!office.womenEntrepreneur) missing.push('Women Entrepreneur');
+  if (!office.startup) missing.push('Startup');
+  if (!office.gstNumber) missing.push('GST Number');
+  if (!getDocForField('firmOffice_gst_cert')) missing.push('GST Certificate');
+  if (!office.estabProofType) missing.push('Proof of Establishment Type');
+  if (!getDocForField('firmOffice_estab_proof')) missing.push('Proof of Establishment Document');
+
+  if (!factory.sameAsOffice) missing.push('Factory Address Same as Office question');
+  if (!factory.factoryAddress) missing.push('Factory Address');
+  if (!factory.country) missing.push('Factory Country');
+  if (!factory.state) missing.push('Factory State');
+  if (!factory.district) missing.push('Factory District');
+  if (!factory.city) missing.push('Factory City');
+  if (!factory.email) missing.push('Factory Email');
+  if (!factory.sez) missing.push('SEZ question');
+  if (!factory.addrProofType) missing.push('Factory Address Proof Type');
+  if (!getDocForField('factory_addr_proof')) missing.push('Factory Address Proof Document');
+
+  if (!standard.knowsStandard) missing.push('Indian Standard question');
+  if (standard.knowsStandard === 'Yes' && !standard.indianStandard) missing.push('Indian Standard');
+  if (!standard.acceptsSIT) missing.push('Scheme of Inspection & Testing acceptance');
+  const varietyOk = (standard.rows || []).some(r => r.variety && getDocForField(`standard_variety_${r.id}`));
+  if (!varietyOk) missing.push('Product Variety');
+
+  return missing;
+};
+
 export default function ApplicationForm({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const office = formData.firmOffice || {};
   const setOffice = (key, val) => updateSection('firmOffice', { ...office, [key]: val });
