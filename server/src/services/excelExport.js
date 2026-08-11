@@ -863,8 +863,6 @@ async function generateExcelCRS(submission) {
   const contact = fd.contact || {};
   const air = fd.air || {};
   const uploads = fd.uploads || {};
-  const decl = fd.declaration || {};
-
   const clientInfo = `Client: ${submission.user?.username || '—'}   |   Status: ${submission.status}   |   Last Updated: ${new Date(submission.updatedAt).toLocaleDateString('en-IN')}`;
 
   const CHECKLIST_DOCS = [
@@ -892,7 +890,7 @@ async function generateExcelCRS(submission) {
     spacer(ws, r++, 4, 4);
     CHECKLIST_DOCS.forEach(d => {
       const status = checklist[String(d.no)] || '';
-      lv2(ws, r++, `${d.no}. ${d.doc}`, status, '', '');
+      lv2(ws, r++, `${d.no}. ${d.doc}`, status, '', '', 32);
     });
     spacer(ws, r++, 4, 6);
 
@@ -1032,11 +1030,11 @@ async function generateExcelCRS(submission) {
   // SHEET 4 — UPLOADS & DECLARATION
   // ============================================================
   {
-    const ws = wb.addWorksheet('Uploads & Declaration');
+    const ws = wb.addWorksheet('Upload Documents');
     ws.columns = [{ width: 40 }, { width: 40 }, { width: 28 }, { width: 42 }];
     let r = 1;
     spacer(ws, r++, 4, 8);
-    titleRow(ws, r++, 4, 'CRS APPLICATION — UPLOAD DOCUMENTS & DECLARATION');
+    titleRow(ws, r++, 4, 'CRS APPLICATION — UPLOAD DOCUMENTS');
     spacer(ws, r++, 4, 6);
 
     secHeader(ws, r++, 4, 'Upload Documents');
@@ -1049,17 +1047,6 @@ async function generateExcelCRS(submission) {
     lv1(ws, r++, 'ID Card of Authorized Signatory of AIR', getDoc(docs, 'uploads_air_id_card'));
     lv1(ws, r++, 'Other Document', getDoc(docs, 'uploads_other'));
     lv1(ws, r++, 'Factory Address Proof / Business License', getDoc(docs, 'uploads_factory_proof'));
-    spacer(ws, r++, 4, 6);
-
-    secHeader(ws, r++, 4, 'Declaration & Undertaking');
-    spacer(ws, r++, 4, 4);
-    lv1(ws, r++, 'Statutory Permissions Required?', decl.statutoryPermissions);
-    lv1(ws, r++, 'Other Information?', decl.otherInfo);
-    lv1(ws, r++, 'Other Request?', decl.otherRequest);
-    lv2(ws, r++, 'Submitter Name *', decl.submitterName || '', 'Submitter Designation *', decl.submitterDesignation || '');
-    lv1(ws, r++, 'Weekly Off?', decl.weeklyOff);
-    lv1(ws, r++, 'Weekly Off Days', decl.weeklyOffDays);
-    lv2(ws, r++, 'Signatory Name *', decl.signatoryName || '', 'Date *', decl.signDate || '');
 
     spacer(ws, r++, 4, 5);
     mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
