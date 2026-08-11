@@ -2,6 +2,24 @@ import React, { useState } from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 import { Eye, EyeOff } from 'lucide-react';
 
+RegistrationForm.isComplete = (formData, getDocForField) => {
+  const d = formData.registration || {};
+  const missing = [];
+  if (!d.email) missing.push('Email');
+  if (!d.password) missing.push('Password');
+  if (!d.firstName) missing.push('First Name');
+  if (!d.lastName) missing.push('Last Name');
+  if (!d.dob) missing.push('Date of Birth');
+  if (!d.mobile) missing.push('Mobile Number');
+  if (!d.nationality) missing.push('Nationality');
+  if (!d.idCardType) missing.push('ID Card Type');
+  if (!d.idCardNumber) missing.push('ID Card Number');
+  if (!d.hintQuestion) missing.push('Hint Question');
+  if (!d.hintAnswer) missing.push('Hint Answer');
+  if (!getDocForField('registration_id_card')) missing.push('Government ID Card');
+  return missing;
+};
+
 export default function RegistrationForm({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.registration || {};
   const set = (key, val) => updateSection('registration', { ...data, [key]: val });

@@ -12,6 +12,19 @@ const BIS_RECOGNIZED_OPTIONS = ['Yes', 'No'];
 
 const EXCEL_ACCEPT = { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] };
 
+TestingInspection.isComplete = (formData, getDocForField) => {
+  const d = formData.testing || {};
+  const missing = [];
+  if (!d.inHouseTesting) missing.push('In-house testing facility question');
+  if (d.inHouseTesting === 'No') {
+    if (!getDocForField('testing_consent_letter')) missing.push('Consent Letter');
+    const rowOk = (d.subContractedTests || []).some(r => r.clauseNo && r.testName && r.labRelationship && r.labName);
+    if (!rowOk) missing.push('Sub-Contracted Tests');
+  }
+  if (!getDocForField('testing_equipment_list')) missing.push('List of Testing Equipment');
+  return missing;
+};
+
 export default function TestingInspection({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.testing || {};
   const set = (key, val) => updateSection('testing', { ...data, [key]: val });

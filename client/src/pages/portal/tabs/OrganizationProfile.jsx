@@ -3,6 +3,36 @@ import { Field, Select, FileUpload } from '../../../components/FormField';
 
 export const COUNTRIES = ['India','Afghanistan','Australia','Bahrain','Bangladesh','Brazil','Canada','China','Egypt','France','Germany','Indonesia','Iran','Iraq','Italy','Japan','Kenya','Kuwait','Malaysia','Mexico','Myanmar','Nepal','Netherlands','New Zealand','Nigeria','Oman','Pakistan','Philippines','Qatar','Russia','Saudi Arabia','Singapore','South Africa','South Korea','Sri Lanka','Thailand','UAE','United Kingdom','USA','Vietnam'];
 
+OrganizationProfile.isComplete = (formData, getDocForField) => {
+  const d = formData.organization || {};
+  const missing = [];
+  if (!d.registeredEmail) missing.push('Registered Email');
+  if (!d.registeredMobile) missing.push('Registered Mobile Number');
+  if (!d.firmName) missing.push('Firm Name');
+  if (!d.ceoName) missing.push('CEO Name');
+  if (!d.officeAddressLine1) missing.push('Office Address');
+  if (!d.officeCountry) missing.push('Office Country');
+  if (!d.officeAddr1) missing.push('Office Address 1');
+  if (!d.officeAddr2) missing.push('Office Address 2');
+  if (!d.officeCity) missing.push('Office City');
+  if (!d.officeAddrProofType) missing.push('Address Proof Document Type');
+  if (!getDocForField('organization_office_addr_proof')) missing.push('Office Address Proof');
+  if (!d.officeEmail) missing.push('Firm/Office Email');
+  if (!d.sector) missing.push('Sector');
+  if (!d.scale) missing.push('Scale');
+  if (!d.estabProofType) missing.push('Proof of Establishment Document Type');
+  if (!getDocForField('organization_estab_proof')) missing.push('Proof of Establishment');
+  if (!d.factoryAddressLine1) missing.push('Factory Address');
+  if (!d.factoryCountry) missing.push('Factory Country');
+  if (!d.factoryAddr1) missing.push('Factory Address 1');
+  if (!d.factoryAddr2) missing.push('Factory Address 2');
+  if (!d.factoryCity) missing.push('Factory City');
+  if (!d.factoryAddrProofType) missing.push('Factory Address Proof Document Type');
+  if (!getDocForField('organization_factory_addr_proof')) missing.push('Factory Address Proof');
+  if (!d.manufacturerEmail) missing.push('Manufacturer Email');
+  return missing;
+};
+
 export default function OrganizationProfile({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.organization || {};
   const set = (key, val) => updateSection('organization', { ...data, [key]: val });

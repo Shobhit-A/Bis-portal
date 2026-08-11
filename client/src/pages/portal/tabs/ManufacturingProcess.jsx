@@ -12,6 +12,21 @@ const CONFORMITY_OPTIONS = [
   'Any Other',
 ];
 
+ManufacturingProcess.isComplete = (formData, getDocForField) => {
+  const d = formData.manufacturing || {};
+  const missing = [];
+  const rowOk = (d.rawMaterials || []).some(r => r.material && r.supplier && r.supplierCountry && r.howReceived);
+  if (!rowOk) missing.push('Raw Material Details');
+  if (!d.outsourcing) missing.push('Outsourcing question');
+  if (d.outsourcing === 'Yes' && !getDocForField('manufacturing_outsource_doc')) missing.push('Outsourcing Agreement');
+  if (!d.hygiene) missing.push('Hygiene question');
+  if (d.hygiene === 'Yes' && !getDocForField('manufacturing_hygiene_doc')) missing.push('Hygiene Supporting Document');
+  if (!getDocForField('manufacturing_flowchart')) missing.push('Process Flow Chart');
+  if (!getDocForField('manufacturing_layout')) missing.push('Factory Layout Plan');
+  if (!getDocForField('manufacturing_machinery')) missing.push('Manufacturing Machinery List');
+  return missing;
+};
+
 export default function ManufacturingProcess({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.manufacturing || {};
   const set = (key, val) => updateSection('manufacturing', { ...data, [key]: val });
