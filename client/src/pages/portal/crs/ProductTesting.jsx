@@ -119,10 +119,19 @@ function ProductListModal({ onClose }) {
 // A product's isNo string may list multiple valid standards (old vs. new edition,
 // or an IS+IEC crosswalk) separated by " / " or " OR " — each becomes its own
 // selectable Indian Standard option instead of one combined free-text value.
+function splitStandards(isNo) {
+  return isNo.split(/\s+OR\s+|\s+\/\s+/i).map(s => s.trim()).filter(Boolean);
+}
+
 function standardOptionsFor(productName) {
   const match = PRODUCT_LIST.find(p => p.product === productName);
-  if (!match) return [];
-  return match.isNo.split(/\s+OR\s+|\s+\/\s+/i).map(s => s.trim()).filter(Boolean);
+  return match ? splitStandards(match.isNo) : [];
+}
+
+const ALL_STANDARDS = [...new Set(PRODUCT_LIST.flatMap(p => splitStandards(p.isNo)))].sort();
+
+function productsForStandard(standard) {
+  return PRODUCT_LIST.filter(p => splitStandards(p.isNo).includes(standard)).map(p => p.product);
 }
 
 export default function ProductTesting({ formData, updateSection, isSubmitted }) {
@@ -134,25 +143,21 @@ export default function ProductTesting({ formData, updateSection, isSubmitted })
 
   const mode = data.mode || 'category';
 
-  const handleProductNameChange = (e) => {
-    const productName = e.target.value;
-    const match = PRODUCT_LIST.find(p => p.product === productName);
-    updateSection('product', { ...data, productName, indianStandard: match?.isNo || '' });
+  // Indian Standard Wise flow: picking a standard scopes the Product Name dropdown to
+  // products that list it, but the user still has to pick the product themselves.
+  const standardProductOptions = productsForStandard(data.indianStandard);
+  const handleStandardChange = (e) => {
+    const indianStandard = e.target.value;
+    updateSection('product', { ...data, indianStandard, productName: '' });
   };
 
-  // Category-wise flow: picking a category resolves the exact product match, then
-  // Indian Standard / Sub Category / Product Name all become dropdowns scoped to it.
+  // Category-wise flow: picking a category scopes the Indian Standard / Sub Category /
+  // Product Name dropdowns to it, but each still requires its own explicit selection —
+  // nothing gets auto-filled.
   const categoryStandardOptions = standardOptionsFor(data.productCategory);
   const handleCategoryChange = (e) => {
     const productCategory = e.target.value;
-    const options = standardOptionsFor(productCategory);
-    updateSection('product', {
-      ...data,
-      productCategory,
-      indianStandard: options.length === 1 ? options[0] : '',
-      subCategory: productCategory,
-      productName: productCategory,
-    });
+    updateSection('product', { ...data, productCategory, indianStandard: '', subCategory: '', productName: '' });
   };
 
   return (
@@ -228,15 +233,18 @@ export default function ProductTesting({ formData, updateSection, isSubmitted })
             </>
           ) : (
             <>
-              <Field label="Product Name" required hint="Pick from the QCO-notified product list">
-                <select className="input" value={data.productName || ''} onChange={handleProductNameChange} disabled={isSubmitted}>
+              <Field label="Indian Standard" required hint="Pick from the QCO-notified standards list">
+                <select className="input" value={data.indianStandard || ''} onChange={handleStandardChange} disabled={isSubmitted}>
                   <option value="">---Select---</option>
-                  {PRODUCT_LIST.map(p => <option key={p.product} value={p.product}>{p.product}</option>)}
+                  {ALL_STANDARDS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </Field>
 
-              <Field label="Indian Standard" required hint="Auto-filled from the selected product">
-                <input className="input bg-gray-50" value={data.indianStandard || ''} readOnly />
+              <Field label="Product Name" required>
+                <select className="input" value={data.productName || ''} onChange={e => set('productName', e.target.value)} disabled={isSubmitted || !data.indianStandard}>
+                  <option value="">---Select---</option>
+                  {standardProductOptions.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
               </Field>
             </>
           )}
