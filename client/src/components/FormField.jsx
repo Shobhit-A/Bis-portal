@@ -37,7 +37,7 @@ export function Select({ value, onChange, options, placeholder = 'Select...', cl
 const DEFAULT_ACCEPT = { 'application/pdf': ['.pdf'], 'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png'] };
 const DEFAULT_ACCEPT_LABEL = 'PDF, JPG, PNG';
 
-export function FileUpload({ fieldKey, fieldLabel, existingDoc, onUploaded, onRemoved, accept = DEFAULT_ACCEPT, acceptLabel = DEFAULT_ACCEPT_LABEL }) {
+export function FileUpload({ fieldKey, fieldLabel, existingDoc, onUploaded, onRemoved, accept = DEFAULT_ACCEPT, acceptLabel = DEFAULT_ACCEPT_LABEL, maxSizeMB = 5 }) {
   const submissionId = useContext(SubmissionIdContext);
   const [uploading, setUploading] = useState(false);
   const [doc, setDoc] = useState(existingDoc || null);
@@ -79,7 +79,7 @@ export function FileUpload({ fieldKey, fieldLabel, existingDoc, onUploaded, onRe
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept,
-    maxSize: 5 * 1024 * 1024,
+    maxSize: maxSizeMB * 1024 * 1024,
     multiple: false,
   });
 
@@ -107,7 +107,7 @@ export function FileUpload({ fieldKey, fieldLabel, existingDoc, onUploaded, onRe
         <>
           <Upload size={18} className="text-gray-300 mx-auto mb-1" />
           <div className="text-xs text-gray-500">{isDragActive ? 'Drop file here' : 'Click or drag to upload'}</div>
-          <div className="text-xs text-gray-400 mt-0.5">{acceptLabel} · Max 5MB</div>
+          <div className="text-xs text-gray-400 mt-0.5">{acceptLabel} · Max {maxSizeMB}MB</div>
         </>
       )}
     </div>

@@ -1,8 +1,15 @@
 import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 import { COUNTRIES } from '../tabs/OrganizationProfile';
+import { INDIAN_STATES } from './AirSignatory';
 
 const ADDR_PROOF_HINT = 'For proof of name and address of manufacturing unit, kindly upload a valid government issued document in which name and address of the manufacturing unit is clearly reflected along with reflection of manufacturing activity for products related to Registration Scheme. Documents like ISO certificates may be submitted in addition, if scope of manufacturing is not clear from the above document. However, an ISO document alone will not be accepted for address proof.';
+
+const PDF_ONLY = { 'application/pdf': ['.pdf'] };
+
+function WarnHint({ children }) {
+  return <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1 mt-1">{children}</p>;
+}
 
 export default function AddressDetails({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
   const data = formData.address || {};
@@ -36,13 +43,21 @@ export default function AddressDetails({ formData, updateSection, getDocForField
             <Field label="Country" required>
               <Select value={data.mfgCountry || 'India'} onChange={v => set('mfgCountry', v)} options={COUNTRIES} />
             </Field>
-            <Field label="State/Province" required><input {...d('mfgState')} /></Field>
+            <Field label="State/Province" required>
+              <Select value={data.mfgState} onChange={v => set('mfgState', v)} options={INDIAN_STATES} />
+            </Field>
           </div>
           <div className="form-row">
-            <Field label="Zip Code" required hint="Zip Code is Mandatory"><input {...d('mfgZip')} /></Field>
+            <Field label="Zip Code" required>
+              <input {...d('mfgZip')} />
+              <WarnHint>Zip Code is Mandatory</WarnHint>
+            </Field>
             <Field label="Fax No."><input {...d('mfgFax')} /></Field>
           </div>
-          <Field label="Contact No." required hint="STD code(s) to be given with contact numbers"><input {...d('mfgContact')} /></Field>
+          <Field label="Contact No." required>
+            <input {...d('mfgContact')} />
+            <WarnHint>STD code(s) to be given with contact numbers</WarnHint>
+          </Field>
         </div>
       </div>
 
@@ -63,10 +78,15 @@ export default function AddressDetails({ formData, updateSection, getDocForField
             <Field label="Country" required>
               <Select value={data.corrCountry} onChange={v => set('corrCountry', v)} options={COUNTRIES} />
             </Field>
-            <Field label="State/Province" required><input {...d('corrState')} /></Field>
+            <Field label="State/Province" required>
+              <Select value={data.corrState} onChange={v => set('corrState', v)} options={INDIAN_STATES} />
+            </Field>
           </div>
           <div className="form-row">
-            <Field label="Zip Code" required><input {...d('corrZip')} /></Field>
+            <Field label="Zip Code" required>
+              <input {...d('corrZip')} />
+              <WarnHint>Zip Code is Mandatory</WarnHint>
+            </Field>
             <Field label="Fax No."><input {...d('corrFax')} /></Field>
           </div>
           <Field label="Contact No." required><input {...d('corrContact')} /></Field>
@@ -74,20 +94,29 @@ export default function AddressDetails({ formData, updateSection, getDocForField
       </div>
 
       <div className="card">
-        <div className="section-header">Correspondence Address Selection</div>
-        <div className="p-6">
+        <div className="section-header">Correspondence Address</div>
+        <div className="p-6 space-y-4">
           <Field label="Correspondence Address" required>
-            <Select value={data.correspondenceSelection || 'Office'} onChange={v => set('correspondenceSelection', v)} options={['Office', 'Manufacturing Unit']} />
+            <div className="flex items-center gap-6">
+              {['Office', 'Manufacturing Unit'].map(opt => (
+                <label key={opt} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                  <input type="radio" name="correspondenceSelection" checked={(data.correspondenceSelection || 'Office') === opt}
+                    onChange={() => set('correspondenceSelection', opt)} disabled={isSubmitted} />
+                  {opt}
+                </label>
+              ))}
+            </div>
           </Field>
-        </div>
-      </div>
 
-      <div className="card">
-        <div className="section-header">Document Upload</div>
-        <div className="p-6">
           <Field label="Address Authentication of Manufacturing Unit" required hint={ADDR_PROOF_HINT}>
+            <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1 mb-2 inline-block">(.pdf file of max 10 MB)</p>
             <FileUpload fieldKey="address_auth_doc" fieldLabel="Address Authentication"
+              accept={PDF_ONLY} acceptLabel="PDF" maxSizeMB={10}
               existingDoc={getDocForField('address_auth_doc')} onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
+          </Field>
+
+          <Field label="Type of Document" required>
+            <input {...d('addrProofDocType')} />
           </Field>
         </div>
       </div>
