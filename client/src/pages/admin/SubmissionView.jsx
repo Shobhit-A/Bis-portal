@@ -28,9 +28,9 @@ const SECTIONS_BY_TYPE = {
     { key: 'declaration', label: 'Declaration & Undertaking' },
   ],
   CRS: [
-    { key: 'checklist', label: 'Document Checklist' },
     { key: 'account', label: 'Registration & Manufacturing Unit' },
     { key: 'address', label: 'Manufacturing Unit & Correspondence Address' },
+    { key: 'checklist', label: 'Document Checklist' },
     { key: 'product', label: 'Product & Testing' },
     { key: 'modelBrand', label: 'Model & Brand Mapping' },
     { key: 'brand', label: 'Brand Details' },
