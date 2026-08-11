@@ -1022,7 +1022,7 @@ async function generateExcelCRS(submission) {
     secHeader(ws, r++, 4, 'Address of the Manufacturing Unit');
     spacer(ws, r++, 4, 4);
     lv1(ws, r++, 'Email *', address.mfgEmail);
-    lv1(ws, r++, 'Address *', address.mfgAddress);
+    lv1(ws, r++, 'Address *', address.mfgAddress, 4, 40);
     lv2(ws, r++, 'Country *', address.mfgCountry || '', 'State/Province *', address.mfgState || '');
     lv2(ws, r++, 'Zip Code *', address.mfgZip || '', 'Fax No.', address.mfgFax || '');
     lv1(ws, r++, 'Contact No. *', address.mfgContact);
@@ -1031,11 +1031,11 @@ async function generateExcelCRS(submission) {
     secHeader(ws, r++, 4, 'Address for Correspondence');
     spacer(ws, r++, 4, 4);
     lv1(ws, r++, 'Email *', address.corrEmail);
-    lv1(ws, r++, 'Address *', address.corrAddress);
+    lv1(ws, r++, 'Address *', address.corrAddress, 4, 40);
     lv2(ws, r++, 'Country *', address.corrCountry || '', 'State/Province *', address.corrState || '');
     lv2(ws, r++, 'Zip Code *', address.corrZip || '', 'Fax No.', address.corrFax || '');
     lv1(ws, r++, 'Contact No. *', address.corrContact);
-    lv1(ws, r++, 'Correspondence Address Selection *', address.correspondenceSelection);
+    lv1(ws, r++, 'Correspondence Address Selection *', address.correspondenceSelection, 4, 28);
     lv1(ws, r++, 'Address Authentication Document', getDoc(docs, 'address_auth_doc'));
     lv1(ws, r++, 'Type of Document *', address.addrProofDocType || '');
     spacer(ws, r++, 4, 6);
@@ -1121,12 +1121,12 @@ async function generateExcelCRS(submission) {
     secHeader(ws, r++, 4, 'Manufacturer Details');
     spacer(ws, r++, 4, 4);
     lv1(ws, r++, 'Firm Name', account.unitName);
-    lv1(ws, r++, 'Firm Address', address.mfgAddress);
+    lv1(ws, r++, 'Firm Address', address.mfgAddress, 4, 40);
     spacer(ws, r++, 4, 6);
 
     secHeader(ws, r++, 4, 'AIR / Authorized Signatory');
     spacer(ws, r++, 4, 4);
-    lv1(ws, r++, 'Representative Scenario *', air.scenario);
+    lv1(ws, r++, 'Representative Scenario *', air.scenario, 4, 48);
     lv2(ws, r++, 'Firm Name *', air.repFirmName || '', 'Firm Address *', air.repFirmAddress || '');
     lv2(ws, r++, 'Aadhar Number', air.aadharNumber || '', 'Govt. Issued Document', air.govtDocType || '');
     lv1(ws, r++, 'Document Number', air.govtDocNumber);
