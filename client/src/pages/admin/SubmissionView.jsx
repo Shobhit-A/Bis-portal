@@ -40,6 +40,7 @@ const SECTIONS_BY_TYPE = {
     { key: 'uploads', label: 'Upload Documents' },
   ],
   WPC: [
+    { key: 'checklist', label: 'Document Checklist' },
     { key: 'serviceRequest', label: 'Service Request Form' },
     { key: 'authorization', label: 'Authorization Format' },
   ],

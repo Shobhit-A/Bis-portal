@@ -1174,10 +1174,17 @@ async function generateExcelWPC(submission) {
 
   const fd = submission.formData || {};
   const docs = submission.documents || [];
+  const checklist = fd.checklist || {};
   const sr = fd.serviceRequest || {};
   const auth = fd.authorization || {};
 
   const clientInfo = `Client: ${submission.user?.username || '—'}   |   Status: ${submission.status}   |   Last Updated: ${new Date(submission.updatedAt).toLocaleDateString('en-IN')}`;
+
+  const CHECKLIST_DOCS = [
+    { no: 1, doc: 'Product Technical Catalogue' },
+    { no: 2, doc: 'Authorization Letter' },
+    { no: 3, doc: 'RF Test Report' },
+  ];
 
   // ============================================================
   // SHEET 1 — SERVICE REQUEST FORM
@@ -1189,6 +1196,14 @@ async function generateExcelWPC(submission) {
     spacer(ws, r++, 4, 8);
     titleRow(ws, r++, 4, 'WPC — SERVICE REQUEST FORM');
     noteRow(ws, r++, 4, '* Mandatory Fields');
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Documents Required for WPC ETA Certification');
+    spacer(ws, r++, 4, 4);
+    CHECKLIST_DOCS.forEach(d => {
+      const status = checklist[String(d.no)] || '';
+      lv2(ws, r++, `${d.no}. ${d.doc}`, status, '', '', 28);
+    });
     spacer(ws, r++, 4, 6);
 
     secHeader(ws, r++, 4, 'Request Details');
