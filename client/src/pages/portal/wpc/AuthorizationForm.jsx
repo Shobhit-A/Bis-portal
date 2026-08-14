@@ -21,10 +21,11 @@ AuthorizationForm.isComplete = (formData, getDocForField) => {
   return missing;
 };
 
-export default function AuthorizationForm({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
+export default function AuthorizationForm({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted, onSubmit, submitting }) {
   const data = formData.authorization || {};
   const set = (key, val) => updateSection('authorization', { ...data, [key]: val });
   const d = (key) => ({ value: data[key] || '', onChange: e => set(key, e.target.value), disabled: isSubmitted, className: 'input' });
+  const missing = AuthorizationForm.isComplete(formData, getDocForField);
 
   return (
     <div className="space-y-6">
@@ -124,6 +125,26 @@ export default function AuthorizationForm({ formData, updateSection, getDocForFi
           </Field>
         </div>
       </div>
+
+      {!isSubmitted && (
+        <div className="card">
+          <div className="p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <input type="checkbox" id="authConfirm" className="mt-0.5" checked={data.confirmed || false} onChange={e => set('confirmed', e.target.checked)} />
+              <label htmlFor="authConfirm" className="text-sm text-gray-700 cursor-pointer">
+                I confirm that all information provided is accurate and all required documents have been uploaded.
+              </label>
+            </div>
+            <button onClick={onSubmit} disabled={submitting || !data.confirmed || missing.length > 0}
+              className="btn-primary bg-green-600 hover:bg-green-700 w-full py-3 text-base">
+              {submitting ? 'Submitting...' : '✓ Submit Form to Absolute Veritas'}
+            </button>
+            {missing.length > 0 && (
+              <p className="text-xs text-gray-400 mt-2 text-center">Complete all required fields before submitting.</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
