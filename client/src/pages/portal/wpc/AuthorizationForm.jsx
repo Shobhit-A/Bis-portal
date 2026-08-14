@@ -28,9 +28,17 @@ export default function AuthorizationForm({ formData, updateSection, getDocForFi
 
   return (
     <div className="space-y-6">
+      <div className="card">
+        <div className="p-8 text-center border-b border-border">
+          <div className="text-2xl font-bold text-primary mb-4">Company Letter Head</div>
+          <div className="text-sm font-semibold text-gray-900 underline">Authorization cum Agreement Between</div>
+        </div>
+      </div>
+
       <p className="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded p-3">
-        Authorization cum Agreement between the Manufacturer and the Indian Representative, appointing the
-        representative to file an equipment type approval application with NRLO (WPC Wing) on the manufacturer's behalf.
+        This document is issued on the manufacturer's company letterhead. Authorization cum Agreement between the
+        Manufacturer and the Indian Representative, appointing the representative to file an equipment type approval
+        application with NRLO (WPC Wing) on the manufacturer's behalf.
       </p>
 
       <div className="card">
