@@ -1246,7 +1246,7 @@ async function generateExcelWPC(submission) {
     ws.columns = [{ width: 28 }, { width: 42 }, { width: 28 }, { width: 42 }];
     let r = 1;
     spacer(ws, r++, 4, 8);
-    mergeSet(ws, r, 1, r, 4, '[ Company Letter Head ]', { bold: true, fg: 'FF1F5C99', bg: 'FFFFFFFF', size: 14, align: 'center' });
+    mergeSet(ws, r, 1, r, 4, auth.letterHead || '[ Company Letter Head ]', { bold: true, fg: 'FF1F5C99', bg: 'FFFFFFFF', size: 14, align: 'center' });
     ws.getRow(r).height = 28;
     r++;
     mergeSet(ws, r, 1, r, 4, 'Authorization cum Agreement Between', { bold: true, fg: 'FF000000', bg: 'FFFFFFFF', size: 11, align: 'center' });

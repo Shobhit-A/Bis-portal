@@ -29,8 +29,9 @@ export default function AuthorizationForm({ formData, updateSection, getDocForFi
   return (
     <div className="space-y-6">
       <div className="card">
-        <div className="p-8 text-center border-b border-border">
-          <div className="text-2xl font-bold text-primary mb-4">Company Letter Head</div>
+        <div className="p-8 text-center border-b border-border space-y-3">
+          <input {...d('letterHead')} placeholder="Company Letter Head"
+            className="input text-center text-2xl font-bold text-primary border-0 border-b-2 border-dashed border-primary/30 rounded-none focus:ring-0 focus:border-primary" />
           <div className="text-sm font-semibold text-gray-900 underline">Authorization cum Agreement Between</div>
         </div>
       </div>
