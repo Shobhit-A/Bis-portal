@@ -39,6 +39,11 @@ const SECTIONS_BY_TYPE = {
     { key: 'air', label: 'AIR / Authorized Signatory' },
     { key: 'uploads', label: 'Upload Documents' },
   ],
+  WPC: [
+    { key: 'checklist', label: 'Document Checklist' },
+    { key: 'serviceRequest', label: 'Service Request Form' },
+    { key: 'authorization', label: 'Authorization Format' },
+  ],
 };
 
 export default function SubmissionView() {

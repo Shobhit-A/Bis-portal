@@ -29,6 +29,7 @@ enum FormType {
   FMCS
   ISI
   CRS
+  WPC
 }
 
 model Submission {
