@@ -4,7 +4,7 @@ const archiver = require('archiver');
 const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 const { adminMiddleware } = require('../middleware/authMiddleware');
-const { generateExcel, generateExcelCRS, generateExcelISI } = require('../services/excelExport');
+const { generateExcel, generateExcelCRS, generateExcelISI, generateExcelWPC } = require('../services/excelExport');
 const { getObjectStream } = require('../services/storage');
 const { sendActivationEmail } = require('../services/emailService');
 
@@ -152,6 +152,7 @@ router.get('/submissions/:id/excel', async (req, res) => {
     if (!submission) return res.status(404).json({ error: 'Not found' });
     const wb = submission.formType === 'CRS' ? await generateExcelCRS(submission)
       : submission.formType === 'ISI' ? await generateExcelISI(submission)
+      : submission.formType === 'WPC' ? await generateExcelWPC(submission)
       : await generateExcel(submission);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${submission.user.username}_BIS_Form.xlsx"`);

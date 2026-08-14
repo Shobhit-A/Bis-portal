@@ -1167,4 +1167,130 @@ async function generateExcelCRS(submission) {
   return wb;
 }
 
-module.exports = { generateExcel, generateExcelCRS, generateExcelISI };
+async function generateExcelWPC(submission) {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Absolute Veritas Portal';
+  wb.created = new Date();
+
+  const fd = submission.formData || {};
+  const docs = submission.documents || [];
+  const sr = fd.serviceRequest || {};
+  const auth = fd.authorization || {};
+
+  const clientInfo = `Client: ${submission.user?.username || '—'}   |   Status: ${submission.status}   |   Last Updated: ${new Date(submission.updatedAt).toLocaleDateString('en-IN')}`;
+
+  // ============================================================
+  // SHEET 1 — SERVICE REQUEST FORM
+  // ============================================================
+  {
+    const ws = wb.addWorksheet('Service Request Form');
+    ws.columns = [{ width: 28 }, { width: 42 }, { width: 28 }, { width: 42 }];
+    let r = 1;
+    spacer(ws, r++, 4, 8);
+    titleRow(ws, r++, 4, 'WPC — SERVICE REQUEST FORM');
+    noteRow(ws, r++, 4, '* Mandatory Fields');
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Request Details');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Manufacturer/Factory Name *', sr.manufacturerName, 4, 24);
+    lv1(ws, r++, 'Report to be Issued in the Name & Address *', sr.reportIssuedTo, 4, 32);
+    lv1(ws, r++, 'Bill to be issued in the Name & Address with GST Number *', sr.billToAddress, 4, 32);
+    lv1(ws, r++, 'Delivery of Reports *', sr.deliveryOfReports);
+    spacer(ws, r++, 4, 6);
+
+    secHeader2(ws, r++, 4, 'Sample Details');
+    spacer(ws, r++, 4, 4);
+    const sampleRows = (sr.sampleRows || []).map(row => ({
+      sampleDetails: row.sampleDetails || '',
+      noOfSamples: row.noOfSamples || '',
+      qty: row.qty || '',
+      testsRequired: row.testsRequired || '',
+      protocolIS: row.protocolIS || '',
+    }));
+    r = drawTable(ws, r, [
+      { col: 1, label: 'Sample Details', key: 'sampleDetails' },
+      { col: 2, label: 'No. of Samples', key: 'noOfSamples' },
+      { col: 3, label: 'Qty.', key: 'qty' },
+      { col: 4, label: 'Test(s) Required (complete tests)', key: 'testsRequired' },
+      { col: 5, label: '', key: '' },
+    ], sampleRows, 4);
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Protocol to be used/IS', (sr.sampleRows || []).map(row => row.protocolIS).filter(Boolean).join('; '));
+    spacer(ws, r++, 4, 6);
+
+    secHeader2(ws, r++, 4, 'Product Details');
+    spacer(ws, r++, 4, 4);
+    lv2(ws, r++, 'Product', sr.product || '', 'Model No.', sr.modelNo || '');
+    lv2(ws, r++, 'Model Name', sr.modelName || '', 'Brand', sr.brand || '');
+    lv2(ws, r++, 'Input Current', sr.inputCurrent || '', 'Output Current', sr.outputCurrent || '');
+    lv2(ws, r++, 'Input Voltage', sr.inputVoltage || '', 'Output Voltage', sr.outputVoltage || '');
+    lv2(ws, r++, 'Lead Model', sr.leadModel || '', 'Identification if any', sr.identification || '');
+    lv1(ws, r++, 'Any other Instruction', sr.otherInstruction || '', 4, 28);
+    spacer(ws, r++, 4, 6);
+
+    secHeader2(ws, r++, 4, 'Sign-off');
+    spacer(ws, r++, 4, 4);
+    lv2(ws, r++, 'Name & Signature *', sr.signatoryName || '', 'Date *', sr.signDate || '');
+    lv1(ws, r++, 'Stamp', getDoc(docs, 'serviceRequest_stamp'));
+
+    spacer(ws, r++, 4, 5);
+    mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+  }
+
+  // ============================================================
+  // SHEET 2 — AUTHORIZATION FORMAT
+  // ============================================================
+  {
+    const ws = wb.addWorksheet('Authorization Format');
+    ws.columns = [{ width: 28 }, { width: 42 }, { width: 28 }, { width: 42 }];
+    let r = 1;
+    spacer(ws, r++, 4, 8);
+    titleRow(ws, r++, 4, 'WPC — AUTHORIZATION CUM AGREEMENT');
+    noteRow(ws, r++, 4, '* Mandatory Fields');
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Manufacturer');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, "Manufacturer's Name *", auth.manufacturerName);
+    lv1(ws, r++, 'Address *', auth.manufacturerAddress, 4, 28);
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Indian Representative');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'Indian Representative Company Name *', auth.repCompanyName);
+    lv1(ws, r++, 'Address *', auth.repAddress, 4, 28);
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Equipment Details');
+    spacer(ws, r++, 4, 4);
+    lv2(ws, r++, 'Model *', auth.model || '', 'Product Name *', auth.productName || '');
+    spacer(ws, r++, 4, 6);
+
+    secHeader(ws, r++, 4, 'Supporting Documents');
+    spacer(ws, r++, 4, 4);
+    lv1(ws, r++, 'RF Test Reports *', getDoc(docs, 'authorization_rf_test_reports'));
+    lv1(ws, r++, 'Lab Accreditation Certificate *', getDoc(docs, 'authorization_lab_accreditation'));
+    spacer(ws, r++, 4, 6);
+
+    secHeader2(ws, r++, 4, 'On behalf of Manufacturer');
+    spacer(ws, r++, 4, 4);
+    lv2(ws, r++, 'Authorized Representative Name *', auth.mfgSignatoryName || '', 'Designation *', auth.mfgSignatoryDesignation || '');
+    lv1(ws, r++, 'Place *', auth.mfgPlace);
+    lv1(ws, r++, 'Sign and Stamp', getDoc(docs, 'authorization_mfg_sign_stamp'));
+    spacer(ws, r++, 4, 6);
+
+    secHeader2(ws, r++, 4, 'On behalf of Indian Representative');
+    spacer(ws, r++, 4, 4);
+    lv2(ws, r++, 'Authorized Representative Name *', auth.repSignatoryName || '', 'Designation *', auth.repSignatoryDesignation || '');
+    lv1(ws, r++, 'Place *', auth.repPlace);
+    lv1(ws, r++, 'Sign and Stamp', getDoc(docs, 'authorization_rep_sign_stamp'));
+
+    spacer(ws, r++, 4, 5);
+    mergeSet(ws, r, 1, r, 4, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+  }
+
+  return wb;
+}
+
+module.exports = { generateExcel, generateExcelCRS, generateExcelISI, generateExcelWPC };

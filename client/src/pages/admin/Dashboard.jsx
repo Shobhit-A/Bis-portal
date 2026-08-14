@@ -314,6 +314,7 @@ export default function AdminDashboard() {
                       <span className={`ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
                         row.formType === 'ISI' ? 'bg-purple-100 text-purple-700' :
                         row.formType === 'CRS' ? 'bg-amber-100 text-amber-700' :
+                        row.formType === 'WPC' ? 'bg-teal-100 text-teal-700' :
                         'bg-blue-100 text-blue-700'
                       }`}>
                         {row.formType}
