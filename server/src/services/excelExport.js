@@ -1246,13 +1246,14 @@ async function generateExcelWPC(submission) {
     ws.columns = [{ width: 28 }, { width: 42 }, { width: 28 }, { width: 42 }];
     let r = 1;
     spacer(ws, r++, 4, 8);
+    titleRow(ws, r++, 4, 'WPC — AUTHORIZATION CUM AGREEMENT');
+    spacer(ws, r++, 4, 6);
     mergeSet(ws, r, 1, r, 4, auth.letterHead || '[ Company Letter Head ]', { bold: true, fg: 'FF1F5C99', bg: 'FFFFFFFF', size: 14, align: 'center' });
     ws.getRow(r).height = 28;
     r++;
     mergeSet(ws, r, 1, r, 4, 'Authorization cum Agreement Between', { bold: true, fg: 'FF000000', bg: 'FFFFFFFF', size: 11, align: 'center' });
     r++;
     spacer(ws, r++, 4, 6);
-    titleRow(ws, r++, 4, 'WPC — AUTHORIZATION CUM AGREEMENT');
     noteRow(ws, r++, 4, '* Mandatory Fields');
     spacer(ws, r++, 4, 6);
 
@@ -1264,7 +1265,7 @@ async function generateExcelWPC(submission) {
 
     secHeader(ws, r++, 4, 'Indian Representative');
     spacer(ws, r++, 4, 4);
-    lv1(ws, r++, 'Indian Representative Company Name *', auth.repCompanyName);
+    lv1(ws, r++, 'Indian Representative Company Name *', auth.repCompanyName, 4, 28);
     lv1(ws, r++, 'Address *', auth.repAddress, 4, 28);
     spacer(ws, r++, 4, 6);
 
@@ -1281,14 +1282,14 @@ async function generateExcelWPC(submission) {
 
     secHeader2(ws, r++, 4, 'On behalf of Manufacturer');
     spacer(ws, r++, 4, 4);
-    lv2(ws, r++, 'Authorized Representative Name *', auth.mfgSignatoryName || '', 'Designation *', auth.mfgSignatoryDesignation || '');
+    lv2(ws, r++, 'Authorized Representative Name *', auth.mfgSignatoryName || '', 'Designation *', auth.mfgSignatoryDesignation || '', 28);
     lv1(ws, r++, 'Place *', auth.mfgPlace);
     lv1(ws, r++, 'Sign and Stamp', getDoc(docs, 'authorization_mfg_sign_stamp'));
     spacer(ws, r++, 4, 6);
 
     secHeader2(ws, r++, 4, 'On behalf of Indian Representative');
     spacer(ws, r++, 4, 4);
-    lv2(ws, r++, 'Authorized Representative Name *', auth.repSignatoryName || '', 'Designation *', auth.repSignatoryDesignation || '');
+    lv2(ws, r++, 'Authorized Representative Name *', auth.repSignatoryName || '', 'Designation *', auth.repSignatoryDesignation || '', 28);
     lv1(ws, r++, 'Place *', auth.repPlace);
     lv1(ws, r++, 'Sign and Stamp', getDoc(docs, 'authorization_rep_sign_stamp'));
 
