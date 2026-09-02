@@ -15,6 +15,7 @@ model User {
   passwordHash String
   role         Role         @default(CLIENT)
   approved     Boolean      @default(true)
+  allowedForms FormType[]   @default([])
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   submissions  Submission[]

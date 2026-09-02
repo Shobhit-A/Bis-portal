@@ -3,12 +3,74 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck } from 'lucide-react';
+import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal } from 'lucide-react';
+
+const FORM_TYPES = ['FMCS', 'ISI', 'CRS', 'WPC'];
 
 function StatusBadge({ status }) {
   if (status === 'SUBMITTED') return <span className="badge-submitted">Submitted</span>;
   if (status === 'IN_PROGRESS') return <span className="badge-progress">In Progress</span>;
   return <span className="badge-notstarted">Not Started</span>;
+}
+
+function FormsBadges({ allowedForms }) {
+  if (!allowedForms || allowedForms.length === 0) {
+    return <span className="text-[10px] text-gray-400">No forms enabled</span>;
+  }
+  return (
+    <div className="flex flex-wrap gap-1">
+      {allowedForms.map(f => (
+        <span key={f} className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">{f}</span>
+      ))}
+    </div>
+  );
+}
+
+function ManageFormsModal({ user, onClose, onSaved }) {
+  const [selected, setSelected] = useState(user.allowedForms || []);
+  const [loading, setLoading] = useState(false);
+
+  const toggle = (f) => setSelected(prev => prev.includes(f) ? prev.filter(x => x !== f) : [...prev, f]);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const res = await api.patch(`/admin/users/${user.id}/forms`, { allowedForms: selected });
+      toast.success(`Form access updated for ${user.username}`);
+      onSaved(res.data.allowedForms);
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update form access');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-sm shadow-xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <h2 className="font-semibold text-gray-900">Manage Forms — {user.username}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+        </div>
+        <div className="p-6 space-y-3">
+          <p className="text-xs text-gray-500">Choose which form types this client can see and fill out.</p>
+          {FORM_TYPES.map(f => (
+            <label key={f} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <input type="checkbox" checked={selected.includes(f)} onChange={() => toggle(f)} />
+              {f}
+            </label>
+          ))}
+          <div className="flex gap-3 pt-2">
+            <button onClick={handleSave} className="btn-primary flex-1" disabled={loading}>
+              {loading ? 'Saving...' : 'Save'}
+            </button>
+            <button type="button" className="btn-secondary flex-1" onClick={onClose}>Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function CreateUserModal({ onClose, onCreated }) {
@@ -127,6 +189,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [resetUser, setResetUser] = useState(null);
+  const [manageFormsUser, setManageFormsUser] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
   const [downloadingDocsId, setDownloadingDocsId] = useState(null);
 
@@ -211,8 +274,8 @@ export default function AdminDashboard() {
   // account remains visible/manageable (reset password, delete).
   const rows = approvedUsers.flatMap(u =>
     u.submissions && u.submissions.length > 0
-      ? u.submissions.map(s => ({ ...s, userId: u.id, username: u.username, accountCreatedAt: u.createdAt }))
-      : [{ id: null, label: null, status: null, updatedAt: null, userId: u.id, username: u.username, accountCreatedAt: u.createdAt }]
+      ? u.submissions.map((s, i) => ({ ...s, userId: u.id, username: u.username, accountCreatedAt: u.createdAt, allowedForms: u.allowedForms, isFirstRowForUser: i === 0 }))
+      : [{ id: null, label: null, status: null, updatedAt: null, userId: u.id, username: u.username, accountCreatedAt: u.createdAt, allowedForms: u.allowedForms, isFirstRowForUser: true }]
   );
 
   return (
@@ -260,8 +323,13 @@ export default function AdminDashboard() {
                     <div>
                       <div className="text-sm font-medium text-gray-900">{u.username}</div>
                       <div className="text-xs text-gray-500">{u.email} · registered {new Date(u.createdAt).toLocaleDateString('en-IN')}</div>
+                      <div className="mt-1"><FormsBadges allowedForms={u.allowedForms} /></div>
                     </div>
                     <div className="flex items-center gap-2">
+                      <button onClick={() => setManageFormsUser(u)}
+                        className="p-1.5 text-gray-400 hover:text-primary rounded hover:bg-blue-50" title="Manage forms">
+                        <SlidersHorizontal size={15} />
+                      </button>
                       <button onClick={() => handleApprove(u.id, u.username)} disabled={approvingId === u.id}
                         className="btn-primary bg-green-600 hover:bg-green-700 flex items-center gap-1.5 px-3 py-1.5 text-xs disabled:opacity-60">
                         {approvingId === u.id ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />} Approve
@@ -320,6 +388,7 @@ export default function AdminDashboard() {
                         {row.formType}
                       </span>
                     )}
+                    {row.isFirstRowForUser && <div className="mt-1"><FormsBadges allowedForms={row.allowedForms} /></div>}
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={row.status} /></td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
@@ -352,6 +421,12 @@ export default function AdminDashboard() {
                           </button>
                         </>
                       )}
+                      {row.isFirstRowForUser && (
+                        <button onClick={() => setManageFormsUser({ id: row.userId, username: row.username, allowedForms: row.allowedForms })}
+                          className="p-1.5 text-gray-400 hover:text-primary rounded hover:bg-blue-50" title="Manage forms">
+                          <SlidersHorizontal size={15} />
+                        </button>
+                      )}
                       <button onClick={() => setResetUser({ id: row.userId, username: row.username })}
                         className="p-1.5 text-gray-400 hover:text-yellow-600 rounded hover:bg-yellow-50" title="Reset password">
                         <Key size={15} />
@@ -371,6 +446,10 @@ export default function AdminDashboard() {
 
       {showCreate && <CreateUserModal onClose={() => setShowCreate(false)} onCreated={u => setUsers(prev => [{ ...u, submissions: [] }, ...prev])} />}
       {resetUser && <ResetPasswordModal user={resetUser} onClose={() => setResetUser(null)} />}
+      {manageFormsUser && (
+        <ManageFormsModal user={manageFormsUser} onClose={() => setManageFormsUser(null)}
+          onSaved={allowedForms => setUsers(prev => prev.map(u => u.id === manageFormsUser.id ? { ...u, allowedForms } : u))} />
+      )}
     </div>
   );
 }

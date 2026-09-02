@@ -3,9 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck, Radio } from 'lucide-react';
 
+const FORM_CARDS = [
+  { key: 'FMCS', path: '/portal/fmcs', icon: FileCheck2, title: 'FMCS', desc: 'Foreign Manufacturers Certification Scheme application.' },
+  { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.' },
+  { key: 'CRS', path: '/portal/crs', icon: ClipboardCheck, title: 'CRS', desc: 'Compulsory Registration Scheme application.' },
+  { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.' },
+];
+
 export default function FormTypeSelect() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const allowed = user?.allowedForms || [];
+  const cards = FORM_CARDS.filter(c => allowed.includes(c.key));
 
   return (
     <div className="min-h-screen bg-surface">
@@ -25,28 +34,21 @@ export default function FormTypeSelect() {
       <div className="max-w-4xl mx-auto px-6 py-16">
         <h1 className="text-lg font-semibold text-gray-900 mb-1 text-center">Choose Application Type</h1>
         <p className="text-sm text-gray-500 mb-10 text-center">Select the certification scheme you'd like to apply for.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <button onClick={() => navigate('/portal/fmcs')} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
-            <FileCheck2 size={28} className="text-primary mb-4" />
-            <div className="text-base font-semibold text-gray-900 mb-1">FMCS</div>
-            <p className="text-xs text-gray-500">Foreign Manufacturers Certification Scheme application.</p>
-          </button>
-          <button onClick={() => navigate('/portal/isi')} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
-            <ShieldCheck size={28} className="text-primary mb-4" />
-            <div className="text-base font-semibold text-gray-900 mb-1">ISI — BIS Standard Mark</div>
-            <p className="text-xs text-gray-500">Indian Standards Institute (ISI) certification mark application.</p>
-          </button>
-          <button onClick={() => navigate('/portal/crs')} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
-            <ClipboardCheck size={28} className="text-primary mb-4" />
-            <div className="text-base font-semibold text-gray-900 mb-1">CRS</div>
-            <p className="text-xs text-gray-500">Compulsory Registration Scheme application.</p>
-          </button>
-          <button onClick={() => navigate('/portal/wpc')} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
-            <Radio size={28} className="text-primary mb-4" />
-            <div className="text-base font-semibold text-gray-900 mb-1">WPC</div>
-            <p className="text-xs text-gray-500">Wireless Planning &amp; Coordination equipment approval application.</p>
-          </button>
-        </div>
+        {cards.length === 0 ? (
+          <div className="card p-10 text-center text-gray-500 text-sm">
+            No forms have been enabled for your account yet. Contact Absolute Veritas to get started.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {cards.map(c => (
+              <button key={c.key} onClick={() => navigate(c.path)} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
+                <c.icon size={28} className="text-primary mb-4" />
+                <div className="text-base font-semibold text-gray-900 mb-1">{c.title}</div>
+                <p className="text-xs text-gray-500">{c.desc}</p>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

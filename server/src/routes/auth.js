@@ -10,6 +10,8 @@ const { sendRegistrationAlert, sendActivationEmail } = require('../services/emai
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const FORM_TYPES = ['FMCS', 'ISI', 'CRS', 'WPC'];
+
 // Only the login route itself is rate-limited — /captcha and /me must stay unrestricted
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many login attempts. Try again in 15 minutes.' } });
 
@@ -53,9 +55,19 @@ router.post('/register', loginLimiter, [
       select: { id: true, username: true, email: true }
     });
 
-    const approveToken = jwt.sign({ type: 'approve-user', userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    const approveUrl = `${req.protocol}://${req.get('host')}/api/auth/approve/${approveToken}`;
-    sendRegistrationAlert({ username: user.username, email: user.email, approveUrl }); // fire-and-forget, don't make the client wait on Brevo
+    const base = `${req.protocol}://${req.get('host')}/api/auth/approve`;
+    const linkFor = (forms) => {
+      const token = jwt.sign({ type: 'approve-user', userId: user.id, forms }, process.env.JWT_SECRET, { expiresIn: '7d' });
+      return `${base}/${token}`;
+    };
+    const approveLinks = {
+      all: linkFor(FORM_TYPES),
+      fmcs: linkFor(['FMCS']),
+      isi: linkFor(['ISI']),
+      crs: linkFor(['CRS']),
+      wpc: linkFor(['WPC']),
+    };
+    sendRegistrationAlert({ username: user.username, email: user.email, approveLinks }); // fire-and-forget, don't make the client wait on Brevo
 
     res.status(201).json({ message: 'Registration submitted. You will be notified by email once your account is approved.' });
   } catch (err) {
@@ -93,10 +105,12 @@ router.get('/approve/:token', async (req, res) => {
     if (!user) return sendPage('Account Not Found', 'This account no longer exists.', '#c62828');
     if (user.approved) return sendPage('Already Approved', `${user.username} was already approved.`, '#2e7d32');
 
-    const updated = await prisma.user.update({ where: { id: user.id }, data: { approved: true } });
-    if (updated.email) sendActivationEmail({ username: updated.username, email: updated.email });
+    const forms = Array.isArray(payload.forms) && payload.forms.every(f => FORM_TYPES.includes(f)) ? payload.forms : [];
+    const formsLabel = forms.length === FORM_TYPES.length ? 'all forms' : forms.join(', ');
+    const updated = await prisma.user.update({ where: { id: user.id }, data: { approved: true, allowedForms: forms } });
+    if (updated.email) sendActivationEmail({ username: updated.username, email: updated.email, formsLabel });
 
-    sendPage('Account Approved ✓', `${updated.username} can now log in to the portal.`, '#2e7d32');
+    sendPage('Account Approved ✓', `${updated.username} can now log in and access: ${formsLabel || 'no forms yet — grant access from the admin dashboard'}.`, '#2e7d32');
   } catch (err) {
     console.error(err);
     sendPage('Error', 'Something went wrong approving this account. Please try from the admin dashboard.', '#c62828');
@@ -140,7 +154,7 @@ router.post('/login', loginLimiter, [
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+    res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role, allowedForms: user.allowedForms } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

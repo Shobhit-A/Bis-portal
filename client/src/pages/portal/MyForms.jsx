@@ -100,10 +100,17 @@ export default function MyForms({ formType, basePath, title }) {
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
-          <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-2">
-            <Plus size={15} /> Start New Form
-          </button>
+          {user?.allowedForms?.includes(formType) && (
+            <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-2">
+              <Plus size={15} /> Start New Form
+            </button>
+          )}
         </div>
+        {!user?.allowedForms?.includes(formType) && (
+          <p className="text-xs text-gray-400 mb-4">
+            You don't have access to start a new {formType} form. Contact Absolute Veritas to request access.
+          </p>
+        )}
 
         <div className="card overflow-hidden">
           {loading ? (

@@ -51,6 +51,9 @@ router.post('/', async (req, res) => {
     const { label, cloneFromId } = req.body;
     if (!label || !label.trim()) return res.status(400).json({ error: 'Label is required' });
     const formType = FORM_TYPES.includes(req.body.formType) ? req.body.formType : 'FMCS';
+    if (!req.user.allowedForms?.includes(formType)) {
+      return res.status(403).json({ error: 'You do not have access to this form type. Contact Absolute Veritas to request access.' });
+    }
 
     let formData = {};
     if (cloneFromId) {
