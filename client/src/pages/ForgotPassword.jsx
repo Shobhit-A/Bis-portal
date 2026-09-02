@@ -24,16 +24,12 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-surface flex flex-col">
-      <div className="bg-primary px-6 py-4 flex items-center gap-3">
-        <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
-          <span className="text-white font-bold text-sm">AV</span>
-        </div>
-        <span className="text-white font-semibold text-sm tracking-wide">ABSOLUTE VERITAS</span>
-      </div>
-
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="card p-8">
+            <div className="flex justify-center mb-6">
+              <img src="/logo.png" alt="Absolute Veritas" className="h-12 w-auto object-contain" />
+            </div>
             <div className="mb-6">
               <h1 className="text-xl font-semibold text-gray-900">Forgot password</h1>
               <p className="text-sm text-gray-500 mt-1">Enter your username and we'll email you a reset link.</p>
