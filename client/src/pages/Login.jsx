@@ -49,7 +49,7 @@ export default function LoginPage() {
             </div>
             <div className="mb-6">
               <h1 className="text-xl font-semibold text-gray-900">Sign in to your account</h1>
-              <p className="text-sm text-gray-500 mt-1">BIS Certification Client Portal</p>
+              <p className="text-sm text-gray-500 mt-1">Client Portal</p>
             </div>
 
             {error && (
