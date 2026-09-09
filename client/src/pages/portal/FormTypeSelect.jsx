@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
-import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck, Radio } from 'lucide-react';
+import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck, Radio, ExternalLink } from 'lucide-react';
 
 const FORM_CARDS = [
-  { key: 'FMCS', path: '/portal/fmcs', icon: FileCheck2, title: 'FMCS', desc: 'Foreign Manufacturers Certification Scheme application.' },
-  { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.' },
-  { key: 'CRS', path: '/portal/crs', icon: ClipboardCheck, title: 'CRS', desc: 'Compulsory Registration Scheme application.' },
-  { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.' },
+  { key: 'FMCS', path: '/portal/fmcs', icon: FileCheck2, title: 'FMCS', desc: 'Foreign Manufacturers Certification Scheme application.', officialUrl: 'https://www.bis.gov.in' },
+  { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.', officialUrl: 'https://www.bis.gov.in' },
+  { key: 'CRS', path: '/portal/crs', icon: ClipboardCheck, title: 'CRS', desc: 'Compulsory Registration Scheme application.', officialUrl: 'https://crs.bis.gov.in' },
+  { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.', officialUrl: 'https://wpc.dot.gov.in' },
 ];
 
 export default function FormTypeSelect() {
@@ -41,11 +41,17 @@ export default function FormTypeSelect() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {cards.map(c => (
-              <button key={c.key} onClick={() => navigate(c.path)} className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all">
+              <div key={c.key} role="button" tabIndex={0} onClick={() => navigate(c.path)}
+                onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate(c.path)}
+                className="card p-8 text-left hover:border-primary/50 hover:shadow-md transition-all cursor-pointer flex flex-col">
                 <c.icon size={28} className="text-primary mb-4" />
                 <div className="text-base font-semibold text-gray-900 mb-1">{c.title}</div>
-                <p className="text-xs text-gray-500">{c.desc}</p>
-              </button>
+                <p className="text-xs text-gray-500 flex-1">{c.desc}</p>
+                <a href={c.officialUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                  className="mt-4 text-xs text-primary hover:underline inline-flex items-center gap-1 w-fit">
+                  Official Website <ExternalLink size={11} />
+                </a>
+              </div>
             ))}
           </div>
         )}
