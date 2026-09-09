@@ -4,10 +4,10 @@ import { useAuth } from '../../lib/AuthContext';
 import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck, Radio, ExternalLink } from 'lucide-react';
 
 const FORM_CARDS = [
-  { key: 'FMCS', path: '/portal/fmcs', icon: FileCheck2, title: 'FMCS', desc: 'Foreign Manufacturers Certification Scheme application.', officialUrl: 'https://www.bis.gov.in' },
-  { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.', officialUrl: 'https://www.bis.gov.in' },
-  { key: 'CRS', path: '/portal/crs', icon: ClipboardCheck, title: 'CRS', desc: 'Compulsory Registration Scheme application.', officialUrl: 'https://crs.bis.gov.in' },
-  { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.', officialUrl: 'https://wpc.dot.gov.in' },
+  { key: 'FMCS', path: '/portal/fmcs', icon: FileCheck2, title: 'FMCS', desc: 'Foreign Manufacturers Certification Scheme application.', manualUrl: 'https://www.bis.gov.in/wp-content/uploads/2026/05/FMCS-Application-SubmissionUM-1-1.pdf' },
+  { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.', manualUrl: 'https://www.bis.gov.in/product-certification/product-specific-information-2/scheme-for-testing-and-inspection/' },
+  { key: 'CRS', path: '/portal/crs', icon: ClipboardCheck, title: 'CRS', desc: 'Compulsory Registration Scheme application.', manualUrl: 'https://www.crsbis.in/BIS/' },
+  { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.', manualUrl: 'https://eservices.dot.gov.in/equipment-type-approval-eta' },
 ];
 
 export default function FormTypeSelect() {
@@ -47,9 +47,9 @@ export default function FormTypeSelect() {
                 <c.icon size={28} className="text-primary mb-4" />
                 <div className="text-base font-semibold text-gray-900 mb-1">{c.title}</div>
                 <p className="text-xs text-gray-500 flex-1">{c.desc}</p>
-                <a href={c.officialUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                <a href={c.manualUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
                   className="mt-4 text-xs text-primary hover:underline inline-flex items-center gap-1 w-fit">
-                  Official Website <ExternalLink size={11} />
+                  Product Manual <ExternalLink size={11} />
                 </a>
               </div>
             ))}
