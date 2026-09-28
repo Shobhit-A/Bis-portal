@@ -5,9 +5,9 @@ import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck, Radio, ExternalLink } 
 
 const FORM_CARDS = [
   { key: 'FMCS', path: '/portal/fmcs', icon: FileCheck2, title: 'FMCS', desc: 'Foreign Manufacturers Certification Scheme application.', manualUrl: 'https://www.bis.gov.in/wp-content/uploads/2026/05/FMCS-Application-SubmissionUM-1-1.pdf' },
-  { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.', manualUrl: 'https://www.bis.gov.in/product-certification/product-specific-information-2/scheme-for-testing-and-inspection/' },
+  { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.', manualUrl: 'https://www.bis.gov.in/product-certification/product-specific-information-2/?lang=en' },
   { key: 'CRS', path: '/portal/crs', icon: ClipboardCheck, title: 'CRS', desc: 'Compulsory Registration Scheme application.', manualUrl: 'https://www.crsbis.in/BIS/' },
-  { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.', manualUrl: 'https://eservices.dot.gov.in/equipment-type-approval-eta' },
+  { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.', manualUrl: 'https://eservices.dot.gov.in/sites/default/files/user-mannual/ETA%20Self%20Declaration%20Applicant%20%20Manual.pdf' },
 ];
 
 export default function FormTypeSelect() {
