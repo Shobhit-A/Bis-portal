@@ -1,4 +1,3 @@
-import React from 'react';
 
 export default function ModelBrandMapping({ formData }) {
   const account = formData.account || {};

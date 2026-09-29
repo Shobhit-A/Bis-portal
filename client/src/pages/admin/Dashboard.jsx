@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
 import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal } from 'lucide-react';
-
-const FORM_TYPES = ['FMCS', 'ISI', 'CRS', 'WPC'];
+import { FORM_TYPES } from '../../lib/constants';
 
 function StatusBadge({ status }) {
   if (status === 'SUBMITTED') return <span className="badge-submitted">Submitted</span>;

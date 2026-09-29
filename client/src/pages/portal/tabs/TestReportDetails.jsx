@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 
 TestReportDetails.isComplete = (formData, getDocForField) => {

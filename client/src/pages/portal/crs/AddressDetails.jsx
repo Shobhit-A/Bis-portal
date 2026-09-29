@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 import { COUNTRIES } from '../tabs/OrganizationProfile';
 import { INDIAN_STATES } from './AirSignatory';

@@ -7,11 +7,10 @@ const { adminMiddleware } = require('../middleware/authMiddleware');
 const { generateExcel, generateExcelCRS, generateExcelISI, generateExcelWPC } = require('../services/excelExport');
 const { getObjectStream } = require('../services/storage');
 const { sendActivationEmail } = require('../services/emailService');
+const { FORM_TYPES } = require('../constants');
 
 const router = express.Router();
 const prisma = new PrismaClient();
-
-const FORM_TYPES = ['FMCS', 'ISI', 'CRS', 'WPC'];
 
 // All admin routes require admin role
 router.use(adminMiddleware);

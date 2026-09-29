@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field, FileUpload } from '../../../components/FormField';
 import { RepeatingTable } from '../../../components/RepeatingTable';
 

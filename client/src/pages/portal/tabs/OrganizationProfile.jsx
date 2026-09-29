@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 
 export const COUNTRIES = ['India','Afghanistan','Australia','Bahrain','Bangladesh','Brazil','Canada','China','Egypt','France','Germany','Indonesia','Iran','Iraq','Italy','Japan','Kenya','Kuwait','Malaysia','Mexico','Myanmar','Nepal','Netherlands','New Zealand','Nigeria','Oman','Pakistan','Philippines','Qatar','Russia','Saudi Arabia','Singapore','South Africa','South Korea','Sri Lanka','Thailand','UAE','United Kingdom','USA','Vietnam'];

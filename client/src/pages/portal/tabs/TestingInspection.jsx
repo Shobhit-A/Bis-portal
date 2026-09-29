@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 import { Plus, Trash2 } from 'lucide-react';
 

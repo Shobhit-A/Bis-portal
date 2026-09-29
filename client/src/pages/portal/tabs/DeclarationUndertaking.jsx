@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field, Select, FileUpload } from '../../../components/FormField';
 
 export default function DeclarationUndertaking({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted, onSubmit, submitting }) {

@@ -1,4 +1,3 @@
-import React from 'react';
 import AccountDetails from './AccountDetails';
 import AddressDetails from './AddressDetails';
 

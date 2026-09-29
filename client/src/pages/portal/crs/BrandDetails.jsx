@@ -1,4 +1,3 @@
-import React from 'react';
 import { RepeatingTable } from '../../../components/RepeatingTable';
 
 const BRAND_COLUMNS = [

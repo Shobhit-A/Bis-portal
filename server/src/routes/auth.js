@@ -6,11 +6,10 @@ const { body, validationResult } = require('express-validator');
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/authMiddleware');
 const { sendRegistrationAlert, sendActivationEmail, sendPasswordResetEmail } = require('../services/emailService');
+const { FORM_TYPES } = require('../constants');
 
 const router = express.Router();
 const prisma = new PrismaClient();
-
-const FORM_TYPES = ['FMCS', 'ISI', 'CRS', 'WPC'];
 
 // Only the login route itself is rate-limited — /captcha and /me must stay unrestricted
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many login attempts. Try again in 15 minutes.' } });

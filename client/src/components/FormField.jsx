@@ -1,6 +1,6 @@
-import React, { useCallback, useState, createContext, useContext } from 'react';
+import { useCallback, useState, createContext, useContext } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, X, File, CheckCircle } from 'lucide-react';
+import { Upload, X, CheckCircle } from 'lucide-react';
 import api from '../lib/axios';
 import toast from 'react-hot-toast';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field, Select } from '../../../components/FormField';
 
 const SALUTATIONS = ['Mr', 'Mrs', 'Ms', 'Dr', 'M/s'];

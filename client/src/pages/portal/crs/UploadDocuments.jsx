@@ -1,4 +1,3 @@
-import React from 'react';
 import { Select, FileUpload } from '../../../components/FormField';
 
 const ROWS = [

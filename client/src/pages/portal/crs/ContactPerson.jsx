@@ -1,4 +1,3 @@
-import React from 'react';
 import { Field } from '../../../components/FormField';
 
 ContactPerson.isComplete = (formData) => {

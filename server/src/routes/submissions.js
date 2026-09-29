@@ -3,6 +3,7 @@ const multer = require('multer');
 const { PrismaClient } = require('@prisma/client');
 const { sendAdminAlert } = require('../services/emailService');
 const { uploadObject, deleteObject } = require('../services/storage');
+const { FORM_TYPES } = require('../constants');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -25,8 +26,6 @@ async function ownSubmission(userId, submissionId, extra = {}) {
   if (!submission || submission.userId !== userId) return null;
   return submission;
 }
-
-const FORM_TYPES = ['FMCS', 'ISI', 'CRS', 'WPC'];
 
 // GET /api/submissions — list my forms, optionally filtered to one form type
 router.get('/', async (req, res) => {

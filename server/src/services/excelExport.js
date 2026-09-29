@@ -77,15 +77,6 @@ function infoRow(ws, row, ncol, text, h = 18) {
   mergeSet(ws, row, 1, row, ncol, '  ' + text, { bold: false, fg: 'FF555555', bg: 'FFEEF2F7', size: 9 });
 }
 
-function warnRow(ws, row, col1, col2, text, h = 18) {
-  ws.getRow(row).height = h;
-  if (col1 === col2) {
-    setCell(ws, row, col1, text, { bold: false, fg: 'FFFF0000', bg: 'FFFFFDE7', size: 9 });
-  } else {
-    mergeSet(ws, row, col1, row, col2, text, { bold: false, fg: 'FFFF0000', bg: 'FFFFFDE7', size: 9 });
-  }
-}
-
 // label (right-aligned, DCE9F5) + value (white) — 4-col sheet
 function lv2(ws, row, lbl1, val1, lbl2, val2, h = 20) {
   ws.getRow(row).height = h;
@@ -105,13 +96,6 @@ function lv1(ws, row, label, value, ncol = 4, h = 20) {
   ws.getRow(row).height = h;
   setCell(ws, row, 1, label, { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'right', size: 10, wrap: true });
   mergeSet(ws, row, 2, row, ncol, value ?? '', { bold: false, fg: 'FF000000', bg: 'FFFFFFFF', align: 'left', size: 10 });
-}
-
-// label cell only (no value) — for Declaration sheet wide col A
-function labelOnly(ws, row, label, h = 28) {
-  ws.getRow(row).height = h;
-  setCell(ws, row, 1, label, { bold: true, fg: 'FF1A3C5E', bg: 'FFDCE9F5', align: 'left', size: 10, wrap: true });
-  mergeSet(ws, row, 2, row, 4, '', { bg: 'FFFFFFFF' });
 }
 
 // Draw a styled table — headers row + data rows
