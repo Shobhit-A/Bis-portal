@@ -26,7 +26,15 @@ export default function Authentication({ formData, updateSection, getDocForField
           </a>
           <Field label="Authentication by Chartered Accountant or by the manufacturer by giving an affidavit / undertaking" required>
             <FileUpload fieldKey="authentication_ca_affidavit" fieldLabel="CA Authentication / Affidavit-Undertaking"
-              existingDoc={getDocForField('authentication_ca_affidavit')} onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
+              existingDoc={getDocForField('authentication_ca_affidavit')} onUploaded={onDocUploaded} onRemoved={onDocRemoved}
+              accept={{
+                'application/pdf': ['.pdf'],
+                'image/jpeg': ['.jpg', '.jpeg'],
+                'image/png': ['.png'],
+                'application/msword': ['.doc'],
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+              }}
+              acceptLabel="PDF, JPG, PNG, DOC, DOCX" />
           </Field>
           <p className="text-xs text-gray-500">Monthly production details uploaded must be on the CA's letterhead in the Renewal application. Use the template above if your CA needs the exact format.</p>
         </div>
