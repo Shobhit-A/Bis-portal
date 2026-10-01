@@ -31,6 +31,7 @@ enum FormType {
   ISI
   CRS
   WPC
+  ISI_RENEWAL
 }
 
 model Submission {

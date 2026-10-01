@@ -49,6 +49,7 @@ async function sendRegistrationAlert({ username, email, approveLinks }) {
     ['ISI only', approveLinks.isi, '#1F5C99'],
     ['CRS only', approveLinks.crs, '#1F5C99'],
     ['WPC only', approveLinks.wpc, '#1F5C99'],
+    ['ISI Renewal only', approveLinks.isiRenewal, '#1F5C99'],
   ].map(([label, url, color]) =>
     `<a href="${url}" style="background: ${color}; color: white; padding: 10px 16px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 13px;">✓ Approve — ${label}</a>`
   ).join(' ');

@@ -14,6 +14,7 @@ import { FMCS_TABS, FMCS_TAB_COMPONENTS } from './pages/portal/fmcsTabs';
 import { ISI_TABS, ISI_TAB_COMPONENTS } from './pages/portal/isiTabs';
 import { CRS_TABS, CRS_TAB_COMPONENTS } from './pages/portal/crsTabs';
 import { WPC_TABS, WPC_TAB_COMPONENTS } from './pages/portal/wpcTabs';
+import { ISI_RENEWAL_TABS, ISI_RENEWAL_TAB_COMPONENTS } from './pages/portal/isiRenewalTabs';
 
 function ProtectedRoute({ children, role }) {
   const { user, loading } = useAuth();
@@ -43,6 +44,8 @@ function AppRoutes() {
       <Route path="/portal/crs/:submissionId/*" element={<ProtectedRoute role="CLIENT"><PortalLayout basePath="/portal/crs" TABS={CRS_TABS} tabComponents={CRS_TAB_COMPONENTS} /></ProtectedRoute>} />
       <Route path="/portal/wpc" element={<ProtectedRoute role="CLIENT"><MyForms formType="WPC" basePath="/portal/wpc" title="WPC Forms" /></ProtectedRoute>} />
       <Route path="/portal/wpc/:submissionId/*" element={<ProtectedRoute role="CLIENT"><PortalLayout basePath="/portal/wpc" TABS={WPC_TABS} tabComponents={WPC_TAB_COMPONENTS} /></ProtectedRoute>} />
+      <Route path="/portal/isi-renewal" element={<ProtectedRoute role="CLIENT"><MyForms formType="ISI_RENEWAL" basePath="/portal/isi-renewal" title="ISI License Renewal Forms" /></ProtectedRoute>} />
+      <Route path="/portal/isi-renewal/:submissionId/*" element={<ProtectedRoute role="CLIENT"><PortalLayout basePath="/portal/isi-renewal" TABS={ISI_RENEWAL_TABS} tabComponents={ISI_RENEWAL_TAB_COMPONENTS} /></ProtectedRoute>} />
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

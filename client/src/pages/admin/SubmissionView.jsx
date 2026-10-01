@@ -44,6 +44,15 @@ const SECTIONS_BY_TYPE = {
     { key: 'serviceRequest', label: 'Service Request Form' },
     { key: 'authorization', label: 'Authorization Format' },
   ],
+  ISI_RENEWAL: [
+    { key: 'checklist', label: 'Document Checklist' },
+    { key: 'certificate', label: 'Certificate Details' },
+    { key: 'production', label: 'Production Return Details' },
+    { key: 'advanceFeePaid', label: 'Advance Marking Fee Paid' },
+    { key: 'renewal', label: 'Renewal Details' },
+    { key: 'authentication', label: 'Authentication & Declaration' },
+    { key: 'fee', label: 'Fee Details & Payment' },
+  ],
 };
 
 export default function SubmissionView() {

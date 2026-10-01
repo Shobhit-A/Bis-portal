@@ -1299,4 +1299,152 @@ async function generateExcelWPC(submission) {
   return wb;
 }
 
-module.exports = { generateExcel, generateExcelCRS, generateExcelISI, generateExcelWPC };
+async function generateExcelISIRenewal(submission) {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Absolute Veritas Portal';
+  wb.created = new Date();
+
+  const fd = submission.formData || {};
+  const docs = submission.documents || [];
+  const checklist = fd.checklist || {};
+  const cert = fd.certificate || {};
+  const production = fd.production || {};
+  const advanceFeePaid = fd.advanceFeePaid || {};
+  const renewal = fd.renewal || {};
+  const authentication = fd.authentication || {};
+  const fee = fd.fee || {};
+  const contact = fee.contact || {};
+
+  const clientInfo = `Client: ${submission.user?.username || '—'}   |   Status: ${submission.status}   |   Last Updated: ${new Date(submission.updatedAt).toLocaleDateString('en-IN')}`;
+
+  const numOf = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  const a = numOf(renewal.actualMarkingFee);
+  const b = numOf(renewal.remainingDues);
+  const c = numOf(renewal.advanceMinMarkingFee);
+  const e = numOf(renewal.advanceFeePaidAmount);
+
+  const NC = 9;
+  const ws = wb.addWorksheet('ISI Renewal Application');
+  ws.columns = [{ width: 30 }, { width: 18 }, { width: 16 }, { width: 16 }, { width: 18 }, { width: 16 }, { width: 18 }, { width: 18 }, { width: 16 }];
+  let r = 1;
+  spacer(ws, r++, NC, 8);
+  titleRow(ws, r++, NC, 'ISI LICENSE RENEWAL APPLICATION');
+  noteRow(ws, r++, NC, '* Mandatory Fields');
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Document Checklist');
+  spacer(ws, r++, NC, 4);
+  lv2(ws, r++, "1. Authentication by Chartered Accountant / Affidavit-Undertaking", checklist['1'] || '', '', '', 28);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Certificate Details');
+  spacer(ws, r++, NC, 4);
+  lv2(ws, r++, 'CM/L Number *', cert.cmlNumber || '', 'Firm Name *', cert.firmName || '');
+  lv2(ws, r++, 'Product *', cert.product || '', 'Brand', cert.brand || '');
+  lv2(ws, r++, 'IS No *', cert.isNumber || '', 'Validity *', cert.validity || '');
+  lv1(ws, r++, 'Status', cert.status || '');
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Production Return Details');
+  spacer(ws, r++, NC, 4);
+  lv2(ws, r++, 'Advance Marking Fee Period — From', production.advanceFeePeriodFrom || '', 'To', production.advanceFeePeriodTo || '');
+  spacer(ws, r++, NC, 4);
+  const productionRows = (production.rows || []).map(row => ({
+    brandName: row.brandName || '', fromDate: row.fromDate || '', toDate: row.toDate || '',
+    productionQuantity: row.productionQuantity || '', productionValue: row.productionValue || '',
+    productionMarked: row.productionMarked || '', productionMarkedPct: row.productionMarkedPct || '',
+    productionValueByCA: row.productionValueByCA || '', markingFee: row.markingFee || '',
+  }));
+  r = drawTable(ws, r, [
+    { col: 1, label: 'Brand Name', key: 'brandName' },
+    { col: 2, label: 'From Date', key: 'fromDate' },
+    { col: 3, label: 'To Date', key: 'toDate' },
+    { col: 4, label: 'Production Quantity', key: 'productionQuantity' },
+    { col: 5, label: 'Production Value', key: 'productionValue' },
+    { col: 6, label: 'Production Marked', key: 'productionMarked' },
+    { col: 7, label: 'Production Marked %', key: 'productionMarkedPct' },
+    { col: 8, label: 'Production Value By CA', key: 'productionValueByCA' },
+    { col: 9, label: 'Marking Fee', key: 'markingFee' },
+  ], productionRows, NC);
+  spacer(ws, r++, NC, 6);
+
+  secHeader2(ws, r++, NC, 'Unit of Production');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, 'Total production of the article(s) licensed for certification marking *', production.totalProductionLicensed, NC);
+  lv1(ws, r++, 'Total production of the article(s) Confirming to Indian Standard *', production.totalProductionConforming, NC);
+  lv1(ws, r++, 'Production covered with BIS Certification Mark — Quantity *', production.coveredQuantity, NC);
+  lv1(ws, r++, 'Production covered with BIS Certification Mark — Value Rs. *', production.coveredValue, NC);
+  lv1(ws, r++, 'Quantity not covered with BIS Certification Mark', production.notCoveredQuantity, NC);
+  lv1(ws, r++, 'Brief information regarding difficulties, if any *', production.difficulties, NC, 32);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Details of the Advance Marking Fee Paid During the Period');
+  spacer(ws, r++, NC, 4);
+  const feePaidRows = (advanceFeePaid.rows || []).map(row => ({
+    transactionNumber: row.transactionNumber || '', receipt: row.receipt || '', transactionDate: row.transactionDate || '',
+    duration: row.duration || '', feeType: row.feeType || '', amount: row.amount || '', amountInDefault: row.amountInDefault || '',
+  }));
+  r = drawTable(ws, r, [
+    { col: 1, label: 'Transaction Number', key: 'transactionNumber' },
+    { col: 2, label: 'Receipt', key: 'receipt' },
+    { col: 3, label: 'Transaction Date', key: 'transactionDate' },
+    { col: 4, label: 'Duration', key: 'duration' },
+    { col: 5, label: 'Fee Type', key: 'feeType' },
+    { col: 6, label: 'Amount', key: 'amount' },
+    { col: 7, label: 'Amount in Default', key: 'amountInDefault' },
+  ], feePaidRows, 7);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Renewal Details');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, 'Select Renewal Period * (up to 5 years)', renewal.renewalPeriod || '', NC);
+  lv1(ws, r++, '(A) Actual Marking Fee of the previous period *', renewal.actualMarkingFee, NC);
+  lv1(ws, r++, '(B) Remaining Dues *', renewal.remainingDues, NC);
+  lv1(ws, r++, '(C) Advance Minimum Marking Fee for the next period *', renewal.advanceMinMarkingFee, NC);
+  lv1(ws, r++, '(D) Marking Fee applicable (A + B)', a + b, NC);
+  spacer(ws, r++, NC, 6);
+
+  secHeader2(ws, r++, NC, 'Calculation of Applicable Marking Fees');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, '(E) Advance Marking Fee paid', renewal.advanceFeePaidAmount, NC);
+  lv1(ws, r++, 'Total Marking Fee payable (A + B + C - E)', a + b + c - e, NC);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Disclaimer');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, 'Authentication by CA or Affidavit/Undertaking *', getDoc(docs, 'authentication_ca_affidavit'), NC);
+  spacer(ws, r++, NC, 6);
+
+  secHeader2(ws, r++, NC, 'Declaration & Notice');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, 'I Agree', authentication.agreed ? 'Yes' : 'No', NC);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Application Fee and Contact BIS');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, 'Address', contact.address, NC);
+  lv2(ws, r++, 'Branch Contact No', contact.phone || '', 'E-mail', contact.email || '');
+  spacer(ws, r++, NC, 6);
+
+  secHeader2(ws, r++, NC, 'Fee Details');
+  spacer(ws, r++, NC, 4);
+  infoRow(ws, r++, NC, 'Gazette Notification for Fee Concessions: https://www.manakonline.in/MANAK/static/userManual/PC/Concessions_Minimum_Marking_Fee.pdf');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, '1. Actual Marking Fee of the previous period', fee.actualMarkingFee, NC);
+  lv1(ws, r++, '2. Annual Licence Fee', fee.annualLicenceFee, NC);
+  lv1(ws, r++, '3. Renewal Application Fee', fee.renewalApplicationFee, NC);
+  lv1(ws, r++, '4. Advance Minimum Marking Fee for the next period', fee.advanceMinMarkingFee, NC);
+  lv1(ws, r++, '5. Advance Marking Fee paid (Subtraction)', fee.advanceFeePaid, NC);
+  lv1(ws, r++, '6. Remaining Dues', fee.remainingDues, NC);
+  lv1(ws, r++, '7. CGST (9.0%)', fee.cgst, NC);
+  lv1(ws, r++, '8. SGST (9.0%)', fee.sgst, NC);
+  lv1(ws, r++, '9. Total Fee', fee.totalFee, NC);
+  lv1(ws, r++, 'Payment Mode *', fee.paymentMode === 'corporate' ? 'Corporate Netbanking' : fee.paymentMode === 'individual' ? 'Individual / Retail Banking' : '', NC);
+
+  spacer(ws, r++, NC, 5);
+  mergeSet(ws, r, 1, r, NC, clientInfo, { fg: 'FF555555', bg: 'FFEEF2F7', size: 8, align: 'center' });
+
+  return wb;
+}
+
+module.exports = { generateExcel, generateExcelCRS, generateExcelISI, generateExcelWPC, generateExcelISIRenewal };

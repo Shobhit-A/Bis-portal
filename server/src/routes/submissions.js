@@ -13,9 +13,9 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: (parseInt(process.env.MAX_FILE_SIZE_MB) || 5) * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new Error('Only PDF, JPG, PNG, or Excel files are allowed'));
+    else cb(new Error('Only PDF, JPG, PNG, Word, or Excel files are allowed'));
   }
 });
 
