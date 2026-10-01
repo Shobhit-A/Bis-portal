@@ -1,4 +1,5 @@
 import { Field } from '../../../components/FormField';
+import { FileText } from 'lucide-react';
 
 const FEE_ROWS = [
   { key: 'actualMarkingFee', label: 'Actual Marking Fee of the previous period' },
@@ -52,8 +53,9 @@ export default function FeeDetails({ formData, updateSection, isSubmitted, onSub
         <div className="section-header">Fee Details</div>
         <div className="p-6 space-y-4">
           <a href="https://www.manakonline.in/MANAK/static/userManual/PC/Concessions_Minimum_Marking_Fee.pdf"
-            target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
-            Gazette Notification for Fee Concessions ↗
+            target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm font-semibold text-primary hover:bg-blue-100 hover:underline transition-colors w-fit">
+            <FileText size={16} /> Gazette Notification for Fee Concessions ↗
           </a>
           <div className="overflow-x-auto">
             <table className="w-full text-xs border border-border rounded">
