@@ -1340,6 +1340,9 @@ async function generateExcelISIRenewal(submission) {
   secHeader(ws, r++, NC, 'Document Checklist');
   spacer(ws, r++, NC, 4);
   lv2(ws, r++, "1. Authentication by Chartered Accountant / Affidavit-Undertaking", checklist['1'] || '', '', '', 28);
+  lv2(ws, r++, '2. Section A Change Documents (Self Compliance Report)', checklist['2'] || '', '', '', 28);
+  lv2(ws, r++, '3. Hygienic Conditions Checklist (Self Compliance Report)', checklist['3'] || '', '', '', 28);
+  lv2(ws, r++, '4. Subcontracted Lab Test Reports (Self Compliance Report)', checklist['4'] || '', '', '', 28);
   spacer(ws, r++, NC, 6);
 
   secHeader(ws, r++, NC, 'Certificate Details');

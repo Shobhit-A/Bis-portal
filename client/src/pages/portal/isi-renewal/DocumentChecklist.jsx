@@ -2,6 +2,9 @@ import { Field, FileUpload } from '../../../components/FormField';
 
 const DOCUMENTS = [
   { no: 1, doc: "Authentication by Chartered Accountant / Affidavit-Undertaking by the manufacturer", requirement: 'Mandatory' },
+  { no: 2, doc: 'Section A Change Documents (Self Compliance Report) — if there is any change to organization, contact, or brand details', requirement: 'Optional' },
+  { no: 3, doc: 'Hygienic Conditions Checklist (Self Compliance Report) — if hygienic conditions apply to your product', requirement: 'Optional' },
+  { no: 4, doc: 'Subcontracted Lab Test Reports (Self Compliance Report) — if the Scheme of Inspection and Testing has changed', requirement: 'Optional' },
 ];
 
 export default function DocumentChecklist({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted }) {
