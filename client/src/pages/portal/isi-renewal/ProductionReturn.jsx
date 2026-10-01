@@ -18,7 +18,7 @@ ProductionReturn.isComplete = (formData) => {
   const missing = [];
   if (!d.totalProductionLicensed) missing.push('Total production of the article(s) licensed for certification marking');
   if (!d.totalProductionConforming) missing.push('Total production of the article(s) Confirming to Indian Standard');
-  if (!d.coveredQuantity) missing.push('Production covered with BIS Certification Mark — Quantity');
+  if (!d.coveredQuantity) missing.push('Production covered with BIS Certification Mark — Quantity (In the terms of Unit Defined)');
   if (!d.coveredValue) missing.push('Production covered with BIS Certification Mark — Value Rs.');
   if (!d.difficulties) missing.push('Brief information regarding difficulties, if any');
   return missing;
@@ -53,18 +53,21 @@ export default function ProductionReturn({ formData, updateSection, isSubmitted 
           <Field label="Total production of the article(s) Confirming to Indian Standard" required>
             <input {...d('totalProductionConforming')} />
           </Field>
-          <div className="form-row">
-            <Field label="Production covered with BIS Certification Mark — Quantity (in the terms of Unit Defined)" required>
-              <input {...d('coveredQuantity')} />
-            </Field>
-            <Field label="Production covered with BIS Certification Mark — Value Rs." required>
-              <input {...d('coveredValue')} />
-            </Field>
+          <div>
+            <div className="text-sm font-medium text-gray-900 mb-2">Production covered with BIS Certification Mark and its approximate value</div>
+            <div className="form-row">
+              <Field label="Quantity (In the terms of Unit Defined)" required>
+                <input {...d('coveredQuantity')} />
+              </Field>
+              <Field label="Value Rs." required>
+                <input {...d('coveredValue')} />
+              </Field>
+            </div>
           </div>
-          <Field label="Quantity not covered with BIS Certification Mark (in the terms of Unit Defined)">
+          <Field label="Quantity not covered with BIS Certification Mark (In the terms of Unit Defined)">
             <input {...d('notCoveredQuantity')} />
           </Field>
-          <Field label="Brief information regarding difficulties, if any, experienced in operating of BIS Licence" required>
+          <Field label="Brief information regarding difficulties if any, experienced in operating of BIS Licence" required>
             <textarea className="input" rows={3} value={data.difficulties || ''} onChange={e => set('difficulties', e.target.value)} disabled={isSubmitted} />
           </Field>
         </div>

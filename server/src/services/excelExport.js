@@ -1372,10 +1372,11 @@ async function generateExcelISIRenewal(submission) {
   spacer(ws, r++, NC, 4);
   lv1(ws, r++, 'Total production of the article(s) licensed for certification marking *', production.totalProductionLicensed, NC);
   lv1(ws, r++, 'Total production of the article(s) Confirming to Indian Standard *', production.totalProductionConforming, NC);
-  lv1(ws, r++, 'Production covered with BIS Certification Mark — Quantity *', production.coveredQuantity, NC);
-  lv1(ws, r++, 'Production covered with BIS Certification Mark — Value Rs. *', production.coveredValue, NC);
-  lv1(ws, r++, 'Quantity not covered with BIS Certification Mark', production.notCoveredQuantity, NC);
-  lv1(ws, r++, 'Brief information regarding difficulties, if any *', production.difficulties, NC, 32);
+  subLabel(ws, r++, NC, 'Production covered with BIS Certification Mark and its approximate value');
+  lv1(ws, r++, 'Quantity (In the terms of Unit Defined) *', production.coveredQuantity, NC);
+  lv1(ws, r++, 'Value Rs. *', production.coveredValue, NC);
+  lv1(ws, r++, 'Quantity not covered with BIS Certification Mark (In the terms of Unit Defined)', production.notCoveredQuantity, NC);
+  lv1(ws, r++, 'Brief information regarding difficulties if any, experienced in operating of BIS Licence *', production.difficulties, NC, 32);
   spacer(ws, r++, NC, 6);
 
   secHeader(ws, r++, NC, 'Details of the Advance Marking Fee Paid During the Period');
