@@ -209,6 +209,22 @@ export default function SubmissionView() {
                   {Object.entries(activeData).map(([key, value]) => {
                     const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                     const isObjectArray = Array.isArray(value) && value.length > 0 && typeof value[0] === 'object' && value[0] !== null;
+                    const isPlainObject = !Array.isArray(value) && typeof value === 'object' && value !== null;
+                    if (isPlainObject) {
+                      return (
+                        <div key={key} className="py-2 border-b border-gray-100 last:border-0">
+                          <div className="text-sm font-medium text-gray-600 mb-2">{label}</div>
+                          <div className="pl-4 space-y-1">
+                            {Object.entries(value).map(([subKey, subValue]) => (
+                              <div key={subKey} className="grid grid-cols-2 gap-4">
+                                <div className="text-xs text-gray-500">{subKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                                <div className="text-sm text-gray-900">{String(subValue || '—')}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    }
                     if (isObjectArray) {
                       const cols = Object.keys(value[0]);
                       return (
