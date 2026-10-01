@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
-import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck, Radio, ExternalLink } from 'lucide-react';
+import { LogOut, FileCheck2, ShieldCheck, ClipboardCheck, Radio, RefreshCw, ExternalLink } from 'lucide-react';
 
 const FORM_CARDS = [
   { key: 'FMCS', path: '/portal/fmcs', icon: FileCheck2, title: 'FMCS', desc: 'Foreign Manufacturers Certification Scheme application.', manualUrl: 'https://www.bis.gov.in/wp-content/uploads/2026/05/FMCS-Application-SubmissionUM-1-1.pdf' },
   { key: 'ISI', path: '/portal/isi', icon: ShieldCheck, title: 'ISI — BIS Standard Mark', desc: 'Indian Standards Institute (ISI) certification mark application.', manualUrl: 'https://www.bis.gov.in/product-certification/product-specific-information-2/?lang=en' },
   { key: 'CRS', path: '/portal/crs', icon: ClipboardCheck, title: 'CRS', desc: 'Compulsory Registration Scheme application.', manualUrl: 'https://www.crsbis.in/BIS/' },
   { key: 'WPC', path: '/portal/wpc', icon: Radio, title: 'WPC', desc: 'Wireless Planning & Coordination equipment approval application.', manualUrl: 'https://eservices.dot.gov.in/sites/default/files/user-mannual/ETA%20Self%20Declaration%20Applicant%20%20Manual.pdf' },
+  { key: 'ISI_RENEWAL', path: '/portal/isi-renewal', icon: RefreshCw, title: 'ISI License Renewal', desc: 'Renewal application for an existing ISI (BIS Standard Mark) license.', manualUrl: 'https://www.bis.gov.in/wp-content/uploads/2021/11/How-To-Apply-for-Renewal-auto-renewal-1.pdf' },
 ];
 
 export default function FormTypeSelect() {
@@ -30,7 +31,7 @@ export default function FormTypeSelect() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-16">
+      <div className="max-w-6xl mx-auto px-6 py-16">
         <h1 className="text-lg font-semibold text-gray-900 mb-1 text-center">Choose Application Type</h1>
         <p className="text-sm text-gray-500 mb-10 text-center">Select the certification scheme you'd like to apply for.</p>
         {cards.length === 0 ? (
@@ -38,7 +39,7 @@ export default function FormTypeSelect() {
             No forms have been enabled for your account yet. Contact Absolute Veritas to get started.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {cards.map(c => (
               <div key={c.key} role="button" tabIndex={0} onClick={() => navigate(c.path)}
                 onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate(c.path)}

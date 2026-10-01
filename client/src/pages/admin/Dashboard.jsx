@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal } from 'lucide-react';
 import { FORM_TYPES } from '../../lib/constants';
 
+const FORM_TYPE_LABELS = { ISI_RENEWAL: 'ISI Renewal' };
+
 function StatusBadge({ status }) {
   if (status === 'SUBMITTED') return <span className="badge-submitted">Submitted</span>;
   if (status === 'IN_PROGRESS') return <span className="badge-progress">In Progress</span>;
@@ -19,7 +21,7 @@ function FormsBadges({ allowedForms }) {
   return (
     <div className="flex flex-wrap gap-1">
       {allowedForms.map(f => (
-        <span key={f} className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">{f}</span>
+        <span key={f} className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">{FORM_TYPE_LABELS[f] || f}</span>
       ))}
     </div>
   );
@@ -57,7 +59,7 @@ function ManageFormsModal({ user, onClose, onSaved }) {
           {FORM_TYPES.map(f => (
             <label key={f} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
               <input type="checkbox" checked={selected.includes(f)} onChange={() => toggle(f)} />
-              {f}
+              {FORM_TYPE_LABELS[f] || f}
             </label>
           ))}
           <div className="flex gap-3 pt-2">
@@ -382,9 +384,10 @@ export default function AdminDashboard() {
                         row.formType === 'ISI' ? 'bg-purple-100 text-purple-700' :
                         row.formType === 'CRS' ? 'bg-amber-100 text-amber-700' :
                         row.formType === 'WPC' ? 'bg-teal-100 text-teal-700' :
+                        row.formType === 'ISI_RENEWAL' ? 'bg-rose-100 text-rose-700' :
                         'bg-blue-100 text-blue-700'
                       }`}>
-                        {row.formType}
+                        {FORM_TYPE_LABELS[row.formType] || row.formType}
                       </span>
                     )}
                     {row.isFirstRowForUser && <div className="mt-1"><FormsBadges allowedForms={row.allowedForms} /></div>}
