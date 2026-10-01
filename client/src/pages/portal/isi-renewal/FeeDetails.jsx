@@ -72,7 +72,7 @@ export default function FeeDetails({ formData, updateSection, isSubmitted, onSub
                     <td className="px-2 py-1.5">{idx + 1}</td>
                     <td className="px-2 py-1.5">{row.label}</td>
                     <td className="px-2 py-1.5">
-                      <input type="number" className="text-xs border border-border rounded px-1.5 py-1 w-28"
+                      <input type="number" min="0" className="text-xs border border-border rounded px-1.5 py-1 w-28"
                         value={data[row.key] || ''} onChange={e => set(row.key, e.target.value)} disabled={isSubmitted} />
                     </td>
                   </tr>

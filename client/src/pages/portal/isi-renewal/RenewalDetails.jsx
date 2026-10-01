@@ -38,13 +38,13 @@ export default function RenewalDetails({ formData, updateSection, isSubmitted })
             <Select value={data.renewalPeriod || ''} onChange={v => set('renewalPeriod', v)} options={PERIOD_OPTIONS} placeholder="Select period" />
           </Field>
           <Field label="(A) Actual Marking Fee of the previous period" required>
-            <input type="number" {...d('actualMarkingFee')} />
+            <input type="number" min="0" {...d('actualMarkingFee')} />
           </Field>
           <Field label="(B) Remaining Dues" required>
-            <input type="number" {...d('remainingDues')} />
+            <input type="number" min="0" {...d('remainingDues')} />
           </Field>
           <Field label="(C) Advance Minimum Marking Fee for the next period" required>
-            <input type="number" {...d('advanceMinMarkingFee')} />
+            <input type="number" min="0" {...d('advanceMinMarkingFee')} />
           </Field>
           <Field label="(D) Marking Fee applicable (A + B)">
             <input className="input bg-gray-50" value={applicable} disabled readOnly />
@@ -56,7 +56,7 @@ export default function RenewalDetails({ formData, updateSection, isSubmitted })
         <div className="section-header">Calculation of Applicable Marking Fees</div>
         <div className="p-6 space-y-4">
           <Field label="(E) Advance Marking Fee paid">
-            <input type="number" {...d('advanceFeePaidAmount')} />
+            <input type="number" min="0" {...d('advanceFeePaidAmount')} />
           </Field>
           <Field label="Total Marking Fee payable (A + B + C - E)">
             <input className="input bg-gray-50" value={totalPayable} disabled readOnly />
