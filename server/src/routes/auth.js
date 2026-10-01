@@ -65,6 +65,7 @@ router.post('/register', loginLimiter, [
       isi: linkFor(['ISI']),
       crs: linkFor(['CRS']),
       wpc: linkFor(['WPC']),
+      isiRenewal: linkFor(['ISI_RENEWAL']),
     };
     sendRegistrationAlert({ username: user.username, email: user.email, approveLinks }); // fire-and-forget, don't make the client wait on Brevo
 
