@@ -12,15 +12,12 @@
 
 @layer base {
   body { @apply bg-surface text-gray-900 font-sans antialiased; }
-  * { @apply box-border; }
-}
-
-@layer utilities {
-  .scrollbar-hide {
+  * {
+    @apply box-border;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  .scrollbar-hide::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     display: none;
   }
 }

@@ -149,7 +149,7 @@ export default function PortalLayout({ basePath, TABS, tabComponents }) {
             </div>
           </nav>
 
-          <div className="bg-white border-b border-border px-6 py-3 overflow-x-auto scrollbar-hide">
+          <div className="bg-white border-b border-border px-6 py-3 overflow-x-auto">
             <div className="flex gap-1 min-w-max">
               {TABS.map((tab, idx) => (
                 <button key={tab.key}
