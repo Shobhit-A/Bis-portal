@@ -1,4 +1,5 @@
 import { Field, FileUpload } from '../../../components/FormField';
+import { Download } from 'lucide-react';
 
 const DECLARATION_TEXT = "If any additional amount is found to be payable by the undersigned due to change in unit rates or revision of Minimum Marking Fee during the validity period of license, I hereby undertake to deposit the required amount as conveyed by the Bureau, within seven days of receipt of communication by the Bureau. In case of failure to deposit the required amount within the stipulated time-frame, the license shall be liable to be suspended unless the Bureau has extended the deadline for submission of the dues.";
 
@@ -19,11 +20,15 @@ export default function Authentication({ formData, updateSection, getDocForField
       <div className="card">
         <div className="section-header">Disclaimer</div>
         <div className="p-6 space-y-4">
+          <a href="/templates/CA_Certificate_Format.docx" download
+            className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline">
+            <Download size={13} /> Download CA Certificate Format (Template)
+          </a>
           <Field label="Authentication by Chartered Accountant or by the manufacturer by giving an affidavit / undertaking" required>
             <FileUpload fieldKey="authentication_ca_affidavit" fieldLabel="CA Authentication / Affidavit-Undertaking"
               existingDoc={getDocForField('authentication_ca_affidavit')} onUploaded={onDocUploaded} onRemoved={onDocRemoved} />
           </Field>
-          <p className="text-xs text-gray-500">Monthly production details uploaded must be on the CA's letterhead in the Renewal application.</p>
+          <p className="text-xs text-gray-500">Monthly production details uploaded must be on the CA's letterhead in the Renewal application. Use the template above if your CA needs the exact format.</p>
         </div>
       </div>
 
