@@ -1312,6 +1312,7 @@ async function generateExcelISIRenewal(submission) {
   const advanceFeePaid = fd.advanceFeePaid || {};
   const renewal = fd.renewal || {};
   const authentication = fd.authentication || {};
+  const selfCompliance = fd.selfCompliance || {};
   const fee = fd.fee || {};
   const contact = fee.contact || {};
 
@@ -1419,6 +1420,49 @@ async function generateExcelISIRenewal(submission) {
   secHeader2(ws, r++, NC, 'Declaration & Notice');
   spacer(ws, r++, NC, 4);
   lv1(ws, r++, 'I Agree', authentication.agreed ? 'Yes' : 'No', NC);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Self Compliance Report — Section A: Changes in Organization Profile');
+  spacer(ws, r++, NC, 4);
+  lv2(ws, r++, 'Organization Details *', selfCompliance.orgChange === 'yes' ? 'Yes' : selfCompliance.orgChange === 'no' ? 'No' : '', 'Contact Details *', selfCompliance.contactChange === 'yes' ? 'Yes' : selfCompliance.contactChange === 'no' ? 'No' : '');
+  lv1(ws, r++, 'Brand Detail *', selfCompliance.brandChange === 'yes' ? 'Yes' : selfCompliance.brandChange === 'no' ? 'No' : '', NC);
+  lv1(ws, r++, 'Section A Change Documents', getDoc(docs, 'selfCompliance_sectionA_docs'), NC);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Section B: Manpower, Manufacturing and Testing Infrastructure');
+  spacer(ws, r++, NC, 4);
+  [
+    ['managementChange', 'Management Details *'], ['technicalPersonnelChange', 'Technical Personnel Details *'],
+    ['manufacturingMachineryChange', 'Manufacturing Machinery Details *'], ['manufacturingProcessChange', 'Manufacturing Process Details *'],
+    ['factoryLayoutChange', 'Factory Layout Plan *'], ['testEquipmentChange', 'Test Equipment Details *'],
+    ['labelChange', 'Form Of Label *'], ['weeklyOffChange', 'Update Weekly Off *'],
+    ['installedCapacityChange', 'Change in Installed Capacity *'],
+  ].forEach(([key, label]) => {
+    const v = selfCompliance[key];
+    lv1(ws, r++, label, v === 'yes' ? 'Yes' : v === 'no' ? 'No' : '', NC);
+  });
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Section C: Compliance Information');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, '1. Standard Implementation', selfCompliance.standardImplementation === 'implemented' ? 'Implemented current version' : selfCompliance.standardImplementation === 'inProcess' ? 'In process of implementation' : '', NC);
+  lv1(ws, r++, '2. Completed action & reported compliance on BIS instructions', selfCompliance.instructionsCompliance ? 'Yes' : 'No', NC);
+  lv1(ws, r++, '3. Hygienic Conditions', selfCompliance.hygienicConditions === 'maintained' ? 'Maintained' : selfCompliance.hygienicConditions === 'notApplicable' ? 'Not Applicable' : '', NC);
+  lv1(ws, r++, 'Hygienic Conditions Checklist', getDoc(docs, 'selfCompliance_hygienic_checklist'), NC);
+  lv1(ws, r++, '4. Change in Raw Material Details *', selfCompliance.rawMaterialChange === 'yes' ? 'Yes' : selfCompliance.rawMaterialChange === 'no' ? 'No' : '', NC);
+  lv1(ws, r++, '5. Change in Scheme of Inspection and Testing *', selfCompliance.sitChange === 'yes' ? 'Yes' : selfCompliance.sitChange === 'no' ? 'No' : '', NC);
+  lv1(ws, r++, 'Subcontracted Lab Test Reports', getDoc(docs, 'selfCompliance_sit_reports'), NC);
+  lv1(ws, r++, '6. Storage/Packing/Marking as per SIT & Indian Standard', selfCompliance.storagePackingCompliance ? 'Yes' : 'No', NC);
+  lv1(ws, r++, '7. Change in Test Equipment Calibration Status *', selfCompliance.testEquipmentCalibrationChange === 'yes' ? 'Yes' : selfCompliance.testEquipmentCalibrationChange === 'no' ? 'No' : '', NC);
+  lv2(ws, r++, '8. Consignee Details Regularly Updated', selfCompliance.consigneeUpdates ? 'Yes' : 'No', 'Last Production Update', selfCompliance.lastProductionUpdateDate || '');
+  lv1(ws, r++, '9. Production Details Regularly Updated', selfCompliance.productionUpdates ? 'Yes' : 'No', NC);
+  lv1(ws, r++, 'Production Details Note', selfCompliance.productionDetailsNote, NC, 28);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, NC, 'Section D: Declaration');
+  spacer(ws, r++, NC, 4);
+  lv1(ws, r++, 'Declaration', `We declare that ${cert.firmName || '[Firm Name]'} have been manufacturing ${cert.product || '[Product]'} on a continual basis in compliance with ${cert.isNumber || '[IS No.]'}. Consignee details are kept updated and the information in this report is true and correct.`, NC, 40);
+  lv1(ws, r++, 'Any other information / declaration', selfCompliance.otherDeclaration, NC, 28);
   spacer(ws, r++, NC, 6);
 
   secHeader(ws, r++, NC, 'Application Fee and Contact BIS');

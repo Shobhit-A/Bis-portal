@@ -51,6 +51,7 @@ const SECTIONS_BY_TYPE = {
     { key: 'advanceFeePaid', label: 'Advance Marking Fee Paid' },
     { key: 'renewal', label: 'Renewal Details' },
     { key: 'authentication', label: 'Authentication & Declaration' },
+    { key: 'selfCompliance', label: 'Self Compliance Report' },
     { key: 'fee', label: 'Fee Details & Payment' },
   ],
 };
