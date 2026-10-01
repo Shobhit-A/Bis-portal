@@ -1313,6 +1313,7 @@ async function generateExcelISIRenewal(submission) {
   const renewal = fd.renewal || {};
   const authentication = fd.authentication || {};
   const selfCompliance = fd.selfCompliance || {};
+  const consignee = fd.consignee || {};
   const fee = fd.fee || {};
   const contact = fee.contact || {};
 
@@ -1326,7 +1327,10 @@ async function generateExcelISIRenewal(submission) {
 
   const NC = 9;
   const ws = wb.addWorksheet('ISI Renewal Application');
-  ws.columns = [{ width: 30 }, { width: 18 }, { width: 16 }, { width: 16 }, { width: 18 }, { width: 16 }, { width: 18 }, { width: 18 }, { width: 16 }];
+  ws.columns = [
+    { width: 30 }, { width: 18 }, { width: 16 }, { width: 16 }, { width: 18 }, { width: 16 }, { width: 18 }, { width: 18 }, { width: 16 },
+    { width: 16 }, { width: 22 }, { width: 12 }, { width: 10 }, { width: 14 }, { width: 14 }, { width: 14 },
+  ];
   let r = 1;
   spacer(ws, r++, NC, 8);
   titleRow(ws, r++, NC, 'ISI LICENSE RENEWAL APPLICATION');
@@ -1463,6 +1467,34 @@ async function generateExcelISIRenewal(submission) {
   spacer(ws, r++, NC, 4);
   lv1(ws, r++, 'Declaration', `We declare that ${cert.firmName || '[Firm Name]'} have been manufacturing ${cert.product || '[Product]'} on a continual basis in compliance with ${cert.isNumber || '[IS No.]'}. Consignee details are kept updated and the information in this report is true and correct.`, NC, 40);
   lv1(ws, r++, 'Any other information / declaration', selfCompliance.otherDeclaration, NC, 28);
+  spacer(ws, r++, NC, 6);
+
+  secHeader(ws, r++, 16, 'Consignee Details');
+  spacer(ws, r++, 16, 4);
+  const consigneeRows = (consignee.rows || []).map(row => ({
+    brandName: row.brandName || '', consigneeName: row.consigneeName || '', address: row.address || '',
+    country: row.country || '', state: row.state || '', district: row.district || '', city: row.city || '', pincode: row.pincode || '',
+    telephone: row.telephone || '', mobile: row.mobile || '', email: row.email || '',
+    quantity: row.quantity || '', year: row.year || '', month: row.month || '', latitude: row.latitude || '', longitude: row.longitude || '',
+  }));
+  r = drawTable(ws, r, [
+    { col: 1, label: 'Brand Name', key: 'brandName' },
+    { col: 2, label: "Consignee's Name", key: 'consigneeName' },
+    { col: 3, label: 'Address', key: 'address' },
+    { col: 4, label: 'Country', key: 'country' },
+    { col: 5, label: 'State', key: 'state' },
+    { col: 6, label: 'District', key: 'district' },
+    { col: 7, label: 'City', key: 'city' },
+    { col: 8, label: 'Pincode', key: 'pincode' },
+    { col: 9, label: 'Telephone', key: 'telephone' },
+    { col: 10, label: 'Mobile', key: 'mobile' },
+    { col: 11, label: 'Email Id', key: 'email' },
+    { col: 12, label: 'Quantity', key: 'quantity' },
+    { col: 13, label: 'Year', key: 'year' },
+    { col: 14, label: 'Month', key: 'month' },
+    { col: 15, label: 'Latitude', key: 'latitude' },
+    { col: 16, label: 'Longitude', key: 'longitude' },
+  ], consigneeRows, 16);
   spacer(ws, r++, NC, 6);
 
   secHeader(ws, r++, NC, 'Application Fee and Contact BIS');
