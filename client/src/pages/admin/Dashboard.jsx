@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal } from 'lucide-react';
+import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal, ExternalLink } from 'lucide-react';
 import { FORM_TYPES } from '../../lib/constants';
 
 const FORM_TYPE_LABELS = { ISI_RENEWAL: 'ISI Renewal' };
@@ -288,6 +288,10 @@ export default function AdminDashboard() {
           <span className="text-gray-900 font-semibold text-sm">Absolute Veritas Form Submission · Admin</span>
         </div>
         <div className="flex items-center gap-4">
+          <a href="https://automation-eight-sigma.vercel.app/" target="_blank" rel="noopener noreferrer"
+            className="text-gray-500 hover:text-primary flex items-center gap-1.5 text-xs">
+            <ExternalLink size={14} /> Client Renewals Tracker
+          </a>
           <span className="text-gray-400 text-xs">{user?.email || user?.username}</span>
           <button onClick={() => { logout(); navigate('/login'); }} className="text-gray-500 hover:text-primary flex items-center gap-1.5 text-xs">
             <LogOut size={14} /> Sign out
