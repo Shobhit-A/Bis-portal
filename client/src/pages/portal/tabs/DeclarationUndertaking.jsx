@@ -1,4 +1,5 @@
 import { Field, Select, FileUpload } from '../../../components/FormField';
+import { ParticleButton } from '../../../components/ParticleButton';
 
 export default function DeclarationUndertaking({ formData, updateSection, getDocForField, onDocUploaded, onDocRemoved, isSubmitted, onSubmit, submitting }) {
   const data = formData.declaration || {};
@@ -98,9 +99,9 @@ export default function DeclarationUndertaking({ formData, updateSection, getDoc
                   I confirm that all information provided is accurate and all required documents have been uploaded.
                 </label>
               </div>
-              <button onClick={onSubmit} disabled={submitting || !data.confirmed} className="btn-primary bg-green-600 hover:bg-green-700 w-full py-3 text-base">
+              <ParticleButton onClick={onSubmit} disabled={submitting || !data.confirmed} className="btn-primary bg-green-600 hover:bg-green-700 w-full py-3 text-base">
                 {submitting ? 'Submitting...' : '✓ Submit Form to Absolute Veritas'}
-              </button>
+              </ParticleButton>
             </div>
           )}
         </div>

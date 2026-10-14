@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SubmissionIdContext } from '../../../components/FormField';
+import { ParticleButton } from '../../../components/ParticleButton';
 
 const MANDATORY_DOCS = ['uploads_ceo_auth', 'uploads_raw_materials', 'uploads_air_ceo_auth', 'uploads_air_id_card', 'uploads_factory_proof'];
 
@@ -157,10 +158,10 @@ export default function Preview({ formData, getDocForField, isSubmitted, onSubmi
 
       {!isSubmitted && (
         <div className="card p-6">
-          <button onClick={onSubmit} disabled={submitting || !allComplete}
+          <ParticleButton onClick={onSubmit} disabled={submitting || !allComplete}
             className="btn-primary bg-green-600 hover:bg-green-700 w-full py-3 text-base disabled:opacity-50">
             {submitting ? 'Submitting...' : '✓ Submit Application'}
-          </button>
+          </ParticleButton>
           {!allComplete && <p className="text-xs text-gray-400 mt-2 text-center">Complete all sections above before submitting.</p>}
         </div>
       )}

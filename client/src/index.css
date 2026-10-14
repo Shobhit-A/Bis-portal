@@ -36,3 +36,17 @@
   .badge-progress { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800; }
   .badge-notstarted { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600; }
 }
+
+@keyframes particle-burst {
+  0% { transform: rotate(var(--angle)) translateX(0) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--angle)) translateX(32px) scale(0); opacity: 0; }
+}
+.particle-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: white;
+  animation: particle-burst 0.5s ease-out forwards;
+  animation-delay: var(--delay);
+}

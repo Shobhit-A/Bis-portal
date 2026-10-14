@@ -1,4 +1,5 @@
 import { Field, FileUpload } from '../../../components/FormField';
+import { ParticleButton } from '../../../components/ParticleButton';
 
 AuthorizationForm.isComplete = (formData, getDocForField) => {
   const d = formData.authorization || {};
@@ -134,10 +135,10 @@ export default function AuthorizationForm({ formData, updateSection, getDocForFi
                 I confirm that all information provided is accurate and all required documents have been uploaded.
               </label>
             </div>
-            <button onClick={onSubmit} disabled={submitting || !data.confirmed || missing.length > 0}
+            <ParticleButton onClick={onSubmit} disabled={submitting || !data.confirmed || missing.length > 0}
               className="btn-primary bg-green-600 hover:bg-green-700 w-full py-3 text-base">
               {submitting ? 'Submitting...' : '✓ Submit Form to Absolute Veritas'}
-            </button>
+            </ParticleButton>
             {missing.length > 0 && (
               <p className="text-xs text-gray-400 mt-2 text-center">Complete all required fields before submitting.</p>
             )}

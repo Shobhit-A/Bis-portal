@@ -1,4 +1,5 @@
 import { Field } from '../../../components/FormField';
+import { ParticleButton } from '../../../components/ParticleButton';
 import { FileText } from 'lucide-react';
 
 const FEE_ROWS = [
@@ -106,10 +107,10 @@ export default function FeeDetails({ formData, updateSection, isSubmitted, onSub
       {!isSubmitted && (
         <div className="card">
           <div className="p-6">
-            <button onClick={onSubmit} disabled={submitting || missing.length > 0}
+            <ParticleButton onClick={onSubmit} disabled={submitting || missing.length > 0}
               className="btn-primary bg-green-600 hover:bg-green-700 w-full py-3 text-base">
               {submitting ? 'Submitting...' : '✓ Submit Renewal Application'}
-            </button>
+            </ParticleButton>
             {missing.length > 0 && (
               <p className="text-xs text-gray-400 mt-2 text-center">Complete all required fields before submitting.</p>
             )}
