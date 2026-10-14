@@ -315,6 +315,23 @@ export default function AdminDashboard() {
           ))}
         </div>
 
+        {/* Client Renewals Tracker */}
+        <a href="https://automation-eight-sigma.vercel.app/" target="_blank" rel="noopener noreferrer"
+          className="card p-5 mb-8 flex items-center justify-between gap-4 bg-primary text-white hover:bg-primary-dark transition-colors group">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
+              <ExternalLink size={20} />
+            </div>
+            <div>
+              <div className="font-semibold text-sm">Client Renewals Tracker</div>
+              <div className="text-xs text-white/70 mt-0.5">Track certification expiry dates and renewal status for all clients on the separate renewals platform</div>
+            </div>
+          </div>
+          <span className="text-xs font-medium flex items-center gap-1.5 shrink-0 group-hover:gap-2.5 transition-all">
+            Open <ExternalLink size={13} />
+          </span>
+        </a>
+
         {/* Pending Approvals */}
         {pendingUsers.length > 0 && (
           <div className="mb-8">
