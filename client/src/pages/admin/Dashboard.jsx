@@ -3,10 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal, ExternalLink } from 'lucide-react';
+import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal, ExternalLink, RefreshCw } from 'lucide-react';
 import { FORM_TYPES } from '../../lib/constants';
 
 const FORM_TYPE_LABELS = { ISI_RENEWAL: 'ISI Renewal' };
+
+// Other Absolute Veritas platforms admin can jump to in one click. Add more entries
+// here as new platforms come online — the sidebar renders this list automatically.
+const EXTERNAL_PLATFORMS = [
+  { key: 'renewals', label: 'Client Renewals Tracker', url: 'https://automation-eight-sigma.vercel.app/', icon: RefreshCw },
+];
 
 function StatusBadge({ status }) {
   if (status === 'SUBMITTED') return <span className="badge-submitted">Submitted</span>;
@@ -280,24 +286,34 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-surface">
-      {/* Navbar */}
-      <nav className="bg-white border-b border-border shadow-sm px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Absolute Veritas" className="h-9 w-auto object-contain" />
-          <span className="text-gray-900 font-semibold text-sm">Absolute Veritas Form Submission · Admin</span>
+    <div className="min-h-screen bg-surface flex">
+      {/* Sidebar — other Absolute Veritas platforms */}
+      <aside className="w-56 bg-primary shrink-0 flex flex-col py-6 px-3 gap-1">
+        <div className="flex items-center gap-2 px-3 mb-6">
+          <img src="/logo.png" alt="Absolute Veritas" className="h-7 w-auto object-contain brightness-0 invert" />
         </div>
-        <div className="flex items-center gap-4">
-          <a href="https://automation-eight-sigma.vercel.app/" target="_blank" rel="noopener noreferrer"
-            className="text-gray-500 hover:text-primary flex items-center gap-1.5 text-xs">
-            <ExternalLink size={14} /> Client Renewals Tracker
+        <div className="text-[10px] font-semibold text-white/40 uppercase tracking-wide px-3 mb-1">Platforms</div>
+        {EXTERNAL_PLATFORMS.map(p => (
+          <a key={p.key} href={p.url} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <p.icon size={18} className="shrink-0" />
+            <span className="flex-1">{p.label}</span>
+            <ExternalLink size={13} className="opacity-50 shrink-0" />
           </a>
-          <span className="text-gray-400 text-xs">{user?.email || user?.username}</span>
-          <button onClick={() => { logout(); navigate('/login'); }} className="text-gray-500 hover:text-primary flex items-center gap-1.5 text-xs">
-            <LogOut size={14} /> Sign out
-          </button>
-        </div>
-      </nav>
+        ))}
+      </aside>
+
+      <div className="flex-1 min-w-0">
+        {/* Navbar */}
+        <nav className="bg-white border-b border-border shadow-sm px-6 py-3 flex items-center justify-between">
+          <span className="text-gray-900 font-semibold text-sm">Absolute Veritas Form Submission · Admin</span>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-400 text-xs">{user?.email || user?.username}</span>
+            <button onClick={() => { logout(); navigate('/login'); }} className="text-gray-500 hover:text-primary flex items-center gap-1.5 text-xs">
+              <LogOut size={14} /> Sign out
+            </button>
+          </div>
+        </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Stats */}
@@ -315,22 +331,6 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Client Renewals Tracker */}
-        <a href="https://automation-eight-sigma.vercel.app/" target="_blank" rel="noopener noreferrer"
-          className="card p-5 mb-8 flex items-center justify-between gap-4 bg-primary text-white hover:bg-primary-dark transition-colors group">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-              <ExternalLink size={20} />
-            </div>
-            <div>
-              <div className="font-semibold text-sm">Client Renewals Tracker</div>
-              <div className="text-xs text-white/70 mt-0.5">Track certification expiry dates and renewal status for all clients on the separate renewals platform</div>
-            </div>
-          </div>
-          <span className="text-xs font-medium flex items-center gap-1.5 shrink-0 group-hover:gap-2.5 transition-all">
-            Open <ExternalLink size={13} />
-          </span>
-        </a>
 
         {/* Pending Approvals */}
         {pendingUsers.length > 0 && (
@@ -465,6 +465,7 @@ export default function AdminDashboard() {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
 
       {showCreate && <CreateUserModal onClose={() => setShowCreate(false)} onCreated={u => setUsers(prev => [{ ...u, submissions: [] }, ...prev])} />}
