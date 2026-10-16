@@ -287,7 +287,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-surface flex">
+    <div className="min-h-screen bg-white flex">
       {/* Sidebar — other Absolute Veritas platforms */}
       <aside className="w-56 bg-primary shrink-0 flex flex-col py-6 px-3 gap-1">
         <div className="px-3 mb-6">
