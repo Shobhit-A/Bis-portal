@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/AuthContext';
 import api from '../../lib/axios';
 import toast from 'react-hot-toast';
-import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal, ExternalLink, RefreshCw } from 'lucide-react';
+import { Users, FileText, LogOut, Plus, Eye, EyeOff, Download, Trash2, Key, X, Loader2, Check, UserCheck, SlidersHorizontal, ExternalLink, RefreshCw, Mail } from 'lucide-react';
 import { FORM_TYPES } from '../../lib/constants';
 
 const FORM_TYPE_LABELS = { ISI_RENEWAL: 'ISI Renewal' };
@@ -12,6 +12,7 @@ const FORM_TYPE_LABELS = { ISI_RENEWAL: 'ISI Renewal' };
 // here as new platforms come online — the sidebar renders this list automatically.
 const EXTERNAL_PLATFORMS = [
   { key: 'renewals', label: 'Client Renewals Tracker', url: 'https://automation-eight-sigma.vercel.app/', icon: RefreshCw },
+  { key: 'brevo', label: 'Brevo', url: 'https://app.brevo.com', icon: Mail },
 ];
 
 function StatusBadge({ status }) {
