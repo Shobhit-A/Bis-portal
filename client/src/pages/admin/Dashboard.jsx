@@ -290,8 +290,10 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-surface flex">
       {/* Sidebar — other Absolute Veritas platforms */}
       <aside className="w-56 bg-primary shrink-0 flex flex-col py-6 px-3 gap-1">
-        <div className="flex items-center gap-2 px-3 mb-6">
-          <img src="/logo.png" alt="Absolute Veritas" className="h-7 w-auto object-contain brightness-0 invert" />
+        <div className="px-3 mb-6">
+          <div className="bg-white rounded-lg px-2.5 py-2 inline-block">
+            <img src="/logo.png" alt="Absolute Veritas" className="h-6 w-auto object-contain" />
+          </div>
         </div>
         <div className="text-[10px] font-semibold text-white/40 uppercase tracking-wide px-3 mb-1">Platforms</div>
         {EXTERNAL_PLATFORMS.map(p => (
